@@ -1,0 +1,24 @@
+1.0.0
+	use of a compositing manager for real transparency
+	ships now with Autotools
+	Xft is now optional
+	cascading menus
+	minimum number of menu items
+	specify a filler icon for filling up
+	the missing icon (question mark) is now configurable
+	_NET_WM_WINDOW_TYPE is used to automatically ignore toolbar windows
+	specify multiple icon paths
+	give name of menu for wake-up through socket on the command line
+
+0.2.3
+	mask for key masks to ignore (Num_Lock)
+	ignore certain windows explicitly
+	choose if trigger button reacts on press or release
+
+0.2.2
+	icon label in the middle of the pie
+	pie-slice extend to the edge of the screen to observe Fitts' Law
+	have launcher, window list or mixed menus
+
+0.1.7
+	first working version

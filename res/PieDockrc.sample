@@ -1,0 +1,210 @@
+# window size in pixels
+# if you're running weak hardware, try to keep this low
+# usage: size PIXELS
+size 320
+
+# observe Fitts' Law and make each pie-slice extend to the edge of the screen?
+# see http://en.wikipedia.org/wiki/Fitts%27_law
+# usage: fitts (0|1)
+fitts 1
+
+# use compositing manager for true transparency?
+# usage: compositing (0|1)
+compositing 1
+
+# do you want to have an icon title in the middle of the pie?
+# usage: title (0|1)
+title 1
+
+# what font do you want to use?
+# usage: font FAMILY SIZE [COLOR]
+#font Sans 9.0 ffffff
+
+# customize font cartouche
+# usage: cartouche CORNER [ALPHA] [COLOR]
+# CORNER 0..255 - corner radius in pixels
+# ALPHA 0..255 - lower values mean higher transparency, higher values mean
+# higher opacity
+# COLOR - hex code of color
+#cartouche 6 192 000000
+
+# zoom icons on mouse-over?
+# usage: zoom VALUE
+# VALUE can be any float from 0.0 (no zoom) - 1.0 (full zoom)
+#zoom 1.0
+
+# should clicking in the middle of the menu have any effect?
+# usage: centre (Ignore|NearestIcon|Disappear)
+#centre Disappear
+
+# should triggers still work if some mask (like Num_Lock) is enabled?
+# usage: ignore-mask KEY
+ignore-mask Num_Lock
+
+# activation keys and (pointer) buttons
+# usage: trigger [menu NAME] (button[-up]|button-down|key) [MODIFIER] (KEY|BUTTON)
+#
+# If you get "X Error of failed request:  BadAccess", some other program
+# have grabbed that key or button already.
+trigger menu launchers button-down Mod4 3
+trigger button-down Mod4 1
+trigger button Mod4 4
+trigger button Mod4 5
+trigger key Mod4 Tab
+
+# button configuration or what the mouse-buttons do while the menu is open
+# usage: button [BUTTON] [ACTION]
+# available actions are:
+#   Launch       - start the program identified by that icon
+#   ShowNext     - show next window of icon, or launch if not running
+#   ShowPrevious - show previous of icon,    or launch if not running
+#   Hide         - hide next window of icon  (minimize / iconify)
+#   Close        - close next window of icon (might lose data!)
+#   SpinUp       - spin menu up              (rotate)
+#   SpinDown     - spin menu down            (rotate widdershins)
+#   SpinNext     - spin to next icon         (rotate)
+#   SpinPrevious - spin to previous icon     (rotate widdershins)
+#   Disappear    - hide pie menu
+button 1 ShowNext
+button 2 ShowPrevious
+button 3 Launch
+button 4 SpinNext
+button 5 SpinPrevious
+
+# key configuration or what the keys on the keyboard do while the menu is open
+# usage: key KEYSYM ACTION
+# available actions: same as in button configuration
+key Escape Disappear
+key Return ShowNext
+key Up SpinNext
+key Down SpinPrevious
+
+# spin-step: how far we'll spin the menu on SpinUp/SpinDown
+# usage: spin-step [-0.75 ... 0.75]
+# default: 0.5 negative values reverse direction widdershins/deasil
+#spin-step -0.5
+
+# focused and unfocused alpha transparency
+# usage: (focused|unfocused|launchers) VALUE
+# VALUE 0..255 - lower values mean higher transparency, higher values mean
+# higher opacity
+#focused 255
+#unfocused 64
+
+# start radius of appearing animation
+# if you're running weak hardware, you might want to disable this (set to 1.0)
+# usage: start-radius VALUE
+# VALUE can be any float from 0.0 (start form centre) - 1.0 (no start animation)
+#start-radius .9
+
+# should the be a minumum number of icons in a menu?
+# usage: minimum-number VALUE
+# VALUE can be any integer greater than 1
+#minimum-number 6
+
+# active indicator or what should mark an icon as having windows
+# usage: active-indicator FILE [(left|center|right)] [(top|center|bottom)]
+#active-indicator "~/.PieDock/active-indicator.png" right bottom
+
+# what icon should be used for unassociated menu items/windows
+# usage: missing-icon FILE
+#missing-icon "~/.PieDock/missing-icon.png"
+
+# what icon should be used to fill menu up to minimum-number (see above)
+# usage: filler-icon FILE
+#filler-icon "~/.PieDock/filler-icon.png"
+
+# path to PNG files, the files must be named like the application
+# usage: path PATH...
+#path "~/.PieDock/icons" "/usr/share/pixmaps"
+# for KDE users
+path "/usr/share/icons/default.kde4/128x128/apps"
+path "/usr/share/icons/default.kde4/32x32/apps"
+path "/usr/share/icons/hicolor/128x128/apps"
+path "/usr/share/icons/hicolor/32x32/apps"
+# for GNOME users
+path "/usr/share/icons/gnome/256x256/apps"
+path "/usr/share/icons/gnome/32x32/apps"
+# common icon storage
+path "/usr/share/pixmaps"
+
+# you may specify windows to ignore, those windows will never show up in
+# the window list, find the window name with "utils/PieDockUtils -l"
+# usage: ignore-window NAME
+#ignore-window "gnome-panel"
+
+# aliases
+# tweak windows having weird class names to get the right icon
+# usage: alias [(name|class|title)] VALUE APPLICATION
+alias title "* OpenOffice.org Writer" oowriter
+alias title "* OpenOffice.org Calc" oocalc
+alias title "* OpenOffice.org Draw" oodraw
+alias title "* OpenOffice.org Impress" ooimpress
+alias class "Firefox" firefox
+alias class "Thunderbird" thunderbird
+alias class "Chrome" chromium
+alias class "NEdit" nedit
+alias class "Xpdf" xpdf
+alias class "MPlayer" mplayer
+alias class "Gimp" gimp
+alias "aterm" terminal
+alias "xterm" terminal
+alias "xfce4-terminal" terminal
+alias "Konsole" terminal
+alias "Blender" blender
+alias "Blender:Render" blender
+alias "realplay.bin" realplay
+alias "googleearth-bin" googleearth
+
+# menu of sticky icons
+# the asterisk (*) will expand the menu with unassigned windows
+# usage:
+# menu [NAME]
+#   icon APPLICATION [COMMAND]
+#   menu ICONNAME
+#     icon APPLICATION [COMMAND]
+#     ...
+#   end
+#   ...
+#   *
+# end
+menu
+	icon firefox
+	*
+end
+
+menu launchers
+	menu control
+		icon terminal
+		icon thunar
+	end
+	menu www
+		icon firefox
+		icon opera
+		icon chromium
+		icon thunderbird
+		icon evolution
+	end
+	menu dev
+		icon eclipse
+		icon nedit
+	end
+	menu art
+		icon gimp
+		icon inkscape
+		icon blender
+	end
+	menu office
+		icon oowriter
+		icon oocalc
+		icon oodraw
+		icon ooimpress
+		icon oobase
+		icon oomath
+	end
+	icon shutdown "sudo /sbin/shutdown -h now"
+end
+
+# preload icons
+# usage: preload [(menus|all|none)]
+preload menus

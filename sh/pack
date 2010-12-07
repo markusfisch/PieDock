@@ -1,0 +1,47 @@
+#!/bin/bash
+
+NAME=PieDock
+OBJECTS="AUTHORS \
+	COPYING \
+	ChangeLog \
+	Doxyfile \
+	INSTALL \
+	Makefile.am \
+	Makefile.in \
+	NEWS \
+	README \
+	aclocal.m4 \
+	configure \
+	configure.ac \
+	depcomp \
+	install-sh \
+	missing \
+	mkinstalldirs \
+	res \
+	sh \
+	src \
+	utils"
+
+if ! [ -d sh ]; then
+	echo "run this script from the project root"
+	exit
+fi
+
+if ! [ -r src/main.cpp ]; then
+	echo "cannot find src/main.cpp"
+	exit
+fi
+
+VERSION=`grep -oE "[0-9]\.[0-9]\.[0-9]" src/main.cpp`
+
+sh/autogen
+
+if [ -d $NAME-$VERSION ]; then
+	echo "$NAME-$VERSION already exists"
+	exit
+fi
+
+mkdir $NAME-$VERSION
+cp -r $OBJECTS $NAME-$VERSION/
+tar cjvf $NAME-$VERSION.tar.bz2 $NAME-$VERSION
+rm -rf $NAME-$VERSION

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+	echo "usage: `basename $0` (start|stop|status|restart|new|clean)..."
+	exit
+fi
+
+BIN=PieDock
+
+if [ -d src ]; then
+	CMD="src/$BIN -r sh/dbgrc"
+elif [ -d ../sh ]; then
+	CMD="./$BIN -r ../sh/dbgrc"
+else
+	echo "run this script either from inside src or from the project root"
+	exit
+fi
+
+function each()
+{
+	[ -z "$1" ] && return
+
+	ps ax | grep "$CMD" | grep -v grep | while read PID REST
+	do
+		$1 $PID
+	done
+}
+
+function stop()
+{
+	each "kill"
+}
+
+function start()
+{
+	$CMD
+}
+
+for ARG in $@
+do
+	case $ARG in
+		star*)
+			start
+			;;
+		sto*)
+			stop
+			;;
+		stat*)
+			each "echo"
+			;;
+		res*)
+			stop
+			start
+			;;
+		c*)
+			make clean
+			;;
+		new|a*)
+			stop
+			[ $ARG == "anew" ] && make clean
+			make || exit
+			start
+			;;
+		*)
+			echo "unknown argument \"$ARG\""
+			exit
+			;;
+	esac
+done

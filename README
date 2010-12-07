@@ -1,0 +1,14 @@
+For copyright information see COPYING
+
+Compile and install:
+
+  $ ./configure
+  $ make
+
+  and then as root
+
+  # make install
+
+Configuration options:
+
+  Use ./configure --help to see the full list of options

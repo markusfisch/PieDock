@@ -1,0 +1,118 @@
+size 320
+fitts 1
+
+title 1
+#font Impact 10.0
+#font Sans 9.0
+#font "6x10" 9.0
+#cartouche 4
+
+ignore-mask Num_Lock
+
+compositing 1
+
+#trigger button 8
+#trigger button Mod4 1
+#trigger button Mod4 4
+#trigger button Mod4 5
+#trigger key Mod4 Tab
+trigger button-down Mod4 2
+trigger key Mod4 Y
+trigger menu launchers button Mod1 2
+
+button 1 ShowNext
+button 2 ShowPrevious
+button 3 Launch
+button 4 SpinNext
+button 5 SpinPrevious
+
+key Escape Disappear
+key Return ShowNext
+key Up SpinNext
+key Down SpinPrevious
+
+#minimum-number 8
+
+active-indicator "~/.PieDock/active-indicators/gnome-emblem-new.png" right bottom
+missing-icon "~/.PieDock/applications/generic/PixelPressIcons/TheJollyRoger.png"
+#filler-icon "~/.PieDock/applications/generic/PixelPressIcons/DoNotDisturb.png"
+
+path "~/.PieDock/applications" "~/.PieDock/actions" "/usr/share/pixmaps"
+
+alias title "* OpenOffice.org Writer" ooo-writer
+alias title "* OpenOffice.org Calc" ooo-calc
+alias title "* OpenOffice.org Draw" ooo-draw
+alias title "* OpenOffice.org Impress" ooo-impress
+alias title "* OpenOffice.org Base" ooo-base
+alias title "* OpenOffice.org Math" ooo-math
+alias class "Firefox" firefox
+alias class "NEdit" nedit
+alias class "Xpdf" xpdf
+alias class "MPlayer" mplayer
+alias "aterm" terminal
+alias "xterm" terminal
+alias "xfce4-terminal" terminal
+alias "chromium" chrome
+alias "googleearth-bin" googleearth
+alias "Blender:Render" blender
+
+menu
+	icon aterm
+	icon nedit
+	icon opera
+	icon chromium
+	icon firefox
+	icon blender "blender -W"
+	icon inkscape
+	icon gimp
+	icon googleearth
+	icon skype
+	menu ooffice
+		icon ooo-writer "oowriter"
+		icon ooo-calc "oocalc"
+		icon ooo-draw "oodraw"
+		icon ooo-impress "ooimpress"
+		icon ooo-base "oobase"
+		icon ooo-math "oomath"
+	end
+	icon window-control ":window-control"
+	*
+end
+
+menu window-control
+	icon close "PieDockUtils -c $WID"
+	icon iconify "PieDockUtils -i $WID"
+	icon fullscreen "PieDockUtils -f $WID"
+	icon lower "PieDockUtils -o $WID"
+	icon stick "PieDockUtils -s $WID"
+	icon shade "PieDockUtils -d $WID"
+end
+
+menu launchers
+	icon aterm
+	icon nedit
+	menu net
+		icon opera
+		icon firefox
+		icon chromium
+		icon skype
+		icon googleearth
+	end
+	menu app
+		icon blender
+		icon gimp
+		icon inkscape
+		menu ooffice
+			icon ooo-writer "oowriter"
+			icon ooo-calc "oocalc"
+			icon ooo-draw "oodraw"
+			icon ooo-impress "ooimpress"
+			icon ooo-base "oobase"
+			icon ooo-math "oomath"
+		end
+	end
+	icon hibernate "glxinfo > /dev/null && sudo /usr/sbin/hibernate"
+	#icon shutdown "pkill X && sudo /sbin/shutdown -h now"
+end
+
+preload menus
