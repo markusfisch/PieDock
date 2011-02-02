@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -454,9 +454,13 @@ void PieMenu::setTwistForSelection()
 
 	for( MenuItems::iterator i = menuItems->begin();
 		i != menuItems->end();
-		i++, n++ )
+		++i, ++n )
 		if( *i == selected )
 		{
+			if( menuItems->oneIconPerWindow() &&
+				++n >= menuItems->size() )
+				break;
+
 			if( n )
 				twist -= f*static_cast<double>( n );
 

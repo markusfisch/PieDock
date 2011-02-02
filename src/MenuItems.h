@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -16,7 +16,7 @@
 
 #include "MenuItem.h"
 
-#include <vector>
+#include <list>
 
 namespace PieDock
 {
@@ -25,17 +25,21 @@ namespace PieDock
 	 *
 	 * @author Markus Fisch <mf@markusfisch.de>
 	 */
-	class MenuItems : public std::vector<MenuItem *>
+	class MenuItems : public std::list<MenuItem *>
 	{
 		public:
-			MenuItems() : windows( false ) {}
+			MenuItems() : windows( false ), one( false ) {}
 			virtual ~MenuItems() {}
 			inline const bool &includeWindows() const {
 				return windows; }
 			inline void setIncludeWindows( bool w ) { windows = w; }
+			inline const bool &oneIconPerWindow() const {
+				return one; }
+			inline void setOneIconPerWindow( bool o ) { one = o; }
 
 		private:
 			bool windows;
+			bool one;
 	};
 }
 

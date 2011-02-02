@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -84,9 +84,9 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.0.0" <<
+								binary << " 1.1.0" <<
 								std::endl <<
-								"Copyright (c) 2007-2010" <<
+								"Copyright (c) 2007-2011" <<
 								std::endl <<
 								"Markus Fisch <mf@markusfisch.de>" <<
 								std::endl <<

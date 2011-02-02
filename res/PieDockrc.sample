@@ -50,7 +50,7 @@ trigger menu launchers button-down Mod4 3
 trigger button-down Mod4 1
 trigger button Mod4 4
 trigger button Mod4 5
-trigger key Mod4 Tab
+trigger menu open-windows key Mod4 Tab
 
 # button configuration or what the mouse-buttons do while the menu is open
 # usage: button [BUTTON] [ACTION]
@@ -72,12 +72,14 @@ button 4 SpinNext
 button 5 SpinPrevious
 
 # key configuration or what the keys on the keyboard do while the menu is open
-# usage: key KEYSYM ACTION
+# usage: key[-up] KEYSYM ACTION
 # available actions: same as in button configuration
 key Escape Disappear
 key Return ShowNext
 key Up SpinNext
 key Down SpinPrevious
+# if you want to trigger the choosen icon on release of Mod4
+#key-up Super_L ShowNext
 
 # spin-step: how far we'll spin the menu on SpinUp/SpinDown
 # usage: spin-step [-0.75 ... 0.75]
@@ -157,7 +159,9 @@ alias "realplay.bin" realplay
 alias "googleearth-bin" googleearth
 
 # menu of sticky icons
-# the asterisk (*) will expand the menu with unassigned windows
+# the asterisk (*) will add icons for all running applications that are
+# not part of the menu already; a double asterisk (**) will add one icon
+# for each open window
 # usage:
 # menu [NAME]
 #   icon APPLICATION [COMMAND]
@@ -202,7 +206,12 @@ menu launchers
 		icon oobase
 		icon oomath
 	end
+	icon hibernate "sudo /usr/sbin/hibernate"
 	icon shutdown "sudo /sbin/shutdown -h now"
+end
+
+menu open-windows
+	**
 end
 
 # preload icons

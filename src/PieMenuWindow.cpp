@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -130,6 +130,7 @@ bool PieMenuWindow::processEvent( XEvent &event )
 			}
 			break;
 		case KeyPress:
+		case KeyRelease:
 			{
 				Settings::KeyFunctions *kf =
 					&app->getSettings()->getKeyFunctions();
@@ -137,7 +138,8 @@ bool PieMenuWindow::processEvent( XEvent &event )
 				for( Settings::KeyFunctions::iterator i = kf->begin();
 					i != kf->end();
 					i++ )
-					if( XKeysymToKeycode( event.xkey.display, (*i).keySym ) ==
+					if( event.type == (*i).eventType &&
+						XKeysymToKeycode( event.xkey.display, (*i).keySym ) ==
 							event.xkey.keycode )
 						return performAction( (*i).action );
 			}

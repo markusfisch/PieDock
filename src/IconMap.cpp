@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -19,12 +19,12 @@
 #include <sstream>
 #include <sys/stat.h>
 
-#ifdef USE_GNOME
+#ifdef WITH_GNOME
 #include <stdint.h>
 #include <gtk/gtk.h>
 #endif
 
-#ifdef KDE
+#ifdef WITH_KDE
 #include <QImage>
 #include <QPixmap>
 
@@ -825,15 +825,41 @@ Icon *IconMap::surfaceIcon( std::string n )
 		}
 	}
 
-#ifdef USE_GNOME
+#ifdef WITH_GNOME
 	// ask GNOME for icon
 	{
-		GdkPixbuf *pixbuf = gtk_icon_theme_load_icon(
-			gtk_icon_theme_get_default(),
-			n.c_str(),
-			128,
-			0,
-			0 );
+		GtkIconTheme *theme = gtk_icon_theme_get_for_screen(
+			gdk_screen_get_default() );
+		GdkPixbuf *pixbuf = 0;
+
+		// theme look up
+		{
+			GtkIconInfo *iconInfo = gtk_icon_theme_lookup_icon(
+				theme,
+				n.c_str(),
+				128,
+				GTK_ICON_LOOKUP_USE_BUILTIN );
+
+			if( iconInfo )
+			{
+				pixbuf = gdk_pixbuf_new_from_file_at_size(
+					gtk_icon_info_get_filename( iconInfo ),
+					128,
+					-1,
+					0 );
+
+				gtk_icon_info_free( iconInfo );
+			}
+		}
+
+		// otherwise try to load the icon blindly
+		if( !pixbuf )
+			pixbuf = gtk_icon_theme_load_icon(
+				theme,
+				n.c_str(),
+				128,
+				GTK_ICON_LOOKUP_FORCE_SVG,
+				0 );
 
 		if( pixbuf &&
 			gdk_pixbuf_get_colorspace( pixbuf ) == GDK_COLORSPACE_RGB &&
@@ -852,16 +878,28 @@ Icon *IconMap::surfaceIcon( std::string n )
 			if( s.getPadding() == p )
 				memcpy( dest, src, s.getSize() );
 			else
-				for( int y = s.getHeight(); y--; pixels += p )
+			{
+				int dp = s.getPadding();
+
+				// only 4-byte alignments are sane for 32 bits per pixel
+				if( p%4 ||
+					dp%4 )
+					return 0;
+
+				dp >>= 2;
+				p >>= 2;
+
+				for( int y = s.getHeight(); y--; src += p, dest += dp )
 					for( int x = s.getWidth(); x--; )
 						*dest++ = *src++;
+			}
 
 			return createIcon( s, n );
 		}
 	}
 #endif
 
-#ifdef KDE
+#ifdef WITH_KDE
 	// ask KDE for icon
 	{
 		KIconLoader *loader = KGlobal::iconLoader();
@@ -878,9 +916,21 @@ Icon *IconMap::surfaceIcon( std::string n )
 			if( s.getPadding() == p )
 				memcpy( dest, src, s.getSize() );
 			else
-				for( int y = s.getHeight(); y--; pixels += p )
+			{
+				int dp = s.getPadding();
+
+				// only 4-byte alignments are sane for 32 bits per pixel
+				if( p%4 ||
+					dp%4 )
+					return 0;
+
+				dp >>= 2;
+				p >>= 2;
+
+				for( int y = s.getHeight(); y--; src += p, dest += dp )
 					for( int x = s.getWidth(); x--; )
 						*dest++ = *src++;
+			}
 
 			return createIcon( s, n );
 		}

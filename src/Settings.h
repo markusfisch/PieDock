@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -78,6 +78,7 @@ namespace PieDock
 			{
 				KeySym keySym;
 				Action action;
+				unsigned int eventType;
 			} KeyFunction;
 
 			typedef struct

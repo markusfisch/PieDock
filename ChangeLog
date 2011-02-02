@@ -1,3 +1,9 @@
+1.1.0
+	windows on the same workspace get raised now too
+	option to have an icon for each window
+	menu now responds to key releases too (key-up directive)
+	ask gtk libs for icons when configured with --with-gnome
+
 1.0.0
 	use of a compositing manager for real transparency
 	ships now with Autotools
@@ -16,9 +22,11 @@
 	choose if trigger button reacts on press or release
 
 0.2.2
-	icon label in the middle of the pie
-	pie-slice extend to the edge of the screen to observe Fitts' Law
+	show a label in the middle of the pie
+	pie-slices extend now to the edge of the screen to observe Fitts' Law
 	have launcher, window list or mixed menus
+	improved handling of mod masks
+	improved keyboard control when the menu is open
 
 0.1.7
-	first working version
+	first complete, working version

@@ -1,7 +1,7 @@
 # Initialize autoconf and automake
 AC_PREREQ([2.65])
 AC_INIT(src/main.cpp)
-AM_INIT_AUTOMAKE(PieDock, 1.0)
+AM_INIT_AUTOMAKE(PieDock, 1.1.0)
 
 # Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -76,6 +76,19 @@ AC_ARG_ENABLE(
 		AC_DEFINE(HAVE_XRENDER, 1, "Xrender support")
 		LIBS="$LIBS -lXrender")
 )
+
+# Check if user wants GNOME integration
+AC_ARG_WITH([gnome], AS_HELP_STRING([--with-gnome],
+	[ask GNOME for icons]))
+
+AS_IF([test "x$with_gnome" = "xyes"], [
+	PKG_CHECK_MODULES(GTK,
+		[gtk+-2.0 >= 2.4.0],
+		[AC_DEFINE([WITH_GNOME],,[GTK+ is supported])],
+		[AC_MSG_RESULT(no)])
+	LIBS="$LIBS $GTK_LIBS"
+	CXXFLAGS="$CXXFLAGS $GTK_CFLAGS"
+])
 
 # Checks for header files.
 AC_PATH_X

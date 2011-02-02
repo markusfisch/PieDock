@@ -19,6 +19,7 @@ compositing 1
 trigger button-down Mod4 2
 trigger key Mod4 Y
 trigger menu launchers button Mod1 2
+trigger menu open-windows key Mod4 S
 
 button 1 ShowNext
 button 2 ShowPrevious
@@ -28,8 +29,10 @@ button 5 SpinPrevious
 
 key Escape Disappear
 key Return ShowNext
+key-up Super_L ShowNext
 key Up SpinNext
 key Down SpinPrevious
+key S SpinNext
 
 #minimum-number 8
 
@@ -113,6 +116,10 @@ menu launchers
 	end
 	icon hibernate "glxinfo > /dev/null && sudo /usr/sbin/hibernate"
 	#icon shutdown "pkill X && sudo /sbin/shutdown -h now"
+end
+
+menu open-windows
+	**
 end
 
 preload menus

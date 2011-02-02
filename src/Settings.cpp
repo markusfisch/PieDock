@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -247,7 +247,8 @@ void Settings::load( Display *d )
 						line );
 			}
 		}
-		else if( !(*i).compare( "key" ) )
+		else if( !(*i).compare( "key" ) ||
+			!(*i).compare( "key-up" ) )
 		{
 			if( tokens.size() != 3 )
 				throwParsingError(
@@ -255,7 +256,10 @@ void Settings::load( Display *d )
 					line );
 			else
 			{
-				KeyFunction kf = { 0, Settings::NoAction };
+				KeyFunction kf = { 0, Settings::NoAction, KeyPress };
+
+				if( !(*i).compare( "key-up" ) )
+					kf.eventType = KeyRelease;
 
 				if( (kf.keySym = XStringToKeysym( (*++i).c_str() )) &&
 					(kf.action = resolveActionString( *++i )) !=
@@ -770,8 +774,13 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 			menus[menuName].push_back(
 				new MenuItem( iconName, ":"+subMenuName ) );
 		}
-		else if( !(*i).compare( "*" ) )
+		else if( !(*i).compare( 0, 1, "*" ) )
+		{
 			menus[menuName].setIncludeWindows( true );
+
+			if( !(*i).compare( "**" ) )
+				menus[menuName].setOneIconPerWindow( true );
+		}
 		else if( !(*i).compare( "icon" ) )
 		{
 			if( ++i == tokens.end() )

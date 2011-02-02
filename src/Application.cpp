@@ -39,7 +39,7 @@ Application::Application( Settings &s ) :
 	settings( &s ),
 	suspend( StandBy )
 {
-	if(	!display )
+	if( !display )
 		throw "cannot open display";
 
 	socketFile =

@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -43,8 +43,14 @@ bool Menu::update( std::string menuName )
 	if( !(menuItems = app->getSettings()->getMenu( menuName )) )
 		return false;
 
+	// multiple windows per icon
 	typedef std::map<Icon *, MenuItem *> IconToItem;
 	IconToItem iconToItem;
+
+	// one icon per window
+	typedef std::map<Window, MenuItem *> WindowToItem;
+	WindowToItem windowToItem;
+
 	IconMap *iconMap = &app->getSettings()->getIconMap();
 
 	// clear windows and make sure all items have valid icons
@@ -62,8 +68,19 @@ bool Menu::update( std::string menuName )
 			(*i)->setIcon( icon );
 		}
 
+		if( menuItems->oneIconPerWindow() )
+			windowToItem[(*i)->getNextWindow()] = (*i);
+
 		iconToItem[icon] = (*i);
 		(*i)->clearWindows();
+	}
+
+	// move menu item to the top when one icon per window is used
+	if( menuItems->oneIconPerWindow() &&
+		selected )
+	{
+		menuItems->remove( selected );
+		menuItems->push_front( selected );
 	}
 
 	// assign windows to menu items; this is done by evaluating name, class
@@ -77,7 +94,18 @@ bool Menu::update( std::string menuName )
 		{
 			if( !WindowManager::isNormalWindow( app->getDisplay(), (*i) ) )
 				continue;
-		
+
+			if( menuItems->oneIconPerWindow() )
+			{
+				WindowToItem::iterator w;
+
+				if( (w = windowToItem.find( (*i) )) != windowToItem.end() )
+				{
+					(*w).second->addWindow( app->getDisplay(), (*i) );
+					continue;
+				}
+			}
+
 			XClassHint xch;
 
 			if( !XGetClassHint( app->getDisplay(), (*i), &xch ) ||
@@ -92,17 +120,29 @@ bool Menu::update( std::string menuName )
 				!(icon = iconMap->getIconByName( xch.res_name )) )
 				icon = iconMap->getMissingIcon( xch.res_name );
 
-			IconToItem::iterator m;
-
-			if( (m = iconToItem.find( icon )) != iconToItem.end() )
-				(*m).second->addWindow( app->getDisplay(), (*i) );
-			else if( menuItems->includeWindows() )
+			if( menuItems->oneIconPerWindow() )
 			{
 				MenuItem *item = new MenuItem( icon );
 				item->addWindow( app->getDisplay(), (*i) );
 
-				iconToItem[icon] = item;
 				menuItems->push_back( item );
+				continue;
+			}
+
+			// find existing icon or create a new one
+			{
+				IconToItem::iterator m;
+
+				if( (m = iconToItem.find( icon )) != iconToItem.end() )
+					(*m).second->addWindow( app->getDisplay(), (*i) );
+				else if( menuItems->includeWindows() )
+				{
+					MenuItem *item = new MenuItem( icon );
+					item->addWindow( app->getDisplay(), (*i) );
+
+					iconToItem[icon] = item;
+					menuItems->push_back( item );
+				}
 			}
 		}
 	}

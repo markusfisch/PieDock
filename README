@@ -9,6 +9,10 @@ Compile and install:
 
   # make install
 
-Configuration options:
+Configuration options for building:
 
   Use ./configure --help to see the full list of options
+
+Run-time setup:
+
+  Copy res/PieDockrc.sample to ~/.PieDockrc and modify it to meet your needs
