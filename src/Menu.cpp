@@ -54,33 +54,41 @@ bool Menu::update( std::string menuName )
 	IconMap *iconMap = &app->getSettings()->getIconMap();
 
 	// clear windows and make sure all items have valid icons
-	for( MenuItems::iterator i = menuItems->begin();
-		i != menuItems->end();
-		i++ )
 	{
-		Icon *icon;
+		MenuItems::iterator si = menuItems->end();
 
-		if( !(icon = (*i)->getIcon()) )
+		for( MenuItems::iterator i = menuItems->begin();
+			i != menuItems->end();
+			i++ )
 		{
-			if( !(icon = iconMap->getIconByName( (*i)->getTitle() )) )
-				icon = iconMap->getMissingIcon( (*i)->getTitle() );
+			Icon *icon;
 
-			(*i)->setIcon( icon );
+			if( !(icon = (*i)->getIcon()) )
+			{
+				if( !(icon = iconMap->getIconByName( (*i)->getTitle() )) )
+					icon = iconMap->getMissingIcon( (*i)->getTitle() );
+
+				(*i)->setIcon( icon );
+			}
+
+			if( menuItems->oneIconPerWindow() )
+			{
+				windowToItem[(*i)->getNextWindow()] = (*i);
+
+				if( *i == selected )
+					si = i;
+			}
+
+			iconToItem[icon] = (*i);
+			(*i)->clearWindows();
 		}
 
-		if( menuItems->oneIconPerWindow() )
-			windowToItem[(*i)->getNextWindow()] = (*i);
-
-		iconToItem[icon] = (*i);
-		(*i)->clearWindows();
-	}
-
-	// move menu item to the top when one icon per window is used
-	if( menuItems->oneIconPerWindow() &&
-		selected )
-	{
-		menuItems->remove( selected );
-		menuItems->push_front( selected );
+		// move menu item to the top when one icon per window is used
+		if( si != menuItems->end() )
+		{
+			menuItems->erase( si );
+			menuItems->push_front( selected );
+		}
 	}
 
 	// assign windows to menu items; this is done by evaluating name, class
