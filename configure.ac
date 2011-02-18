@@ -85,7 +85,7 @@ AS_IF([test "x$with_gnome" = "xyes"], [
 	PKG_CHECK_MODULES(GTK,
 		[gtk+-2.0 >= 2.4.0],
 		[AC_DEFINE([WITH_GNOME],,[GTK+ is supported])],
-		[AC_MSG_RESULT(no)])
+		exit)
 	LIBS="$LIBS $GTK_LIBS"
 	CXXFLAGS="$CXXFLAGS $GTK_CFLAGS"
 ])

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PACKAGE=PieDockInstant-`uname -m`.bin
+ARCH=`uname -m`
+PACKAGE=PieDockInstant-$ARCH.bin
 TEMPLATE=PieDockInstant
 
 if [ -d $TEMPLATE ]; then
@@ -133,7 +134,6 @@ ignore-mask Num_Lock
 trigger button Mod4 1
 trigger button Mod4 4
 trigger button Mod4 5
-trigger key Mod4 Tab
 
 # button configuration or what the mouse-buttons do while the menu is open
 # usage: button [BUTTON] [ACTION]
@@ -229,6 +229,8 @@ alias class "Gimp" gimp
 alias "aterm" terminal
 alias "xterm" terminal
 alias "xfce4-terminal" terminal
+alias "gedit" text-editor
+alias "Konsole" terminal
 alias "Blender:Render" blender
 alias "googleearth-bin" googleearth
 
@@ -264,20 +266,28 @@ http://markusfisch.de/PieDock
 
 EEOF
 
+if [ "`uname -m`" != "$ARCH" ]; then
+	echo "ERROR: wrong architecture"
+	exit
+fi
+
 echo -n "Extracting archive ... "
 sed -e '1,/^exit\$/d' "\$0" | tar xzf -
 echo "ok"
 
 echo -n "Configuring ... "
 ICONS=""
-APPS="chrome \
+APPS="terminal \
+	chrome \
 	chromium \
 	opera \
 	firefox \
 	thunderbird \
+	gedit \
 	gimp \
 	inkscape \
 	blender \
+	nautilus \
 	thunar \
 	rekonq \
 	abiword \
@@ -305,7 +315,6 @@ appear:
     Windows-key + left mouse button
     Windows-key + scroll wheel up
     Windows-key + scroll wheel down
-    Windows-key + Tab
 
 If you got "X Error of failed request:  BadAccess", some other program
 have grabbed one of those keys or buttons already. In that case you'll

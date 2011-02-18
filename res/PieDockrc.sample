@@ -46,11 +46,14 @@ ignore-mask Num_Lock
 #
 # If you get "X Error of failed request:  BadAccess", some other program
 # have grabbed that key or button already.
-trigger menu launchers button-down Mod4 3
 trigger button-down Mod4 1
+trigger menu launchers button Mod4 3
 trigger button Mod4 4
 trigger button Mod4 5
-trigger menu open-windows key Mod4 Tab
+# if you want Mod4+Tab to switch between open windows
+#trigger menu open-windows key Mod4 Tab
+# if your mouse has more than 5 buttons (check with xev)
+#trigger button 6
 
 # button configuration or what the mouse-buttons do while the menu is open
 # usage: button [BUTTON] [ACTION]
@@ -78,7 +81,7 @@ key Escape Disappear
 key Return ShowNext
 key Up SpinNext
 key Down SpinPrevious
-# if you want to trigger the choosen icon on release of Mod4
+# if you want the active icon to be shown/run on release of Mod4 (Mod4+Tab)
 #key-up Super_L ShowNext
 
 # spin-step: how far we'll spin the menu on SpinUp/SpinDown
@@ -107,6 +110,8 @@ key Down SpinPrevious
 # active indicator or what should mark an icon as having windows
 # usage: active-indicator FILE [(left|center|right)] [(top|center|bottom)]
 #active-indicator "~/.PieDock/active-indicator.png" right bottom
+# if you're on GNOME, you may just simply use this
+active-indicator "/usr/share/icons/gnome/48x48/emblems/emblem-new.png" right bottom
 
 # what icon should be used for unassociated menu items/windows
 # usage: missing-icon FILE
@@ -152,8 +157,8 @@ alias class "Gimp" gimp
 alias "aterm" terminal
 alias "xterm" terminal
 alias "xfce4-terminal" terminal
+alias "gedit" text-editor
 alias "Konsole" terminal
-alias "Blender" blender
 alias "Blender:Render" blender
 alias "realplay.bin" realplay
 alias "googleearth-bin" googleearth
@@ -173,7 +178,11 @@ alias "googleearth-bin" googleearth
 #   *
 # end
 menu
+	icon terminal
 	icon firefox
+	icon gedit
+	icon nautilus
+	icon synaptic
 	*
 end
 
