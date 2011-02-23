@@ -1,7 +1,6 @@
 #!/bin/bash
 
-ARCH=`uname -m`
-PACKAGE=PieDockInstant-$ARCH.bin
+PACKAGE=PieDockInstant-`uname -m`.bin
 TEMPLATE=PieDockInstant
 
 if [ -d $TEMPLATE ]; then
@@ -188,6 +187,7 @@ key Down SpinPrevious
 # active indicator or what should mark an icon as having windows
 # usage: active-indicator FILE [(left|center|right)] [(top|center|bottom)]
 #active-indicator "path/to/active-indicator.png" right bottom
+INDICATOR
 
 # what icon should be used for unassociated menu items/windows
 # usage: missing-icon FILE
@@ -266,16 +266,21 @@ http://markusfisch.de/PieDock
 
 EEOF
 
-if [ "`uname -m`" != "$ARCH" ]; then
-	echo "ERROR: wrong architecture"
-	exit
-fi
-
 echo -n "Extracting archive ... "
 sed -e '1,/^exit\$/d' "\$0" | tar xzf -
 echo "ok"
 
 echo -n "Configuring ... "
+INDICATOR=""
+CANDIDATE=""
+for R in "48x48" "32x32" "16x16"
+do
+	CANDIDATE=\`find /usr/share/icons/ -name "emblem-new.png" | grep \$R\`
+	[ "\$CANDIDATE" ] && break
+done
+[ "\$CANDIDATE" ] &&
+	INDICATOR="active-indicator \"\$CANDIDATE\" right bottom"
+
 ICONS=""
 APPS="terminal \
 	chrome \
@@ -299,7 +304,7 @@ for A in \$APPS
 do
 	which \$A &>/dev/null && ICONS="\$ICONS\ticon \$A\\\n"
 done
-cat $TEMPLATE/conf/PieDockrc.template | sed -e "s_ICONS_\${ICONS}_g;" > $TEMPLATE/conf/PieDockrc
+cat $TEMPLATE/conf/PieDockrc.template | sed -e "s_ICONS_\${ICONS}_g;s_INDICATOR_\${INDICATOR}_g;" > $TEMPLATE/conf/PieDockrc
 rm $TEMPLATE/conf/PieDockrc.template
 echo "ok"
 
