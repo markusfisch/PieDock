@@ -19,20 +19,6 @@
 #include <sstream>
 #include <sys/stat.h>
 
-#ifdef WITH_GNOME
-#include <stdint.h>
-#include <gtk/gtk.h>
-#endif
-
-#ifdef WITH_KDE
-#include <QImage>
-#include <QPixmap>
-
-#include <stdint.h>
-#include <kglobal.h>
-#include <kiconloader.h>
-#endif
-
 using namespace PieDock;
 
 const char IconMap::fallbackPng[] = {
@@ -824,118 +810,6 @@ Icon *IconMap::surfaceIcon( std::string n )
 			return createIcon( s, n );
 		}
 	}
-
-#ifdef WITH_GNOME
-	// ask GNOME for icon
-	{
-		GtkIconTheme *theme = gtk_icon_theme_get_for_screen(
-			gdk_screen_get_default() );
-		GdkPixbuf *pixbuf = 0;
-
-		// theme look up
-		{
-			GtkIconInfo *iconInfo = gtk_icon_theme_lookup_icon(
-				theme,
-				n.c_str(),
-				128,
-				GTK_ICON_LOOKUP_USE_BUILTIN );
-
-			if( iconInfo )
-			{
-				pixbuf = gdk_pixbuf_new_from_file_at_size(
-					gtk_icon_info_get_filename( iconInfo ),
-					128,
-					-1,
-					0 );
-
-				gtk_icon_info_free( iconInfo );
-			}
-		}
-
-		// otherwise try to load the icon blindly
-		if( !pixbuf )
-			pixbuf = gtk_icon_theme_load_icon(
-				theme,
-				n.c_str(),
-				128,
-				GTK_ICON_LOOKUP_FORCE_SVG,
-				0 );
-
-		if( pixbuf &&
-			gdk_pixbuf_get_colorspace( pixbuf ) == GDK_COLORSPACE_RGB &&
-			gdk_pixbuf_get_bits_per_sample( pixbuf ) == 8 &&
-			gdk_pixbuf_get_n_channels( pixbuf ) == 4 &&
-			gdk_pixbuf_get_has_alpha( pixbuf ) )
-		{
-			uint32_t *src = reinterpret_cast<uint32_t *>(
-				gdk_pixbuf_get_pixels( pixbuf ) );
-			int w = gdk_pixbuf_get_width( pixbuf );
-			int h = gdk_pixbuf_get_height( pixbuf );
-			int p = gdk_pixbuf_get_rowstride( pixbuf )-(w<<4);
-			ArgbSurface s( w, h );
-			uint32_t *dest = reinterpret_cast<uint32_t *>( s.getData() );
-
-			if( s.getPadding() == p )
-				memcpy( dest, src, s.getSize() );
-			else
-			{
-				int dp = s.getPadding();
-
-				// only 4-byte alignments are sane for 32 bits per pixel
-				if( p%4 ||
-					dp%4 )
-					return 0;
-
-				dp >>= 2;
-				p >>= 2;
-
-				for( int y = s.getHeight(); y--; src += p, dest += dp )
-					for( int x = s.getWidth(); x--; )
-						*dest++ = *src++;
-			}
-
-			return createIcon( s, n );
-		}
-	}
-#endif
-
-#ifdef WITH_KDE
-	// ask KDE for icon
-	{
-		KIconLoader *loader = KGlobal::iconLoader();
-		QPixmap pixmap = loader->loadIcon( n.c_str(), KIcon::Desktop, 128 );
-		QImage image = pixmap.toImage();
-
-		if( image.format() == QImage::Format_ARGB32_Premultiplied )
-		{
-			ArgbSurface s( image.width(), image.height() );
-			uint32_t *dest = reinterpret_cast<uint32_t *>( s.getData() );
-			uint32_t *src = reinterpret_cast<uint32_t *>( image.bits() );
-			int p = image.bytesPerLine()-(w<<4);
-
-			if( s.getPadding() == p )
-				memcpy( dest, src, s.getSize() );
-			else
-			{
-				int dp = s.getPadding();
-
-				// only 4-byte alignments are sane for 32 bits per pixel
-				if( p%4 ||
-					dp%4 )
-					return 0;
-
-				dp >>= 2;
-				p >>= 2;
-
-				for( int y = s.getHeight(); y--; src += p, dest += dp )
-					for( int x = s.getWidth(); x--; )
-						*dest++ = *src++;
-			}
-
-			return createIcon( s, n );
-		}
-	}
-#endif
 
 	return 0;
 }

@@ -77,19 +77,6 @@ AC_ARG_ENABLE(
 		LIBS="$LIBS -lXrender")
 )
 
-# Check if user wants GNOME integration
-AC_ARG_WITH([gnome], AS_HELP_STRING([--with-gnome],
-	[ask GNOME for icons]))
-
-AS_IF([test "x$with_gnome" = "xyes"], [
-	PKG_CHECK_MODULES(GTK,
-		[gtk+-2.0 >= 2.4.0],
-		[AC_DEFINE([WITH_GNOME],,[GTK+ is supported])],
-		exit)
-	LIBS="$LIBS $GTK_LIBS"
-	CXXFLAGS="$CXXFLAGS $GTK_CFLAGS"
-])
-
 # Checks for header files.
 AC_PATH_X
 AC_CHECK_HEADERS([stdint.h stdlib.h string.h sys/socket.h unistd.h])
