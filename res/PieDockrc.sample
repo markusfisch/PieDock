@@ -52,6 +52,8 @@ trigger button Mod4 4
 trigger button Mod4 5
 # if you want Mod4+Tab to switch between open windows
 #trigger menu open-windows key Mod4 Tab
+# if you want Mod4+< to switch between all windows of the active application
+#trigger menu windows-of-active key Mod4 less
 # if your mouse has more than 5 buttons (check with xev)
 #trigger button 6
 
@@ -83,6 +85,10 @@ key Up SpinNext
 key Down SpinPrevious
 # if you want the active icon to be shown/run on release of Mod4 (Mod4+Tab)
 #key-up Super_L ShowNext
+# to spin on a press of Tab
+#key Tab SpinNext
+# to spin on a press of <
+#key less SpinNext
 
 # spin-step: how far we'll spin the menu on SpinUp/SpinDown
 # usage: spin-step [-0.75 ... 0.75]
@@ -166,7 +172,8 @@ alias "googleearth-bin" googleearth
 # menu of sticky icons
 # the asterisk (*) will add icons for all running applications that are
 # not part of the menu already; a double asterisk (**) will add one icon
-# for each open window
+# for each open window; three asterisks (***) will add only windows of
+# the application that has the (keyboard/mouse) focus
 # usage:
 # menu [NAME]
 #   icon APPLICATION [COMMAND]
@@ -221,6 +228,10 @@ end
 
 menu open-windows
 	**
+end
+
+menu windows-of-active
+	***
 end
 
 # preload icons

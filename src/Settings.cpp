@@ -778,8 +778,11 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 		{
 			menus[menuName].setIncludeWindows( true );
 
-			if( !(*i).compare( "**" ) )
+			if( !(*i).compare( 0, 2, "**" ) )
 				menus[menuName].setOneIconPerWindow( true );
+
+			if( !(*i).compare( "***" ) )
+				menus[menuName].setOnlyFromActive( true );
 		}
 		else if( !(*i).compare( "icon" ) )
 		{

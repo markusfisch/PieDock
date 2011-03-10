@@ -36,10 +36,14 @@ namespace PieDock
 			inline const bool &oneIconPerWindow() const {
 				return one; }
 			inline void setOneIconPerWindow( bool o ) { one = o; }
+			inline const bool &onlyFromActive() const {
+				return only; }
+			inline void setOnlyFromActive( bool o ) { only = o; }
 
 		private:
 			bool windows;
 			bool one;
+			bool only;
 	};
 }
 

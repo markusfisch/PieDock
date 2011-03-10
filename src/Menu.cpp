@@ -91,6 +91,19 @@ bool Menu::update( std::string menuName )
 		}
 	}
 
+	// get filter
+	std::string classFilter;
+
+	if( menuItems->onlyFromActive() )
+	{
+		Window w = WindowManager::getActive( app->getDisplay() );
+		XClassHint xch;
+
+		if( w &&
+			XGetClassHint( app->getDisplay(), w, &xch ) )
+			classFilter = xch.res_class;
+	}
+
 	// assign windows to menu items; this is done by evaluating name, class
 	// or title of the windows since you just can't trust window IDs over time
 	{
@@ -109,6 +122,15 @@ bool Menu::update( std::string menuName )
 
 				if( (w = windowToItem.find( (*i) )) != windowToItem.end() )
 				{
+					if( menuItems->onlyFromActive() )
+					{
+						XClassHint xch;
+
+						if( XGetClassHint( app->getDisplay(), (*i), &xch ) &&
+							classFilter.compare( xch.res_class ) )
+							continue;
+					}
+
 					(*w).second->addWindow( app->getDisplay(), (*i) );
 					continue;
 				}
@@ -118,6 +140,10 @@ bool Menu::update( std::string menuName )
 
 			if( !XGetClassHint( app->getDisplay(), (*i), &xch ) ||
 				app->getSettings()->ignoreWindow( xch.res_name ) )
+				continue;
+
+			if( menuItems->onlyFromActive() &&
+				classFilter.compare( xch.res_class ) )
 				continue;
 
 			Icon *icon;

@@ -20,6 +20,7 @@ trigger button-down Mod4 2
 trigger key Mod4 Y
 trigger menu launchers button Mod1 2
 trigger menu open-windows key Mod4 S
+trigger menu windows-of-active key Mod4 less
 
 button 1 ShowNext
 button 2 ShowPrevious
@@ -33,6 +34,7 @@ key-up Super_L ShowNext
 key Up SpinNext
 key Down SpinPrevious
 key S SpinNext
+key less SpinNext
 
 #minimum-number 8
 
@@ -120,6 +122,10 @@ end
 
 menu open-windows
 	**
+end
+
+menu windows-of-active
+	***
 end
 
 preload menus
