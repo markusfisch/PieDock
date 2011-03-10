@@ -69,6 +69,7 @@ void PngSurface::load( std::istream &in )
 	png_set_sig_bytes( png, 0 );
 	png_read_png( png, info, 
 		PNG_TRANSFORM_IDENTITY | 
+		PNG_TRANSFORM_STRIP_16 |
 		PNG_TRANSFORM_EXPAND |
 		PNG_TRANSFORM_BGR,
 		0 );
@@ -91,8 +92,7 @@ void PngSurface::load( std::istream &in )
 		y++, dest += w )
 		memcpy( dest, src, w<<2 );
 
-	// convert grayscale image to argb, png_set_gray_to_rgb() doesn't work
-	// for some reason
+	// convert grayscale image to argb
 	{
 		int ct = png_get_color_type( png, info );
 
