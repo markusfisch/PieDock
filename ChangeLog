@@ -1,3 +1,8 @@
+1.2.0
+	switch through windows of active application only
+	fixed loading of PNG files with a bit depth of 16
+	removed optional support for gtk_icon_theme_* and KGlocal::iconLoader()
+
 1.1.0
 	windows on the same workspace get raised now too
 	option to have an icon for each window
