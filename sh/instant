@@ -15,7 +15,8 @@ fi
 
 if ! mkdir $TEMPLATE ||
 	! mkdir "$TEMPLATE/bin" ||
-	! mkdir "$TEMPLATE/conf"; then
+	! mkdir "$TEMPLATE/conf" ||
+	! mkdir "$TEMPLATE/icons"; then
 	echo "$TEMPLATE cannot be created"
 	exit
 fi
@@ -43,6 +44,17 @@ fi
 function start()
 {
 	cd \`dirname \$0\`
+
+	# update configuration file
+	[ -f conf/PieDockrc ] &&
+		grep "$TEMPLATE/icons\"" conf/PieDockrc &>/dev/null && {
+		C=conf/PieDockrc
+		T=conf/.PieDockrc-temporary
+		cp \$C \$T &&
+			cat \$T | sed -e "s_$TEMPLATE/icons\"_\`pwd\`/icons\"_g;" > \$C &&
+			rm \$T
+	}
+
 	bin/\$BIN -r conf/\${BIN}rc &
 }
 
@@ -94,7 +106,7 @@ fitts 1
 
 # use compositing manager for true transparency?
 # usage: compositing (0|1)
-compositing 1
+compositing COMPOSITING
 
 # do you want to have an icon title in the middle of the pie?
 # usage: title (0|1)
@@ -199,6 +211,7 @@ INDICATOR
 
 # path to PNG files, the files must be named like the application
 # usage: path PATH...
+path "$TEMPLATE/icons"
 path "/usr/share/icons/default.kde4/128x128/apps"
 path "/usr/share/icons/default.kde4/32x32/apps"
 path "/usr/share/icons/hicolor/128x128/apps"
@@ -271,40 +284,90 @@ sed -e '1,/^exit\$/d' "\$0" | tar xzf -
 echo "ok"
 
 echo -n "Configuring ... "
-INDICATOR=""
-CANDIDATE=""
-for R in "48x48" "32x32" "16x16"
-do
-	CANDIDATE=\`find /usr/share/icons/ -name "emblem-new.png" | grep \$R\`
-	[ "\$CANDIDATE" ] && break
-done
-[ "\$CANDIDATE" ] &&
-	INDICATOR="active-indicator \"\$CANDIDATE\" right bottom"
 
+# check for compositing
+COMPOSITING="0"
+which pgrep &>/dev/null && {
+	for M in compbiz xcompmgr
+	do
+		pgrep \$M &>/dev/null || continue
+
+		COMPOSITING="1"
+		break
+	done
+}
+
+# search for proper indicator icon
+INDICATOR=""
+{
+	CANDIDATE=""
+
+	for R in "48x48" "32x32" "16x16"
+	do
+		CANDIDATE=\`find /usr/share/icons/ -name "emblem-new.png" | grep \$R\`
+		[ "\$CANDIDATE" ] && break
+	done
+
+	[ "\$CANDIDATE" ] &&
+		INDICATOR="active-indicator \"\$CANDIDATE\" right bottom"
+}
+
+# search for applications that may have good icons
 ICONS=""
-APPS="terminal \
-	chrome \
-	chromium \
-	opera \
-	firefox \
-	thunderbird \
-	gedit \
-	gimp \
-	inkscape \
-	blender \
-	nautilus \
-	thunar \
-	rekonq \
-	abiword \
-	gnumeric \
-	exaile \
-	konsole \
-	skype"
-for A in \$APPS
-do
-	which \$A &>/dev/null && ICONS="\$ICONS\ticon \$A\\\n"
-done
-cat $TEMPLATE/conf/PieDockrc.template | sed -e "s_ICONS_\${ICONS}_g;s_INDICATOR_\${INDICATOR}_g;" > $TEMPLATE/conf/PieDockrc
+{
+	APPS="terminal \
+		konsole \
+		chromium \
+		opera \
+		firefox \
+		thunderbird \
+		gedit \
+		gimp \
+		inkscape \
+		blender \
+		nautilus \
+		thunar \
+		rekonq \
+		abiword \
+		gnumeric \
+		exaile \
+		skype"
+
+	SVGS=/usr/share/icons/hicolor/scalable/apps/
+	[ -d "\$SVGS" ] &&
+		which convert &>/dev/null &&
+		HAVE_CONVERT=1
+
+	for A in \$APPS
+	do
+		which \$A &>/dev/null || continue
+
+		FOUND=0
+		for P in "/usr/share/icons/default.kde4/128x128/apps" "/usr/share/icons/hicolor/128x128/apps" "/usr/share/icons/gnome/256x256/apps"
+		do
+			stat \$P/\$A &>/dev/null || continue
+
+			FOUND=1
+			break
+		done
+		(( FOUND )) && continue
+
+		(( HAVE_CONVERT )) && {
+			for F in \${SVGS}\${A}*.svg
+			do
+				stat "\$F" &>/dev/null && {
+					convert -density 128 -background transparent "\$F" "$TEMPLATE/icons/\${A}.png" &>/dev/null
+					break;
+				}
+			done
+		}
+
+		ICONS="\$ICONS\ticon \$A\\\n"
+	done
+}
+
+# now write the configuration file
+cat $TEMPLATE/conf/PieDockrc.template | sed -e "s_COMPOSITING_\${COMPOSITING}_g;s_INDICATOR_\${INDICATOR}_g;s_ICONS_\${ICONS}_g;" > $TEMPLATE/conf/PieDockrc
 rm $TEMPLATE/conf/PieDockrc.template
 echo "ok"
 
