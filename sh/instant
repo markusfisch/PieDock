@@ -299,12 +299,12 @@ which pgrep &>/dev/null && {
 
 # search for proper indicator icon
 INDICATOR=""
-{
+[ -d /usr/share/icons/ ] && {
 	CANDIDATE=""
 
 	for R in "48x48" "32x32" "16x16"
 	do
-		CANDIDATE=\`find /usr/share/icons/ -name "emblem-new.png" | grep \$R\`
+		CANDIDATE=\`find /usr/share/icons/ -name "emblem-new.png" | grep -m 1 \$R\`
 		[ "\$CANDIDATE" ] && break
 	done
 
