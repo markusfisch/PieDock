@@ -28,7 +28,7 @@ namespace PieDock
 	class MenuItems : public std::list<MenuItem *>
 	{
 		public:
-			MenuItems() : windows( false ), one( false ) {}
+			MenuItems() : windows( false ), one( false ), only( false ) {}
 			virtual ~MenuItems() {}
 			inline const bool &includeWindows() const {
 				return windows; }
