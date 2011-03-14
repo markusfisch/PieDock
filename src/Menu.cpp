@@ -231,7 +231,7 @@ bool Menu::change( Settings::Action a )
 	std::string cmd = selected->getCommand();
 
 	// check if this menu should launch another menu
-	if( !cmd.substr( 0, 1 ).compare( ":" ) )
+	if( !cmd.compare( 0, 1, ":" ) )
 	{
 		update( cmd.substr( 1 ) );
 		return true;
@@ -317,10 +317,8 @@ std::string Menu::getItemTitle() const
 {
 	if( selected )
 	{
-		if( !selected->getTitle().empty() )
-			return selected->getTitle();
-
-		if( selected->hasWindows() )
+		if( !selected->isSticky() &&
+			selected->hasWindows() )
 		{
 			std::string t = WindowManager::getTitle(
 				app->getDisplay(),
@@ -330,6 +328,8 @@ std::string Menu::getItemTitle() const
 
 			return t;
 		}
+
+		return selected->getTitle();
 	}
 
 	return "";
