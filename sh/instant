@@ -47,11 +47,11 @@ function start()
 
 	# update configuration file
 	[ -f conf/PieDockrc ] &&
-		grep "$TEMPLATE/icons\"" conf/PieDockrc &>/dev/null && {
+		grep "${TEMPLATE}/icons\"" conf/PieDockrc &>/dev/null && {
 		C=conf/PieDockrc
 		T=conf/.PieDockrc-temporary
 		cp \$C \$T &&
-			cat \$T | sed -e "s_$TEMPLATE/icons\"_\`pwd\`/icons\"_g;" > \$C &&
+			cat \$T | sed -e "s_\"[.]*${TEMPLATE}/icons\"_\"\`pwd\`/icons\"_g;" > \$C &&
 			rm \$T
 	}
 
