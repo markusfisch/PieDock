@@ -288,7 +288,7 @@ echo -n "Configuring ... "
 # check for compositing
 COMPOSITING="0"
 which pgrep &>/dev/null && {
-	for M in compbiz xcompmgr
+	for M in compiz xcompmgr
 	do
 		pgrep \$M &>/dev/null || continue
 
