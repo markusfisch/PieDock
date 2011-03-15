@@ -51,7 +51,7 @@ function start()
 		C=conf/PieDockrc
 		T=conf/.PieDockrc-temporary
 		cp \$C \$T &&
-			cat \$T | sed -e "s_\"[.]*${TEMPLATE}/icons\"_\"\`pwd\`/icons\"_g;" > \$C &&
+			cat \$T | sed -e "s_\".*${TEMPLATE}/icons\"_\"\`pwd\`/icons\"_g;" > \$C &&
 			rm \$T
 	}
 
