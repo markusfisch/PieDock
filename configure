@@ -4336,6 +4336,7 @@ if test "x$ac_cv_lib_Xft_XftFontOpen" = x""yes; then :
 $as_echo "#define HAVE_XFT 1" >>confdefs.h
 
 			LIBS="$LIBS -lXft -lfreetype"
+			XFT=true
 fi
 
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for FT_Init_FreeType in -lfreetype" >&5
@@ -4378,7 +4379,6 @@ if test "x$ac_cv_lib_freetype_FT_Init_FreeType" = x""yes; then :
   LIBS="$LIBS -lfreetype"
 fi
 
-		XFT=true
 	else
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4427,6 +4427,7 @@ if test "x$ac_cv_lib_Xft_XftFontOpen" = x""yes; then :
 $as_echo "#define HAVE_XFT 1" >>confdefs.h
 
 		LIBS="$LIBS -lXft"
+		XFT=true
 fi
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for FT_Init_FreeType in -lfreetype" >&5
@@ -4469,7 +4470,6 @@ if test "x$ac_cv_lib_freetype_FT_Init_FreeType" = x""yes; then :
   LIBS="$LIBS -lfreetype"
 fi
 
-	XFT=true
 
 fi
 

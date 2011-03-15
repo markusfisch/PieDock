@@ -29,20 +29,20 @@ AC_ARG_ENABLE(
 		AC_MSG_RESULT([yes])
 		AC_CHECK_LIB(Xft, XftFontOpen,
 			AC_DEFINE(HAVE_XFT, 1, "Xft support")
-			LIBS="$LIBS -lXft -lfreetype")
+			LIBS="$LIBS -lXft -lfreetype"
+			XFT=true)
 		AC_CHECK_LIB(freetype, FT_Init_FreeType,
 			LIBS="$LIBS -lfreetype")
-		XFT=true
 	else
 		AC_MSG_RESULT([no])
 	fi,
 	AC_MSG_RESULT([yes])
 	AC_CHECK_LIB(Xft, XftFontOpen,
 		AC_DEFINE(HAVE_XFT, 1, "Xft support")
-		LIBS="$LIBS -lXft")
+		LIBS="$LIBS -lXft"
+		XFT=true)
 	AC_CHECK_LIB(freetype, FT_Init_FreeType,
 		LIBS="$LIBS -lfreetype")
-	XFT=true
 )
 
 # Checks for Freetype
