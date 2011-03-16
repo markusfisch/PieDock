@@ -138,7 +138,7 @@ void Text::setColor( Color c )
 void Text::draw( const int x, const int y, const std::string s ) const
 {
 #ifdef HAVE_XFT
-	XftDrawString8(
+	XftDrawStringUtf8(
 		xftDraw,
 		&xftColor,
 		xftFont,
