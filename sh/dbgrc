@@ -44,6 +44,7 @@ missing-icon "~/.PieDock/applications/generic/PixelPressIcons/TheJollyRoger.png"
 
 path "~/.PieDock/applications" "~/.PieDock/actions" "/usr/share/pixmaps"
 
+alias title "*- VIM" vim
 alias title "* OpenOffice.org Writer" ooo-writer
 alias title "* OpenOffice.org Calc" ooo-calc
 alias title "* OpenOffice.org Draw" ooo-draw
