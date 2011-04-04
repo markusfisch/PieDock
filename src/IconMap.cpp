@@ -661,6 +661,25 @@ void IconMap::addTitleAlias( std::string a, std::string n )
 }
 
 /**
+ * Return icon for given window properties
+ *
+ * @param t - window title
+ * @param c - resource class
+ * @param n - resource name
+ */
+Icon *IconMap::getIcon( std::string t, std::string c, std::string n )
+{
+	Icon *icon;
+
+	if( !(icon = getIconByTitle( t )) &&
+		!(icon = getIconByClass( c )) &&
+		!(icon = getIconByName( n )) )
+		icon = getMissingIcon( n );
+
+	return icon;
+}
+
+/**
  * Return icon for a window by name
  *
  * @param n - resource name of window
@@ -800,7 +819,7 @@ Icon *IconMap::surfaceIcon( std::string n )
 		struct stat buf;
 
 		// look only for lower case
-		std::transform( file.begin(), file.end(), file.begin(), ::tolower );	
+		std::transform( file.begin(), file.end(), file.begin(), ::tolower );
 		file = *i+file+".png";
 
 		if( stat( file.c_str(), &buf ) > -1 )

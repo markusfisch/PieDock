@@ -52,6 +52,7 @@ namespace PieDock
 			virtual void addNameAlias( std::string, std::string );
 			virtual void addClassAlias( std::string, std::string );
 			virtual void addTitleAlias( std::string, std::string );
+			virtual Icon *getIcon( std::string, std::string, std::string );
 			virtual Icon *getIconByName( std::string );
 			virtual Icon *getIconByClass( std::string );
 			virtual Icon *getIconByTitle( std::string );
