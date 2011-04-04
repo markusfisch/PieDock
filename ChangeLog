@@ -1,5 +1,5 @@
 1.2.1
-	improved determination of icons in window menus
+	improved icon determination in one-icon-per-window menus
 
 1.2.0
 	switch through windows of active application only
