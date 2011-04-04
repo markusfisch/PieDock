@@ -1,3 +1,6 @@
+1.2.1
+	improved determination of icons in window menus
+
 1.2.0
 	switch through windows of active application only
 	fixed loading of PNG files with a bit depth of 16
