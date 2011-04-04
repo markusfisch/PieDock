@@ -105,7 +105,7 @@ bool Menu::update( std::string menuName )
 	}
 
 	// assign windows to menu items; this is done by evaluating name, class
-	// or title of the windows since you just can't trust window IDs over time
+	// and title of the windows since you just can't trust window IDs over time
 	{
 		WindowManager::WindowList wl( app->getDisplay() );
 
@@ -122,14 +122,22 @@ bool Menu::update( std::string menuName )
 
 				if( (w = windowToItem.find( (*i) )) != windowToItem.end() )
 				{
-					if( menuItems->onlyFromActive() )
-					{
-						XClassHint xch;
+					XClassHint xch;
+					Icon *icon;
 
-						if( XGetClassHint( app->getDisplay(), (*i), &xch ) &&
-							classFilter.compare( xch.res_class ) )
-							continue;
-					}
+					if( !XGetClassHint( app->getDisplay(), (*i), &xch ) )
+						continue;
+
+					if( menuItems->onlyFromActive() &&
+						classFilter.compare( xch.res_class ) )
+						continue;
+
+					// always get icon anew when reusing a window ID
+					if( (icon = iconMap->getIcon(
+							WindowManager::getTitle( app->getDisplay(), (*i) ),
+							xch.res_class,
+							xch.res_name ) ))
+						(*w).second->setIcon( icon );
 
 					(*w).second->addWindow( app->getDisplay(), (*i) );
 					continue;
@@ -146,13 +154,10 @@ bool Menu::update( std::string menuName )
 				classFilter.compare( xch.res_class ) )
 				continue;
 
-			Icon *icon;
-
-			if( !(icon = iconMap->getIconByTitle(
-					WindowManager::getTitle( app->getDisplay(), (*i) ) )) &&
-				!(icon = iconMap->getIconByClass( xch.res_class )) &&
-				!(icon = iconMap->getIconByName( xch.res_name )) )
-				icon = iconMap->getMissingIcon( xch.res_name );
+			Icon *icon = iconMap->getIcon(
+				WindowManager::getTitle( app->getDisplay(), (*i) ),
+				xch.res_class,
+				xch.res_name );
 
 			if( menuItems->oneIconPerWindow() )
 			{
