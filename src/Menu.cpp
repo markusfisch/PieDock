@@ -132,12 +132,19 @@ bool Menu::update( std::string menuName )
 						classFilter.compare( xch.res_class ) )
 						continue;
 
+					std::string windowTitle = WindowManager::getTitle(
+						app->getDisplay(),
+						(*i) );
+
 					// always get icon anew when reusing a window ID
 					if( (icon = iconMap->getIcon(
-							WindowManager::getTitle( app->getDisplay(), (*i) ),
+							windowTitle,
 							xch.res_class,
 							xch.res_name ) ))
+					{
 						(*w).second->setIcon( icon );
+						(*w).second->setTitle( windowTitle );
+					}
 
 					(*w).second->addWindow( app->getDisplay(), (*i) );
 					continue;
@@ -154,8 +161,12 @@ bool Menu::update( std::string menuName )
 				classFilter.compare( xch.res_class ) )
 				continue;
 
+			std::string windowTitle = WindowManager::getTitle(
+				app->getDisplay(),
+				(*i) );
+
 			Icon *icon = iconMap->getIcon(
-				WindowManager::getTitle( app->getDisplay(), (*i) ),
+				windowTitle,
 				xch.res_class,
 				xch.res_name );
 
@@ -163,6 +174,7 @@ bool Menu::update( std::string menuName )
 			{
 				MenuItem *item = new MenuItem( icon );
 				item->addWindow( app->getDisplay(), (*i) );
+				item->setTitle( windowTitle );
 
 				menuItems->push_back( item );
 				continue;
@@ -178,6 +190,7 @@ bool Menu::update( std::string menuName )
 				{
 					MenuItem *item = new MenuItem( icon );
 					item->addWindow( app->getDisplay(), (*i) );
+					item->setTitle( windowTitle );
 
 					iconToItem[icon] = item;
 					menuItems->push_back( item );
@@ -321,21 +334,7 @@ void Menu::execute( Settings::Action a )
 std::string Menu::getItemTitle() const
 {
 	if( selected )
-	{
-		if( !selected->isSticky() &&
-			selected->hasWindows() )
-		{
-			std::string t = WindowManager::getTitle(
-				app->getDisplay(),
-				selected->getNextWindow() );
-
-			selected->setTitle( t );
-
-			return t;
-		}
-
 		return selected->getTitle();
-	}
 
 	return "";
 };
