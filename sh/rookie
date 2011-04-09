@@ -70,7 +70,7 @@ EOF
 
 	# try to get libraries on Fedora
 	which yum &>/dev/null && {
-		sudo yum install gcc-c++ \
+		sudo yum -y install gcc-c++ \
 			make \
 			xorg-x11-libX11-devel \
 			xorg-x11-libXrender-devel \
