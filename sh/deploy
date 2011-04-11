@@ -1,0 +1,127 @@
+#!/bin/bash
+
+cat <<EOF
+
+This will build, install and run PieDock. If there are libraries or tools
+missing, this script will try to install them through your local package
+management system. In order to do that, you will be required to give your
+root password or to run this as root.
+
+If you interested in learning how to build software from source on Linux/BSD,
+just have a look at this file. If you want to know, what packages are
+necessary to build this software, have a look at this file.
+
+Do you want to build, install and run PieDock now (y/n)?
+EOF
+
+read A && [[ $A != y ]] && exit -1
+
+# check we're in the right place
+[ -x configure ] || {
+	cd ..
+	[ -x configure ] || {
+		echo "error: missing configure script"
+		exit -1
+	}
+}
+
+# and have a setup script
+[ -x sh/setup ] || {
+	echo "error: missing setup script"
+	exit -1
+}
+
+for (( RUNS=2; RUNS--; ))
+do
+	# try to configure build for this system
+	./configure && {
+		# build, install, setup and run
+		make && sudo make install && sh/setup && PieDock &&
+			cat <<EOF
+
+Congratulations! PieDock was successfully installed and run!
+
+You may press one of the following combinations to make the menu
+appear:
+
+    Windows-key + left mouse button
+    Windows-key + scroll wheel up
+    Windows-key + scroll wheel down
+
+To fine-tune the experience, check out the configuration file at
+
+$HOME/.PieDockrc
+
+You may now erase this directory.
+
+EOF
+
+		break
+	}
+
+	ERROR_STRING="error: libraries cannot be installed"
+
+	# try to get libraries on Ubuntu or Debian
+	which apt-get &>/dev/null && {
+		sudo apt-get -y --no-upgrade install g++ \
+			libx11-dev \
+			libxrender-dev \
+			libxft2-dev \
+			libfreetype6-dev \
+			libpng-dev || {
+			echo $ERROR_STRING
+			exit -1
+		}
+
+		continue
+	}
+
+	# try to get libraries on openSUSE
+	which zypper &>/dev/null && {
+		# where's Xft on SUSE?
+		sudo zypper --non-interactive install gcc-c++ \
+			make \
+			xorg-x11-libX11-devel \
+			xorg-x11-libXrender-devel \
+			freetype2-devel \
+			libpng14-devel || {
+			echo $ERROR_STRING
+			exit -1
+		}
+
+		continue
+	}
+
+	# try to get libraries on Fedora
+	which yum &>/dev/null && {
+		sudo yum -y install gcc-c++ \
+			make \
+			libX11-devel \
+			libXrender-devel \
+			libXft-devel \
+			freetype-devel \
+			libpng-devel || {
+			echo $ERROR_STRING
+			exit -1
+		}
+
+		continue
+	}
+
+	# build on Gentoo
+	which emerge &>/dev/null && {
+		# assuming X libraries are installed already
+		sudo emerge --noreplace libpng \
+			libXrender \
+			libXft \
+			freetype || {
+			echo $ERROR_STRING
+			exit -1
+		}
+
+		continue
+	}
+
+	echo "error: sorry, your package management system is not supported."
+	exit -1
+done
