@@ -7,10 +7,6 @@ missing, this script will try to install them through your local package
 management system. In order to do that, you will be required to give your
 root password or to run this as root.
 
-If you interested in learning how to build software from source on Linux/BSD,
-just have a look at this file. If you want to know, what packages are
-necessary to build this software, have a look at this file.
-
 Do you want to build, install and run PieDock now (y/n)?
 EOF
 
@@ -31,13 +27,41 @@ read A && [[ $A != y ]] && exit -1
 	exit -1
 }
 
+# check for sudo if not run as root
+SUDO=
+[[ $EUID -ne 0 ]] && {
+	SUDO=sudo
+	which $SUDO &>/dev/null || {
+		echo "error: "
+		exit -1
+	}
+}
+
 for (( RUNS=2; RUNS--; ))
 do
 	# try to configure build for this system
 	./configure && {
-		# build, install, setup and run
-		make && sudo make install && sh/setup && PieDock &&
-			cat <<EOF
+		make || {
+			echo "error: build failed, check the top most error"
+			exit -1
+		}
+
+		$SUDO make install || {
+			echo "error: installation failed, check the top most error"
+			exit -1
+		}
+
+		sh/setup || {
+			echo "error: setup failed"
+			exit -1
+		}
+
+		PieDock || {
+			echo "error: PieDock failed to start $HOME/.PieDockrc"
+			exit -1
+		}
+
+		cat <<EOF
 
 Congratulations! PieDock was successfully installed and run!
 
@@ -63,7 +87,7 @@ EOF
 
 	# try to get libraries on Ubuntu or Debian
 	which apt-get &>/dev/null && {
-		sudo apt-get -y --no-upgrade install g++ \
+		$SUDO apt-get -y --no-upgrade install g++ \
 			libx11-dev \
 			libxrender-dev \
 			libxft2-dev \
@@ -79,7 +103,7 @@ EOF
 	# try to get libraries on openSUSE
 	which zypper &>/dev/null && {
 		# where's Xft on SUSE?
-		sudo zypper --non-interactive install gcc-c++ \
+		$SUDO zypper --non-interactive install gcc-c++ \
 			make \
 			xorg-x11-libX11-devel \
 			xorg-x11-libXrender-devel \
@@ -94,7 +118,7 @@ EOF
 
 	# try to get libraries on Fedora
 	which yum &>/dev/null && {
-		sudo yum -y install gcc-c++ \
+		$SUDO yum -y install gcc-c++ \
 			make \
 			libX11-devel \
 			libXrender-devel \
@@ -111,7 +135,7 @@ EOF
 	# build on Gentoo
 	which emerge &>/dev/null && {
 		# assuming X libraries are installed already
-		sudo emerge --noreplace libpng \
+		$SUDO emerge --noreplace libpng \
 			libXrender \
 			libXft \
 			freetype || {
