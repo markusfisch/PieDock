@@ -60,6 +60,7 @@ alias "xterm" terminal
 alias "xfce4-terminal" terminal
 alias "chromium" chrome
 alias "googleearth-bin" googleearth
+alias "Blender" blender
 alias "Blender:Render" blender
 
 menu
