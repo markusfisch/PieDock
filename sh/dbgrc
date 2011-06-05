@@ -38,8 +38,8 @@ key L SpinNext
 
 #minimum-number 8
 
-active-indicator "~/.PieDock/active-indicators/gnome-emblem-new.png" right bottom
-missing-icon "~/.PieDock/applications/generic/PixelPressIcons/TheJollyRoger.png"
+#active-indicator "~/.PieDock/active-indicators/gnome-emblem-new.png" right bottom
+#missing-icon "~/.PieDock/applications/generic/PixelPressIcons/TheJollyRoger.png"
 #filler-icon "~/.PieDock/applications/generic/PixelPressIcons/DoNotDisturb.png"
 
 path "~/.PieDock/applications" "~/.PieDock/actions" "/usr/share/pixmaps"
