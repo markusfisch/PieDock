@@ -12,8 +12,11 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 #include "WindowManager.h"
+#include "ArgbSurface.h"
 
 #include <X11/Xutil.h>
+#include <stdint.h>
+#include <string.h>
 
 using namespace PieDock;
 
@@ -46,23 +49,96 @@ void WindowManager::WindowList::addClientsOf( Display *d )
  */
 void WindowManager::activate( Display *d, Window w )
 {
+	Window root = DefaultRootWindow( d );
+
 	// switch to workspace
 	{
-		unsigned long workspace = getWorkspace( d, w );
-		Window root = DefaultRootWindow( d );
 		Property <unsigned long> p( d, root );
 
-		if( (p.fetch( XA_CARDINAL, "_NET_CURRENT_DESKTOP" ) ||
-				p.fetch( XA_CARDINAL, "_WIN_WORKSPACE" )) &&
-			workspace != *p.getData() )
-			sendClientMessage(
-				d,
-				root,
-				"_NET_CURRENT_DESKTOP",
-				workspace );
+		if( p.fetch( XA_CARDINAL, "_NET_NUMBER_OF_DESKTOPS" ) &&
+			*p.getData() == 1 )
+		{
+			XWindowAttributes desktop;
+			XWindowAttributes window;
+
+			// get desktop geometry, can't use _NET_WORKAREA here because
+			// it returns the geometry minus dock windows; nor does
+			// _NET_DESKTOP_GEOMETRY fit because it returns the dimensions
+			// of the large desktop
+			if( XGetWindowAttributes( d, root, &desktop ) &&
+				XGetWindowAttributes( d, w, &window ) )
+			{
+				Window dummy;
+
+				// get position of window relative to the current viewport
+				XTranslateCoordinates(
+					d,
+					w,
+					window.root,
+					-window.border_width,
+					-window.border_width,
+					&window.x,
+					&window.y,
+					&dummy );
+
+				if( (window.x < 0 ||
+						window.y < 0 ||
+						window.x > desktop.width ||
+						window.y > desktop.height) &&
+					p.fetch( XA_CARDINAL, "_NET_DESKTOP_VIEWPORT" ) )
+				{
+					struct
+					{
+						unsigned long x;
+						unsigned long y;
+					} view = { p.getData()[0], p.getData()[1] };
+
+					if( p.fetch( XA_CARDINAL, "_NET_DESKTOP_GEOMETRY" ) )
+					{
+						if( window.x < 0 &&
+							!view.x )
+							window.x += p.getData()[0];
+
+						if( window.y < 0 &&
+							!view.y )
+							window.y += p.getData()[1];
+					}
+
+					sendClientMessage(
+						d,
+						root,
+						"_NET_DESKTOP_VIEWPORT",
+						// this coordinates need to be a multiple of
+						// of the root window geometry and NOT of the
+						// workspace geometry
+						(window.x+view.x)/desktop.width*desktop.width,
+						(window.y+view.y)/desktop.height*desktop.height,
+						CurrentTime );
+				}
+			}
+		}
+		else
+		{
+			unsigned long workspace = getWorkspace( d, w );
+
+			if( (p.fetch( XA_CARDINAL, "_NET_CURRENT_DESKTOP" ) ||
+					p.fetch( XA_CARDINAL, "_WIN_WORKSPACE" )) &&
+				workspace != *p.getData() )
+				sendClientMessage(
+					d,
+					root,
+					"_NET_CURRENT_DESKTOP",
+					workspace );
+		}
 	}
 
-	sendClientMessage( d, w, "_NET_ACTIVE_WINDOW" );
+	sendClientMessage(
+		d,
+		root,
+		"_NET_ACTIVE_WINDOW",
+		2L,
+		CurrentTime );
+
 	XMapRaised( d, w );
 
 	// wait until the window becomes viewable before setting input focus;
@@ -139,6 +215,63 @@ std::string WindowManager::getTitle( Display *d, Window w )
 }
 
 /**
+ * Return icon of some window
+ *
+ * @param d - display
+ * @param w - window id
+ */
+ArgbSurface *WindowManager::getIcon( Display *d, Window w )
+{
+	Property<unsigned long> p( d, w );
+
+	if( !p.fetch( XA_CARDINAL, "_NET_WM_ICON", 0xffffffff ) )
+		return 0;
+
+	unsigned long *icon = 0;
+	unsigned long iconSize = 0;
+
+	// find biggest icon
+	{
+		unsigned long *b = p.getData();
+
+		for( unsigned long l = p.getItems();
+			l > 2; )
+		{
+			unsigned long s = b[0]*b[1];
+
+			if( s > iconSize )
+			{
+				icon = b;
+				iconSize = s;
+			}
+
+			s += 2;
+			b += s;
+			l -= s;
+		}
+	}
+
+	ArgbSurface *s;
+
+	if( !icon ||
+		!(s = new ArgbSurface( icon[0], icon[1] )) )
+		return 0;
+
+	// copy image data, don't use memcpy here since the bytes per pixel
+	// may be different from ArgbSurface's 32 bits
+	{
+		uint32_t *dest = reinterpret_cast<uint32_t *>( s->getData() );
+		unsigned long *src = &icon[2];
+
+		for( int y = s->getHeight(); y--; )
+			for( int x = s->getWidth(); x--; )
+				*dest++ = *src++ & 0xffffffff;
+	}
+
+	return s;
+}
+
+/**
  * Return workspace of window
  *
  * @param d - display
@@ -206,7 +339,7 @@ void WindowManager::setWindowType( Display *d, Window w, const char *type )
 	Atom a[2];
 	int n = 0;
 
-	a[n++] = getAtom( d, type );	
+	a[n++] = getAtom( d, type );
 
 	XChangeProperty(
 		d,
@@ -242,7 +375,6 @@ void WindowManager::sendClientMessage(
 	unsigned long data4 )
 {
 	XEvent event;
-	long mask = SubstructureRedirectMask | SubstructureNotifyMask;
 
 	event.xclient.type = ClientMessage;
 	event.xclient.serial = 0;
@@ -260,7 +392,7 @@ void WindowManager::sendClientMessage(
 		d,
 		w,
 		False,
-		mask,
+		SubstructureRedirectMask | SubstructureNotifyMask,
 		&event );
 }
 

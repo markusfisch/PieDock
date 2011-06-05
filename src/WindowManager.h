@@ -23,6 +23,9 @@
 
 namespace PieDock
 {
+	// forward declaration
+	class ArgbSurface;
+
 	/**
 	 * Interface to the window manager
 	 *
@@ -48,6 +51,7 @@ namespace PieDock
 			static void close( Display *, Window );
 			static Window getActive( Display * );
 			static std::string getTitle( Display *, Window );
+			static ArgbSurface *getIcon( Display *, Window );
 			static unsigned long getWorkspace( Display *, Window );
 			static unsigned long getNumberOfWorkspaces( Display * );
 			static bool isNormalWindow( Display *, Window );
