@@ -674,7 +674,7 @@ Icon *IconMap::getIcon( std::string t, std::string c, std::string n )
 	if( !(icon = getIconByTitle( t )) &&
 		!(icon = getIconByClass( c )) &&
 		!(icon = getIconByName( n )) )
-		icon = getMissingIcon( n );
+		return 0;
 
 	return icon;
 }
@@ -686,7 +686,43 @@ Icon *IconMap::getIcon( std::string t, std::string c, std::string n )
  */
 Icon *IconMap::getIconByName( std::string n )
 {
-	return surfaceIcon( n );
+	// try to resolve alias
+	{
+		AliasToFile::iterator i;
+
+		if( (i = nameToFile.find( n )) != nameToFile.end() )
+			n = (*i).second;
+	}
+
+	// cache look up
+	{
+		FileToIcon::iterator i;
+
+		if( (i = cache.find( n )) != cache.end() )
+			return (*i).second;
+	}
+
+	// load PNG file from disk
+	for( Paths::iterator i = paths.begin();
+		i != paths.end();
+		++i )
+	{
+		std::string file = n;
+		struct stat buf;
+
+		// look only for lower case
+		std::transform( file.begin(), file.end(), file.begin(), ::tolower );
+		file = *i+file+".png";
+
+		if( stat( file.c_str(), &buf ) > -1 )
+		{
+			PngSurface s( file );
+
+			return createIcon( s, n, Icon::File );
+		}
+	}
+
+	return 0;
 }
 
 /**
@@ -753,7 +789,7 @@ Icon *IconMap::getMissingIcon( std::string n )
 		}
 	}
 
-	return createIcon( *missingSurface, n );
+	return createIcon( *missingSurface, n, Icon::Missing );
 }
 
 /**
@@ -784,53 +820,7 @@ Icon *IconMap::getFillerIcon()
 		}
 	}
 
-	return createIcon( *fillerSurface, "" );
-}
-
-/**
- * Surface a given icon or create a new one
- *
- * @param n - resource name of window
- */
-Icon *IconMap::surfaceIcon( std::string n )
-{
-	// try to resolve alias
-	{
-		AliasToFile::iterator i;
-
-		if( (i = nameToFile.find( n )) != nameToFile.end() )
-			n = (*i).second;
-	}
-
-	// cache look up
-	{
-		FileToIcon::iterator i;
-
-		if( (i = cache.find( n )) != cache.end() )
-			return (*i).second;
-	}
-
-	// load PNG file from disk
-	for( Paths::iterator i = paths.begin();
-		i != paths.end();
-		++i )
-	{
-		std::string file = n;
-		struct stat buf;
-
-		// look only for lower case
-		std::transform( file.begin(), file.end(), file.begin(), ::tolower );
-		file = *i+file+".png";
-
-		if( stat( file.c_str(), &buf ) > -1 )
-		{
-			PngSurface s( file );
-
-			return createIcon( s, n );
-		}
-	}
-
-	return 0;
+	return createIcon( *fillerSurface, "", Icon::Filler );
 }
 
 /**
@@ -838,10 +828,11 @@ Icon *IconMap::surfaceIcon( std::string n )
  *
  * @param s - ARGB surface for icon
  * @param n - resource name of window
+ * @param t - icon type
  */
-Icon *IconMap::createIcon( ArgbSurface &s, std::string n )
+Icon *IconMap::createIcon( ArgbSurface &s, std::string n, Icon::Type t )
 {
-	Icon *icon = new Icon( s );
+	Icon *icon = new Icon( s, t );
 	cache[n] = icon;
 
 	return icon;

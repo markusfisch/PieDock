@@ -116,49 +116,13 @@ bool Menu::update( std::string menuName )
 			if( !WindowManager::isNormalWindow( app->getDisplay(), (*i) ) )
 				continue;
 
-			if( menuItems->oneIconPerWindow() )
-			{
-				WindowToItem::iterator w;
-
-				if( (w = windowToItem.find( (*i) )) != windowToItem.end() )
-				{
-					XClassHint xch;
-					Icon *icon;
-
-					if( !XGetClassHint( app->getDisplay(), (*i), &xch ) )
-						continue;
-
-					if( menuItems->onlyFromActive() &&
-						classFilter.compare( xch.res_class ) )
-						continue;
-
-					std::string windowTitle = WindowManager::getTitle(
-						app->getDisplay(),
-						(*i) );
-
-					// always get icon anew when reusing a window ID
-					if( (icon = iconMap->getIcon(
-							windowTitle,
-							xch.res_class,
-							xch.res_name ) ))
-					{
-						(*w).second->setIcon( icon );
-						(*w).second->setTitle( windowTitle );
-					}
-
-					(*w).second->addWindow( app->getDisplay(), (*i) );
-					continue;
-				}
-			}
-
 			XClassHint xch;
 
 			if( !XGetClassHint( app->getDisplay(), (*i), &xch ) ||
-				app->getSettings()->ignoreWindow( xch.res_name ) )
-				continue;
-
-			if( menuItems->onlyFromActive() &&
-				classFilter.compare( xch.res_class ) )
+				(!menuItems->oneIconPerWindow() &&
+					app->getSettings()->ignoreWindow( xch.res_name )) ||
+				(menuItems->onlyFromActive() &&
+					classFilter.compare( xch.res_class )) )
 				continue;
 
 			std::string windowTitle = WindowManager::getTitle(
@@ -170,8 +134,43 @@ bool Menu::update( std::string menuName )
 				xch.res_class,
 				xch.res_name );
 
+			if( !icon ||
+				icon->getType() == Icon::Missing )
+			{
+				ArgbSurface *s;
+
+				if( (s = WindowManager::getIcon( app->getDisplay(), (*i) )) )
+				{
+					icon = iconMap->createIcon(
+						*s,
+						xch.res_name,
+						Icon::Window );
+
+					delete s;
+				}
+				else if( !icon )
+					icon = iconMap->getMissingIcon( xch.res_name );
+			}
+
 			if( menuItems->oneIconPerWindow() )
 			{
+				WindowToItem::iterator w;
+
+				// use existing icon
+				if( (w = windowToItem.find( (*i) )) != windowToItem.end() )
+				{
+					// always get icon anew when reusing a window ID
+					if( icon )
+					{
+						(*w).second->setIcon( icon );
+						(*w).second->setTitle( windowTitle );
+					}
+
+					(*w).second->addWindow( app->getDisplay(), (*i) );
+					continue;
+				}
+
+				// create new icon
 				MenuItem *item = new MenuItem( icon );
 				item->addWindow( app->getDisplay(), (*i) );
 				item->setTitle( windowTitle );

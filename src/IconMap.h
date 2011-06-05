@@ -58,13 +58,12 @@ namespace PieDock
 			virtual Icon *getIconByTitle( std::string );
 			virtual Icon *getMissingIcon( std::string );
 			virtual Icon *getFillerIcon();
+			virtual Icon *createIcon( ArgbSurface &, std::string, Icon::Type );
 
 		protected:
 			typedef std::map<std::string, std::string> AliasToFile;
 			typedef std::map<std::string, Icon *> FileToIcon;
 
-			virtual Icon *surfaceIcon( std::string );
-			virtual Icon *createIcon( ArgbSurface &, std::string );
 			virtual void freeIcons();
 
 		private:

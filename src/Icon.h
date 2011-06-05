@@ -26,9 +26,23 @@ namespace PieDock
 	class Icon : public ArgbSurfaceSizeMap
 	{
 		public:
-			Icon( ArgbSurface &s ) :
-				ArgbSurfaceSizeMap( s ) {}
+			enum Type
+			{
+				Missing,
+				Filler,
+				File,
+				Window
+			};
+
+			Icon( ArgbSurface &s, Type t = File ) :
+				ArgbSurfaceSizeMap( s ),
+				type( t ) {}
 			virtual ~Icon() {}
+			inline const Type &getType() const { return type; }
+			inline void setType( Type t ) { type = t; }
+
+		private:
+			Type type;
 	};
 }
 
