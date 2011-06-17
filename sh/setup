@@ -43,6 +43,7 @@ ICONS=""
 		opera \
 		firefox \
 		thunderbird \
+		evolution \
 		gedit \
 		gimp \
 		inkscape \
@@ -50,10 +51,15 @@ ICONS=""
 		nautilus \
 		thunar \
 		rekonq \
+		libreoffice \
+		ooffice \
 		abiword \
 		gnumeric \
 		exaile \
-		skype"
+		skype \
+		empathy \
+		rhythmbox \
+		banshee"
 
 	SVGS=/usr/share/icons/hicolor/scalable/apps/
 	[ -d "$SVGS" ] &&
