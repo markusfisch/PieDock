@@ -1,3 +1,9 @@
+1.3.0
+Changing the workspace/viewport works now for large desktops, like Compiz, too.
+
+1.2.0
+Switch through the windows of only one application.
+
 1.1.0
 Now it's easier to switch between applications from the keyboard (for example
 by Mod4+Tab). By using the key-up directive, you're able to trigger some action
