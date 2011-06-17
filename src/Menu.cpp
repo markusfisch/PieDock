@@ -101,7 +101,12 @@ bool Menu::update( std::string menuName )
 
 		if( w &&
 			XGetClassHint( app->getDisplay(), w, &xch ) )
+		{
 			classFilter = xch.res_class;
+
+			XFree( xch.res_name );
+			XFree( xch.res_class );
+		}
 	}
 
 	// assign windows to menu items; this is done by evaluating name, class
@@ -118,12 +123,19 @@ bool Menu::update( std::string menuName )
 
 			XClassHint xch;
 
-			if( !XGetClassHint( app->getDisplay(), (*i), &xch ) ||
-				(!menuItems->oneIconPerWindow() &&
+			if( !XGetClassHint( app->getDisplay(), (*i), &xch ) )
+				continue;
+
+			if( (!menuItems->oneIconPerWindow() &&
 					app->getSettings()->ignoreWindow( xch.res_name )) ||
 				(menuItems->onlyFromActive() &&
 					classFilter.compare( xch.res_class )) )
+			{
+				XFree( xch.res_name );
+				XFree( xch.res_class );
+
 				continue;
+			}
 
 			std::string windowTitle = WindowManager::getTitle(
 				app->getDisplay(),
@@ -151,6 +163,9 @@ bool Menu::update( std::string menuName )
 				else if( !icon )
 					icon = iconMap->getMissingIcon( xch.res_name );
 			}
+
+			XFree( xch.res_name );
+			XFree( xch.res_class );
 
 			if( menuItems->oneIconPerWindow() )
 			{
@@ -294,7 +309,9 @@ void Menu::execute( Settings::Action a )
 
 						oss << cmd.substr( 0, p ) <<
 							"0x" <<
-							std::hex << getWindowBelowCursor() <<
+							std::hex << WindowManager::getClientWindow(
+								app->getDisplay(),
+								getWindowBelowCursor() ) <<
 							cmd.substr( p+4 );
 
 						cmd = oss.str();
