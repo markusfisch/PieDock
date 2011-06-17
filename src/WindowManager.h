@@ -50,6 +50,7 @@ namespace PieDock
 			static void iconify( Display *, Window );
 			static void close( Display *, Window );
 			static Window getActive( Display * );
+			static Window getClientWindow( Display *, Window );
 			static std::string getTitle( Display *, Window );
 			static ArgbSurface *getIcon( Display *, Window );
 			static unsigned long getWorkspace( Display *, Window );

@@ -15,6 +15,11 @@
 #include "ArgbSurface.h"
 
 #include <X11/Xutil.h>
+
+#ifdef HAVE_XMU
+#include <X11/Xmu/WinUtil.h>
+#endif
+
 #include <stdint.h>
 #include <string.h>
 
@@ -134,7 +139,7 @@ void WindowManager::activate( Display *d, Window w )
 
 	sendClientMessage(
 		d,
-		root,
+		w,
 		"_NET_ACTIVE_WINDOW",
 		2L,
 		CurrentTime );
@@ -195,6 +200,82 @@ Window WindowManager::getActive( Display *d )
 		return 0;
 
 	return *p.getData();
+}
+
+/**
+ * Get client/content window from a possible frame/decor window
+ *
+ * @param d - display
+ * @param w - window
+ */
+Window WindowManager::getClientWindow( Display *d, Window w )
+{
+	Window root;
+	int i;
+	unsigned int u;
+
+	if( XGetGeometry( d, w, &root, &i, &i, &u, &u, &u, &u ) &&
+		w != root )
+	{
+#ifdef HAVE_XMU
+		w = XmuClientWindow( d, w );
+#else
+		/**
+		 * Private class to stand in if XmuClientWindow is missing;
+		 * didn't like the thought of having a depedency for this
+		 */
+		class WindowDiver
+		{
+			public:
+				WindowDiver( Display *d ) : display( d ) {}
+				virtual ~WindowDiver() {}
+				Window find( Window window )
+				{
+					if( hasWmState( window ) )
+						return window;
+
+					return checkChildren( window );
+				}
+
+			private:
+				Window checkChildren( Window window ) const
+				{
+					Window root;
+					Window parent;
+					Window *children;
+					unsigned int n;
+
+					if( !XQueryTree( display, window, &root, &parent,
+							&children, &n ) )
+						return window;
+
+					for( int i = 0; i < n; ++i )
+						if( hasWmState( children[i] ) )
+							return children[i];
+
+					for( int i = 0; i < n; ++i )
+						checkChildren( children[i] );
+
+					return window;
+				};
+				const bool hasWmState( const Window window ) const
+				{
+					Property<unsigned char*> p( display, window );
+
+					return p.fetch(
+						getAtom( display, "WM_STATE" ),
+						"WM_STATE" );
+				};
+
+				Display *display;
+		};
+
+		WindowDiver wd( d );
+		return wd.find( w );
+#endif
+	}
+
+	return w;
 }
 
 /**
@@ -390,7 +471,7 @@ void WindowManager::sendClientMessage(
 
 	XSendEvent(
 		d,
-		w,
+		DefaultRootWindow( d ),
 		False,
 		SubstructureRedirectMask | SubstructureNotifyMask,
 		&event );
