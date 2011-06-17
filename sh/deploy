@@ -89,6 +89,7 @@ EOF
 	which apt-get &>/dev/null && {
 		$SUDO apt-get -y --no-upgrade install g++ \
 			libx11-dev \
+			libxmu-dev \
 			libxrender-dev \
 			libxft2-dev \
 			libfreetype6-dev \
@@ -106,6 +107,7 @@ EOF
 		$SUDO zypper --non-interactive install gcc-c++ \
 			make \
 			xorg-x11-libX11-devel \
+			xorg-x11-libXmu-devel \
 			xorg-x11-libXrender-devel \
 			freetype2-devel \
 			libpng14-devel || {
@@ -121,6 +123,7 @@ EOF
 		$SUDO yum -y install gcc-c++ \
 			make \
 			libX11-devel \
+			libXmu-devel \
 			libXrender-devel \
 			libXft-devel \
 			freetype-devel \

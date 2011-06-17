@@ -689,6 +689,7 @@ enable_option_checking
 enable_dependency_tracking
 enable_xft
 enable_xrender
+enable_xmu
 with_x
 '
       ac_precious_vars='build_alias
@@ -1325,6 +1326,7 @@ Optional Features:
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-xft        Xft support default=yes
   --enable-xrender        Xrender (transparent) support default=yes
+  --enable-xmu        use libXmu default=yes
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2729,7 +2731,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=PieDock
- VERSION=1.2.2
+ VERSION=1.3.1
 
 
 cat >>confdefs.h <<_ACEOF
@@ -4192,6 +4194,8 @@ _ACEOF
 
   LIBS="-lX11 $LIBS"
 
+else
+  as_fn_error "libX11 not found" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for png_create_read_struct in -lpng" >&5
@@ -4237,6 +4241,8 @@ _ACEOF
 
   LIBS="-lpng $LIBS"
 
+else
+  as_fn_error "libpng not found" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for deflate in -lz" >&5
@@ -4282,6 +4288,8 @@ _ACEOF
 
   LIBS="-lz $LIBS"
 
+else
+  as_fn_error "libz not found" "$LINENO" 5
 fi
 
 
@@ -4626,6 +4634,111 @@ if test "x$ac_cv_lib_Xrender_XRenderCreatePicture" = x""yes; then :
 $as_echo "#define HAVE_XRENDER 1" >>confdefs.h
 
 		LIBS="$LIBS -lXrender"
+fi
+
+
+fi
+
+
+# Check for libXmu
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to have libXmu" >&5
+$as_echo_n "checking whether to have libXmu... " >&6; }
+# Check whether --enable-xmu was given.
+if test "${enable_xmu+set}" = set; then :
+  enableval=$enable_xmu; if test x$enableval = "xyes"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XmuClientWindow in -lXmu" >&5
+$as_echo_n "checking for XmuClientWindow in -lXmu... " >&6; }
+if test "${ac_cv_lib_Xmu_XmuClientWindow+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lXmu  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XmuClientWindow ();
+int
+main ()
+{
+return XmuClientWindow ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_Xmu_XmuClientWindow=yes
+else
+  ac_cv_lib_Xmu_XmuClientWindow=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xmu_XmuClientWindow" >&5
+$as_echo "$ac_cv_lib_Xmu_XmuClientWindow" >&6; }
+if test "x$ac_cv_lib_Xmu_XmuClientWindow" = x""yes; then :
+
+$as_echo "#define HAVE_XMU 1" >>confdefs.h
+
+			LIBS="$LIBS -lXmu"
+fi
+
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XmuClientWindow in -lXmu" >&5
+$as_echo_n "checking for XmuClientWindow in -lXmu... " >&6; }
+if test "${ac_cv_lib_Xmu_XmuClientWindow+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lXmu  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XmuClientWindow ();
+int
+main ()
+{
+return XmuClientWindow ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_Xmu_XmuClientWindow=yes
+else
+  ac_cv_lib_Xmu_XmuClientWindow=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xmu_XmuClientWindow" >&5
+$as_echo "$ac_cv_lib_Xmu_XmuClientWindow" >&6; }
+if test "x$ac_cv_lib_Xmu_XmuClientWindow" = x""yes; then :
+
+$as_echo "#define HAVE_XMU 1" >>confdefs.h
+
+		LIBS="$LIBS -lXmu"
 fi
 
 

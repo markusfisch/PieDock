@@ -1,7 +1,7 @@
 # Initialize autoconf and automake
 AC_PREREQ([2.65])
 AC_INIT(src/main.cpp)
-AM_INIT_AUTOMAKE(PieDock, 1.2.2)
+AM_INIT_AUTOMAKE(PieDock, 1.3.1)
 
 # Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -14,9 +14,9 @@ AC_PROG_CC
 AC_PROG_INSTALL
 
 # Checks for mandatory libraries
-AC_CHECK_LIB([X11], [XOpenDisplay])
-AC_CHECK_LIB([png], [png_create_read_struct])
-AC_CHECK_LIB([z], [deflate])
+AC_CHECK_LIB([X11], [XOpenDisplay], , AC_MSG_ERROR([libX11 not found]))
+AC_CHECK_LIB([png], [png_create_read_struct], , AC_MSG_ERROR([libpng not found]))
+AC_CHECK_LIB([z], [deflate], , AC_MSG_ERROR([libz not found]))
 
 # Checks for Xft
 XFT=false
@@ -75,6 +75,25 @@ AC_ARG_ENABLE(
 	AC_CHECK_LIB(Xrender, XRenderCreatePicture,
 		AC_DEFINE(HAVE_XRENDER, 1, "Xrender support")
 		LIBS="$LIBS -lXrender")
+)
+
+# Check for libXmu
+AC_MSG_CHECKING([whether to have libXmu])
+AC_ARG_ENABLE(
+  xmu,
+[  --enable-xmu        use libXmu [default=yes]],
+	if test x$enableval = "xyes"; then
+		AC_MSG_RESULT([yes])
+		AC_CHECK_LIB(Xmu, XmuClientWindow,
+			AC_DEFINE(HAVE_XMU, 1, "libXmu support")
+			LIBS="$LIBS -lXmu")
+	else
+		AC_MSG_RESULT([no])
+	fi,
+	AC_MSG_RESULT([yes])
+	AC_CHECK_LIB(Xmu, XmuClientWindow,
+		AC_DEFINE(HAVE_XMU, 1, "libXmu support")
+		LIBS="$LIBS -lXmu")
 )
 
 # Checks for header files.
