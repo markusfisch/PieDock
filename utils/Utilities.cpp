@@ -58,6 +58,9 @@ void Utilities::listWindows()
 				display, (*i) ) << "\"" << std::endl <<
 			"\tName: \"" << xch.res_name << "\"" << std::endl <<
 			"\tClass: \"" << xch.res_class << "\"" << std::endl;
+
+		XFree( xch.res_name );
+		XFree( xch.res_class );
 	}
 }
 
@@ -83,27 +86,27 @@ void Utilities::execute( Utilities::Action a, Window w )
 		case Maximize:
 			WindowManager::sendClientMessage(
 				display,
-				w, 
+				w,
 				"_NET_WM_STATE",
 				static_cast<unsigned long>( StateToggle ),
-				static_cast<unsigned long>( WindowManager::getAtom( 
-					display, 
+				static_cast<unsigned long>( WindowManager::getAtom(
+					display,
 					"_NET_WM_STATE_MAXIMIZED_VERT" ) ),
-				static_cast<unsigned long>( WindowManager::getAtom( 
-					display, 
+				static_cast<unsigned long>( WindowManager::getAtom(
+					display,
 					"_NET_WM_STATE_MAXIMIZED_HORZ" ) ) );
 			break;
 		case Fullscreen:
 			WindowManager::sendClientMessage(
 				display,
-				w, 
+				w,
 				"_NET_WM_STATE",
 				static_cast<unsigned long>( StateToggle ),
-				static_cast<unsigned long>( WindowManager::getAtom( 
-					display, 
+				static_cast<unsigned long>( WindowManager::getAtom(
+					display,
 					"_NET_WM_STATE_FULLSCREEN" ) ) );
 			break;
-/* for some reason this will kill the whole X server when called out of 
+/* for some reason this will kill the whole X server when called out of
    PieDock; when called manually from aterm it works ?! xkill shows the
    same behaviour so the error may lie somewhere in PieDock::Menu::run()
 		case Kill:
@@ -120,21 +123,21 @@ void Utilities::execute( Utilities::Action a, Window w )
 		case Shade:
 			WindowManager::sendClientMessage(
 				display,
-				w, 
+				w,
 				"_NET_WM_STATE",
 				static_cast<unsigned long>( StateToggle ),
-				static_cast<unsigned long>( WindowManager::getAtom( 
-					display, 
+				static_cast<unsigned long>( WindowManager::getAtom(
+					display,
 					"_NET_WM_STATE_SHADED" ) ) );
 			break;
 		case Stick:
 			WindowManager::sendClientMessage(
 				display,
-				w, 
+				w,
 				"_NET_WM_STATE",
 				static_cast<unsigned long>( StateToggle ),
-				static_cast<unsigned long>( WindowManager::getAtom( 
-					display, 
+				static_cast<unsigned long>( WindowManager::getAtom(
+					display,
 					"_NET_WM_STATE_STICKY" ) ) );
 			break;
 	}
