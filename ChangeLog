@@ -1,7 +1,10 @@
+1.3.2
+	fixed replacement for XmuClientWindow
+
 1.3.1
 	fixed memory leak by freeing XClassHint members
 	improved sending client messages to WM
-	translate decor/frame windows when replacing WID in commands
+	translate decor/frame windows when replacing the window ID in commands
 	minor configure.ac fixes
 
 1.3.0
