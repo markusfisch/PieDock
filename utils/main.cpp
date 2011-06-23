@@ -61,9 +61,9 @@ int main( int argc, char **argv )
 						exit( 0 );
 					case 'v':
 						std::cout <<
-							basename( binary ) << " 1.0.0" <<
+							basename( binary ) << " 1.0.1" <<
 							std::endl <<
-							"Copyright (c) 2007-2010" <<
+							"Copyright (c) 2007-2011" <<
 							std::endl <<
 							"Markus Fisch <mf@markusfisch.de>" <<
 							std::endl <<
