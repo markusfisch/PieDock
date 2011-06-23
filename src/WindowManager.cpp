@@ -234,7 +234,8 @@ Window WindowManager::getClientWindow( Display *d, Window w )
 					if( hasWmState( window ) )
 						return window;
 
-					return checkChildren( window );
+					Window w = checkChildren( window );
+					return w ? w : window;
 				}
 
 			private:
@@ -247,16 +248,21 @@ Window WindowManager::getClientWindow( Display *d, Window w )
 
 					if( !XQueryTree( display, window, &root, &parent,
 							&children, &n ) )
-						return window;
+						return 0;
 
 					for( int i = 0; i < n; ++i )
 						if( hasWmState( children[i] ) )
 							return children[i];
 
 					for( int i = 0; i < n; ++i )
-						checkChildren( children[i] );
+					{
+						Window w;
 
-					return window;
+						if( (w = checkChildren( children[i] )) )
+							return w;
+					}
+
+					return 0;
 				};
 				const bool hasWmState( const Window window ) const
 				{
