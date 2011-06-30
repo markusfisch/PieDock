@@ -62,17 +62,24 @@ function start()
 {
 	cd \`dirname \$0\`
 
-	# update configuration file
-	[ -f conf/PieDockrc ] &&
-		grep "${TEMPLATE}/icons\"" conf/PieDockrc &>/dev/null && {
-		C=conf/PieDockrc
-		T=conf/.PieDockrc-temporary
-		cp \$C \$T &&
-			cat \$T | sed -e "s_\".*${TEMPLATE}/icons\"_\"\`pwd\`/icons\"_g;" > \$C &&
-			rm \$T
+	F="\${BIN}rc"
+	RC="\${HOME}/.\$F"
+
+	# check for rc file in home first
+	[ -f "\$RC" ] || {
+		RC="conf/\$F"
+
+		# realize local configuration template
+		[ -f "\$RC" ] &&
+			grep "${TEMPLATE}/icons\"" "\$RC" &>/dev/null && {
+				T="conf/.tmp"
+				cp \$RC \$T &&
+					cat \$T | sed -e "s_\".*${TEMPLATE}/icons\"_\"\`pwd\`/icons\"_g;" > \$RC &&
+					rm \$T
+			}
 	}
 
-	bin/\$BIN -r conf/\${BIN}rc &
+	bin/\$BIN -r \$RC &
 }
 
 function stop()
