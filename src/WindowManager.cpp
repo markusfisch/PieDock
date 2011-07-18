@@ -214,8 +214,9 @@ Window WindowManager::getClientWindow( Display *d, Window w )
 	int i;
 	unsigned int u;
 
-	if( XGetGeometry( d, w, &root, &i, &i, &u, &u, &u, &u ) &&
-		w != root )
+	if( w &&
+		w != DefaultRootWindow( d ) &&
+		XGetGeometry( d, w, &root, &i, &i, &u, &u, &u, &u ) )
 	{
 #ifdef HAVE_XMU
 		w = XmuClientWindow( d, w );
