@@ -1,3 +1,7 @@
+1.3.3
+	fixed crash when trying to determine a client window from a invalid window
+	stock icons for window controlling actions added
+
 1.3.2
 	fixed replacement for XmuClientWindow
 
