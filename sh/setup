@@ -65,7 +65,6 @@ ICONS=""
 		which convert &>/dev/null &&
 		HAVE_CONVERT=1
 
-	# no place to put new icons into
 	[ -d "$ICON_PATH" ] ||
 		mkdir -p "$ICON_PATH" ||
 		HAVE_CONVERT=0
@@ -94,12 +93,13 @@ ICONS=""
 			done
 		}
 
-		ICONS="$ICONS\ticon $A\n"
+		ICONS="${ICONS}	icon ${A}
+"
 	done
 }
 
 # now write the configuration file
-cat <<EOF | sed -e "s_COMPOSITING_${COMPOSITING}_g;s_INDICATOR_${INDICATOR}_g;s_ICONS_${ICONS}_g;" > $RC
+cat <<EOF > $RC
 # window size in pixels
 # if you're running weak hardware, try to keep this low
 # usage: size PIXELS
@@ -112,7 +112,7 @@ fitts 1
 
 # use compositing manager for true transparency?
 # usage: compositing (0|1)
-COMPOSITING
+$COMPOSITING
 
 # do you want to have an icon title in the middle of the pie?
 # usage: title (0|1)
@@ -205,7 +205,7 @@ key Down SpinPrevious
 # active indicator or what should mark an icon as having windows
 # usage: active-indicator FILE [(left|center|right)] [(top|center|bottom)]
 #active-indicator "path/to/active-indicator.png" right bottom
-INDICATOR
+$INDICATOR
 
 # what icon should be used for unassociated menu items/windows
 # usage: missing-icon FILE
@@ -266,7 +266,7 @@ alias "googleearth-bin" googleearth
 #   *
 # end
 menu
-ICONS
+$ICONS
 	*
 end
 
