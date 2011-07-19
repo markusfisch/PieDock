@@ -3,9 +3,8 @@
 readonly RC=${RC:=${HOME}/.PieDockrc}
 readonly ICON_PATH=${ICON_PATH:=${HOME}/.PieDock/icons}
 
-# make a backup of existing configuration
-[ -f "$RC" ] &&
-	cp "$RC" "$RC-backup-$USER-`date +%Y%m%d`-$$"
+# abort if there's already a config file
+[ -f "$RC" ] && exit
 
 # check for compositing
 COMPOSITING="#compositing 1"
