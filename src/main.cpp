@@ -58,6 +58,7 @@ int main( int argc, char **argv )
 	{
 		PieDock::Settings settings;
 		char *menuName = 0;
+		bool background = true;
 
 		// parse arguments
 		{
@@ -80,7 +81,8 @@ int main( int argc, char **argv )
 								"\t-r FILE    path and name of alternative " <<
 									"configuration file" << std::endl <<
 								"\t-m [MENU]  show already running " <<
-									"instance" << std::endl;
+									"instance" << std::endl <<
+								"\t-f         stay in foreground" << std::endl;
 							return 0;
 						case 'v':
 							std::cout <<
@@ -103,6 +105,9 @@ int main( int argc, char **argv )
 								throw "missing FILE argument";
 							settings.setConfigurationFile( *++argv );
 							break;
+						case 'f':
+							background = false;
+							break;
 						case 'm':
 							if( argc > 1 &&
 								**(argv+1) != '-' )
@@ -120,16 +125,19 @@ int main( int argc, char **argv )
 				settings.setConfigurationFileFromBinary( binary );
 		}
 
-		switch( fork() )
+		if (background)
 		{
-			default:
-				// terminate parent process to detach from shell
-				return 0;
-			case 0:
-				// pursue in child process
-				break;
-			case -1:
-				throw "cannot fork";
+			switch( fork() )
+			{
+				default:
+					// terminate parent process to detach from shell
+					return 0;
+				case 0:
+					// pursue in child process
+					break;
+				case -1:
+					throw "cannot fork";
+			}
 		}
 
 		// always open display after fork
