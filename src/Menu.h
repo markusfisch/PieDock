@@ -42,6 +42,8 @@ namespace PieDock
 			virtual bool change( Settings::Action = Settings::Launch );
 			virtual void execute( Settings::Action = Settings::Launch );
 			virtual std::string getItemTitle() const;
+			inline MenuItem *getSelected() const {
+				return selected; }
 
 		protected:
 			Application *app;
