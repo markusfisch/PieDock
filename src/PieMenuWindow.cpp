@@ -69,12 +69,14 @@ PieMenuWindow::~PieMenuWindow()
 bool PieMenuWindow::appear( std::string n,
 	PieMenuWindow::Placement p )
 {
+	lastMenuName.clear();
 	if( !menu.update( n ) )
 		return false;
 
 	if( p == PieMenuWindow::IconBelowCursor )
 		menu.setTwistForSelection();
 
+	lastMenuName = n;
 	show( p );
 
 	return true;
@@ -119,11 +121,12 @@ bool PieMenuWindow::processEvent( XEvent &event )
 			break;
 		case ButtonRelease:
 			{
-				Settings::ButtonFunctions *bf =
-					&app->getSettings()->getButtonFunctions();
+				Settings::ButtonFunctions bf =
+					app->getSettings()->getButtonFunctions(lastMenuName,
+						menu.getSelected());
 
-				for( Settings::ButtonFunctions::iterator i = bf->begin();
-					i != bf->end();
+				for( Settings::ButtonFunctions::iterator i = bf.begin();
+					i != bf.end();
 					i++ )
 					if( (*i).button == event.xbutton.button )
 						return performAction( (*i).action );

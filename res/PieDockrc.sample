@@ -173,7 +173,9 @@ alias "googleearth-bin" googleearth
 # the asterisk (*) will add icons for all running applications that are
 # not part of the menu already; a double asterisk (**) will add one icon
 # for each open window; three asterisks (***) will add only windows of
-# the application that has the (keyboard/mouse) focus
+# the application that has the (keyboard/mouse) focus.
+# individual button configuration for menus and items is supported and
+# will override global definitions.
 # usage:
 # menu [NAME]
 #   icon APPLICATION [COMMAND]

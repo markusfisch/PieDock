@@ -49,6 +49,7 @@ namespace PieDock
 			Pixmap textCanvas;
 			Text *text;
 			CartoucheMap cartoucheMap;
+			std::string lastMenuName;
 
 			virtual void show( Placement = AroundCursor );
 			virtual void hide();

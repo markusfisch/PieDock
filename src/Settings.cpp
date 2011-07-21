@@ -25,6 +25,35 @@
 using namespace PieDock;
 
 /**
+ * Returns the mouse button functions for the given menu and icon
+ */
+Settings::ButtonFunctions Settings::getButtonFunctions(const std::string &menu,
+	MenuItem *item)
+{
+	// Normally, the first matching button function will be used,
+	// so start with defnitions that will override the others.
+	ButtonFunctions functions;
+
+	// First, append item functions
+	if( itemButtonFunctions.find(item) != itemButtonFunctions.end() )
+		functions.insert(functions.end(),
+			itemButtonFunctions.find(item)->second.begin(),
+			itemButtonFunctions.find(item)->second.end());
+
+	// Menu functions
+	if( menuButtonFunctions.find(menu) != menuButtonFunctions.end() )
+		functions.insert(functions.end(),
+			menuButtonFunctions.find(menu)->second.begin(),
+			menuButtonFunctions.find(menu)->second.end());
+
+	// Default functions
+	functions.insert(functions.end(), buttonFunctions.begin(),
+		buttonFunctions.end());
+
+	return functions;
+}
+
+/**
  * Set configuration file from binary
  *
  * @param b - name of binary
@@ -802,6 +831,58 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 				menus[menuName].push_back(
 					new MenuItem( name, command ) );
+			}
+		}
+		else if( !(*i).compare( "button" ) ) // Invidual menu or icon button definitions
+		{
+			if( tokens.size() != 3 )
+				throwParsingError(
+					"insufficient arguments to button directive",
+					line );
+			else
+			{
+				ButtonFunction bf = { 0, Settings::NoAction };
+				int button = atoi( (*++i).c_str() );
+
+				switch( button )
+				{
+					case 0:
+						throwParsingError(
+							"invalid button number",
+							line );
+						break;
+					case 1:
+						bf.button = Button1;
+						break;
+					case 2:
+						bf.button = Button2;
+						break;
+					case 3:
+						bf.button = Button3;
+						break;
+					case 4:
+						bf.button = Button4;
+						break;
+					case 5:
+						bf.button = Button5;
+						break;
+					default:
+						// not defined by X11
+						bf.button = button;
+						break;
+				}
+
+				if( bf.button &&
+					(bf.action = resolveActionString( *++i )) !=
+						Settings::NoAction )
+					if (menus[menuName].empty()) // Assign to menu
+						menuButtonFunctions[menuName].push_back(bf);
+					else // Assign to icon
+						itemButtonFunctions[menus[menuName].back()].push_back(bf);
+				else
+					throwParsingError(
+						"invalid button action",
+						line );
 			}
 		}
 	}
