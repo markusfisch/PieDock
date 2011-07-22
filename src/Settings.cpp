@@ -875,10 +875,12 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 				if( bf.button &&
 					(bf.action = resolveActionString( *++i )) !=
 						Settings::NoAction )
+				{
 					if (menus[menuName].empty()) // Assign to menu
 						menuButtonFunctions[menuName].push_back(bf);
 					else // Assign to icon
 						itemButtonFunctions[menus[menuName].back()].push_back(bf);
+				}
 				else
 					throwParsingError(
 						"invalid button action",
