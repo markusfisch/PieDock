@@ -747,6 +747,7 @@ void Settings::load( Display *d )
 int Settings::readMenu( std::istream &in, int line, std::string menuName )
 {
 	Statement statement;
+	std::string context = "menu";
 
 	for( ; getline( in, statement ); line++ )
 	{
@@ -777,6 +778,8 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 			menus[menuName].push_back(
 				new MenuItem( iconName, ":"+subMenuName ) );
+
+			context = "menu";
 		}
 		else if( !(*i).compare( 0, 1, "*" ) )
 		{
@@ -787,6 +790,8 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 			if( !(*i).compare( "***" ) )
 				menus[menuName].setOnlyFromActive( true );
+
+			context = "menu";
 		}
 		else if( !(*i).compare( "icon" ) )
 		{
@@ -806,6 +811,8 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 				menus[menuName].push_back(
 					new MenuItem( name, command ) );
+
+				context = "icon";
 			}
 		}
 		else if( !(*i).compare( "button" ) ) // Invidual menu or icon button definitions
@@ -827,10 +834,10 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 						"invalid button action",
 						line );
 
-				// Assign to menu or icon
-				if (menus[menuName].empty())
+				// Assign to menu or icon, depending on the current context
+				if ( context == "menu" )
 					menuButtonFunctions[menuName].push_back(bf);
-				else
+				else if ( context == "icon" && !menus[menuName].empty() )
 					itemButtonFunctions[menus[menuName].back()].push_back(bf);
 			}
 		}
