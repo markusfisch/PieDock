@@ -44,12 +44,16 @@ namespace PieDock
 			virtual std::string getItemTitle() const;
 			inline MenuItem *getSelected() const {
 				return selected; }
+			inline std::string getName() const {
+				return name;
+			}
 
 		protected:
 			Application *app;
 			MenuItem *selected;
 			MenuItems *menuItems;
 			Window windowBelowCursor;
+			std::string name;
 
 			virtual int run( std::string ) const;
 	};
