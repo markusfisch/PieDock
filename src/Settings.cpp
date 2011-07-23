@@ -82,6 +82,8 @@ void Settings::load( Display *d )
 		keys.clear();
 		buttons.clear();
 		buttonFunctions.clear();
+		itemButtonFunctions.clear();
+		menuButtonFunctions.clear();
 		keyFunctions.clear();
 		iconMap.reset();
 		clearMenus();
