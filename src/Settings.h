@@ -144,6 +144,7 @@ namespace PieDock
 			virtual int readMenu( std::istream &, int, std::string );
 			virtual void clearMenus();
 			virtual Action resolveActionString( std::string );
+			unsigned int resolveButtonCode( std::string );
 			virtual void throwParsingError( const char *, unsigned int );
 			virtual void presizeIcon( Icon *, int, int, int, int, int, int );
 
