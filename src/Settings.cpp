@@ -238,44 +238,17 @@ void Settings::load( Display *d )
 			else
 			{
 				ButtonFunction bf = { 0, Settings::NoAction };
-				int button = atoi( (*++i).c_str() );
-
-				switch( button )
-				{
-					case 0:
-						throwParsingError(
-							"invalid button number",
-							line );
-						break;
-					case 1:
-						bf.button = Button1;
-						break;
-					case 2:
-						bf.button = Button2;
-						break;
-					case 3:
-						bf.button = Button3;
-						break;
-					case 4:
-						bf.button = Button4;
-						break;
-					case 5:
-						bf.button = Button5;
-						break;
-					default:
-						// not defined by X11
-						bf.button = button;
-						break;
-				}
-
-				if( bf.button &&
-					(bf.action = resolveActionString( *++i )) !=
-						Settings::NoAction )
-					buttonFunctions.push_back( bf );
-				else
+				if ( (bf.button = resolveButtonCode( *++i )) == 0 )
+					throwParsingError(
+						"invalid button number",
+						line );
+				if ( (bf.action = resolveActionString( *++i )) ==
+					Settings::NoAction )
 					throwParsingError(
 						"invalid button action",
 						line );
+
+				buttonFunctions.push_back( bf );
 			}
 		}
 		else if( !(*i).compare( "key" ) ||
@@ -844,49 +817,21 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 			else
 			{
 				ButtonFunction bf = { 0, Settings::NoAction };
-				int button = atoi( (*++i).c_str() );
-
-				switch( button )
-				{
-					case 0:
-						throwParsingError(
-							"invalid button number",
-							line );
-						break;
-					case 1:
-						bf.button = Button1;
-						break;
-					case 2:
-						bf.button = Button2;
-						break;
-					case 3:
-						bf.button = Button3;
-						break;
-					case 4:
-						bf.button = Button4;
-						break;
-					case 5:
-						bf.button = Button5;
-						break;
-					default:
-						// not defined by X11
-						bf.button = button;
-						break;
-				}
-
-				if( bf.button &&
-					(bf.action = resolveActionString( *++i )) !=
-						Settings::NoAction )
-				{
-					if (menus[menuName].empty()) // Assign to menu
-						menuButtonFunctions[menuName].push_back(bf);
-					else // Assign to icon
-						itemButtonFunctions[menus[menuName].back()].push_back(bf);
-				}
-				else
+				if ( (bf.button = resolveButtonCode( *++i )) == 0 )
+					throwParsingError(
+						"invalid button number",
+						line );
+				if ( (bf.action = resolveActionString( *++i )) ==
+					Settings::NoAction )
 					throwParsingError(
 						"invalid button action",
 						line );
+
+				// Assign to menu or icon
+				if (menus[menuName].empty())
+					menuButtonFunctions[menuName].push_back(bf);
+				else
+					itemButtonFunctions[menus[menuName].back()].push_back(bf);
 			}
 		}
 	}
@@ -944,6 +889,36 @@ Settings::Action Settings::resolveActionString( std::string s )
 		return Disappear;
 
 	return NoAction;
+}
+
+/**
+ * Resolve X11 mouse button code
+ *
+ * @param s - String
+ */
+unsigned int Settings::resolveButtonCode( std::string s )
+{
+	int button = atoi( s.c_str() );
+	switch( button )
+	{
+		case 0:
+			return 0;
+		case 1:
+			return Button1;
+		case 2:
+			return Button2;
+		case 3:
+			return Button3;
+		case 4:
+			return Button4;
+		case 5:
+			return Button5;
+		default:
+			// not defined by X11
+			return button;
+	}
+
+	return 0;
 }
 
 /**
