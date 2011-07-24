@@ -108,7 +108,6 @@ namespace PieDock
 #endif
 			inline Keys &getKeys() { return keys; }
 			inline Buttons &getButtons() { return buttons; }
-			ButtonFunctions getButtonFunctions(const std::string &menu = std::string(), MenuItem *item = NULL);
 			inline KeyFunctions &getKeyFunctions() {
 				return keyFunctions; }
 			inline IconMap &getIconMap() { return iconMap; }
@@ -136,16 +135,19 @@ namespace PieDock
 			inline const Text::Font &getTitleFont() const { return titleFont; }
 			inline const CartoucheSettings &getCartoucheSettings() const {
 				return cartoucheSettings; }
-			virtual void setConfigurationFileFromBinary( std::string );
 			inline const int &getMinimumNumber() const { return minimumNumber; }
+			virtual void setConfigurationFileFromBinary( std::string );
+			virtual ButtonFunctions getButtonFunctions(
+				const std::string &menu = std::string(),
+				MenuItem *item = 0 );
 			virtual void load( Display *d );
 
 		protected:
 			virtual int readMenu( std::istream &, int, std::string );
 			virtual void clearMenus();
-			virtual Action resolveActionString( std::string );
-			unsigned int resolveButtonCode( std::string );
-			virtual void throwParsingError( const char *, unsigned int );
+			virtual Action resolveActionString( const std::string & ) const;
+			virtual unsigned int resolveButtonCode( const std::string & ) const;
+			virtual void throwParsingError( const char *, unsigned int ) const;
 			virtual void presizeIcon( Icon *, int, int, int, int, int, int );
 
 		private:
