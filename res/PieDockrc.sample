@@ -180,9 +180,9 @@ alias "googleearth-bin" googleearth
 # usage:
 # menu [NAME]
 #   icon APPLICATION [COMMAND]
-#   button 1 Launch
+#   button NUMBER ACTION
 #   menu ICONNAME
-#     button 2 Close
+#     button NUMBER ACTION
 #     icon APPLICATION [COMMAND]
 #     ...
 #   end
