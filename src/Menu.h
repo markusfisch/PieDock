@@ -37,16 +37,15 @@ namespace PieDock
 				windowBelowCursor = w; }
 			inline const Window &getWindowBelowCursor() const {
 				return windowBelowCursor; }
+			inline MenuItem *getSelected() const {
+				return selected; }
+			inline const std::string &getName() const {
+				return name; }
 			virtual bool update( std::string );
 			virtual void draw( int, int ) {}
 			virtual bool change( Settings::Action = Settings::Launch );
 			virtual void execute( Settings::Action = Settings::Launch );
 			virtual std::string getItemTitle() const;
-			inline MenuItem *getSelected() const {
-				return selected; }
-			inline std::string getName() const {
-				return name;
-			}
 
 		protected:
 			Application *app;
