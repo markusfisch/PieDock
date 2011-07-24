@@ -120,8 +120,9 @@ bool PieMenuWindow::processEvent( XEvent &event )
 		case ButtonRelease:
 			{
 				Settings::ButtonFunctions bf =
-					app->getSettings()->getButtonFunctions(menu.getName(),
-						menu.getSelected());
+					app->getSettings()->getButtonFunctions(
+						menu.getName(),
+						menu.getSelected() );
 
 				for( Settings::ButtonFunctions::iterator i = bf.begin();
 					i != bf.end();
