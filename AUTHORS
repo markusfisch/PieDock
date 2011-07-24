@@ -1,5 +1,11 @@
 Author:
+
 Markus Fisch <mf@markusfisch.de>
 
 Contributors:
+
 Tatiana Azundris <hacks@azundris.com>
+* Modifier masks for key control
+
+Jonas Gehring <jonas.gehring@boolsoft.org>
+* Custom button actions for menus and icons

@@ -84,13 +84,21 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.3.3" <<
+								binary << " 1.4.0" <<
 								std::endl <<
 								"Copyright (c) 2007-2011" <<
 								std::endl <<
 								"Markus Fisch <mf@markusfisch.de>" <<
 								std::endl <<
+								std::endl <<
 								"Tatiana Azundris <hacks@azundris.com>" <<
+								std::endl <<
+								"* Modifier masks for key control" <<
+								std::endl <<
+								std::endl <<
+								"Jonas Gehring <jonas.gehring@boolsoft.org>" <<
+								std::endl <<
+								"* Custom button actions for menus and icons" <<
 								std::endl <<
 								std::endl <<
 								"Licensed under the MIT license:" <<
