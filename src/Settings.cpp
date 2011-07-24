@@ -25,35 +25,6 @@
 using namespace PieDock;
 
 /**
- * Returns the mouse button functions for the given menu and icon
- */
-Settings::ButtonFunctions Settings::getButtonFunctions(const std::string &menu,
-	MenuItem *item)
-{
-	// Normally, the first matching button function will be used,
-	// so start with defnitions that will override the others.
-	ButtonFunctions functions;
-
-	// First, append item functions
-	if( itemButtonFunctions.find(item) != itemButtonFunctions.end() )
-		functions.insert(functions.end(),
-			itemButtonFunctions.find(item)->second.begin(),
-			itemButtonFunctions.find(item)->second.end());
-
-	// Menu functions
-	if( menuButtonFunctions.find(menu) != menuButtonFunctions.end() )
-		functions.insert(functions.end(),
-			menuButtonFunctions.find(menu)->second.begin(),
-			menuButtonFunctions.find(menu)->second.end());
-
-	// Default functions
-	functions.insert(functions.end(), buttonFunctions.begin(),
-		buttonFunctions.end());
-
-	return functions;
-}
-
-/**
  * Set configuration file from binary
  *
  * @param b - name of binary
@@ -61,6 +32,40 @@ Settings::ButtonFunctions Settings::getButtonFunctions(const std::string &menu,
 void Settings::setConfigurationFileFromBinary( std::string b )
 {
 	setConfigurationFile( Environment::getHome()+"/."+b+"rc" );
+}
+
+/**
+ * Returns the mouse button functions for the given menu and icon
+ *
+ * @param menu - currently active menu name
+ * @param item - currently selected item
+ */
+Settings::ButtonFunctions Settings::getButtonFunctions(
+	const std::string &menu,
+	MenuItem *item )
+{
+	// normally, the first matching button function will be used,
+	// so start with defnitions that will override the others.
+	ButtonFunctions functions;
+
+	// first, append item functions
+	if( itemButtonFunctions.find( item ) != itemButtonFunctions.end() )
+		functions.insert( functions.end(),
+			itemButtonFunctions.find( item )->second.begin(),
+			itemButtonFunctions.find( item )->second.end() );
+
+	// menu functions
+	if( menuButtonFunctions.find( menu ) != menuButtonFunctions.end() )
+		functions.insert( functions.end(),
+			menuButtonFunctions.find( menu )->second.begin(),
+			menuButtonFunctions.find( menu )->second.end() );
+
+	// default functions
+	functions.insert( functions.end(),
+		buttonFunctions.begin(),
+		buttonFunctions.end() );
+
+	return functions;
 }
 
 /**
@@ -82,8 +87,8 @@ void Settings::load( Display *d )
 		keys.clear();
 		buttons.clear();
 		buttonFunctions.clear();
-		itemButtonFunctions.clear();
 		menuButtonFunctions.clear();
+		itemButtonFunctions.clear();
 		keyFunctions.clear();
 		iconMap.reset();
 		clearMenus();
@@ -238,11 +243,13 @@ void Settings::load( Display *d )
 			else
 			{
 				ButtonFunction bf = { 0, Settings::NoAction };
-				if ( (bf.button = resolveButtonCode( *++i )) == 0 )
+
+				if( (bf.button = resolveButtonCode( *++i )) == 0 )
 					throwParsingError(
 						"invalid button number",
 						line );
-				if ( (bf.action = resolveActionString( *++i )) ==
+
+				if( (bf.action = resolveActionString( *++i )) ==
 					Settings::NoAction )
 					throwParsingError(
 						"invalid button action",
@@ -746,10 +753,16 @@ void Settings::load( Display *d )
  */
 int Settings::readMenu( std::istream &in, int line, std::string menuName )
 {
-	Statement statement;
-	std::string context = "menu";
+	enum Context
+	{
+		Menu,
+		Icon
+	};
+	Context context = Menu;
 
-	for( ; getline( in, statement ); line++ )
+	for( Statement statement;
+		getline( in, statement );
+		line++ )
 	{
 		statement.cutComments();
 
@@ -779,7 +792,7 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 			menus[menuName].push_back(
 				new MenuItem( iconName, ":"+subMenuName ) );
 
-			context = "menu";
+			context = Menu;
 		}
 		else if( !(*i).compare( 0, 1, "*" ) )
 		{
@@ -791,7 +804,7 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 			if( !(*i).compare( "***" ) )
 				menus[menuName].setOnlyFromActive( true );
 
-			context = "menu";
+			context = Menu;
 		}
 		else if( !(*i).compare( "icon" ) )
 		{
@@ -812,7 +825,7 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 				menus[menuName].push_back(
 					new MenuItem( name, command ) );
 
-				context = "icon";
+				context = Icon;
 			}
 		}
 		else if( !(*i).compare( "button" ) ) // Invidual menu or icon button definitions
@@ -824,21 +837,33 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 			else
 			{
 				ButtonFunction bf = { 0, Settings::NoAction };
-				if ( (bf.button = resolveButtonCode( *++i )) == 0 )
+
+				if( (bf.button = resolveButtonCode( *++i )) == 0 )
 					throwParsingError(
 						"invalid button number",
 						line );
-				if ( (bf.action = resolveActionString( *++i )) ==
+
+				if( (bf.action = resolveActionString( *++i )) ==
 					Settings::NoAction )
 					throwParsingError(
 						"invalid button action",
 						line );
 
-				// Assign to menu or icon, depending on the current context
-				if ( context == "menu" )
-					menuButtonFunctions[menuName].push_back(bf);
-				else if ( context == "icon" && !menus[menuName].empty() )
-					itemButtonFunctions[menus[menuName].back()].push_back(bf);
+				// assign to menu or icon, depending on context
+				switch( context )
+				{
+					case Menu:
+						menuButtonFunctions[menuName].push_back( bf );
+						break;
+					case Icon:
+						if( menus[menuName].empty() )
+							break;
+
+						itemButtonFunctions[menus[menuName].back()].push_back(
+							bf );
+
+						break;
+				}
 			}
 		}
 	}
@@ -872,7 +897,7 @@ void Settings::clearMenus()
  *
  * @param s - name of action to resolve
  */
-Settings::Action Settings::resolveActionString( std::string s )
+Settings::Action Settings::resolveActionString( const std::string &s ) const
 {
 	if( !s.compare( "Launch" ) )
 		return Launch;
@@ -901,11 +926,12 @@ Settings::Action Settings::resolveActionString( std::string s )
 /**
  * Resolve X11 mouse button code
  *
- * @param s - String
+ * @param s - button number as string
  */
-unsigned int Settings::resolveButtonCode( std::string s )
+unsigned int Settings::resolveButtonCode( const std::string &s ) const
 {
-	int button = atoi( s.c_str() );
+	unsigned int button = atoi( s.c_str() );
+
 	switch( button )
 	{
 		case 0:
@@ -925,6 +951,7 @@ unsigned int Settings::resolveButtonCode( std::string s )
 			return button;
 	}
 
+	// make compiler happy
 	return 0;
 }
 
@@ -934,7 +961,7 @@ unsigned int Settings::resolveButtonCode( std::string s )
  * @param message - error message
  * @param line - line number
  */
-void Settings::throwParsingError( const char *message, unsigned int line )
+void Settings::throwParsingError( const char *message, unsigned int line ) const
 {
 	std::ostringstream s;
 
