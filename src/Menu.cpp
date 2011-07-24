@@ -242,6 +242,7 @@ bool Menu::update( std::string menuName )
 		}
 	}
 
+	name = menuName;
 	return true;
 }
 

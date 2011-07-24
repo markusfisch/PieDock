@@ -108,8 +108,7 @@ namespace PieDock
 #endif
 			inline Keys &getKeys() { return keys; }
 			inline Buttons &getButtons() { return buttons; }
-			inline ButtonFunctions &getButtonFunctions() {
-				return buttonFunctions; }
+			ButtonFunctions getButtonFunctions(const std::string &menu = std::string(), MenuItem *item = NULL);
 			inline KeyFunctions &getKeyFunctions() {
 				return keyFunctions; }
 			inline IconMap &getIconMap() { return iconMap; }
@@ -145,6 +144,7 @@ namespace PieDock
 			virtual int readMenu( std::istream &, int, std::string );
 			virtual void clearMenus();
 			virtual Action resolveActionString( std::string );
+			unsigned int resolveButtonCode( std::string );
 			virtual void throwParsingError( const char *, unsigned int );
 			virtual void presizeIcon( Icon *, int, int, int, int, int, int );
 
@@ -175,6 +175,8 @@ namespace PieDock
 			Keys keys;
 			Buttons buttons;
 			ButtonFunctions buttonFunctions;
+			std::map<MenuItem *, ButtonFunctions> itemButtonFunctions;
+			std::map<std::string, ButtonFunctions> menuButtonFunctions;
 			KeyFunctions keyFunctions;
 			IconMap iconMap;
 			Menus menus;

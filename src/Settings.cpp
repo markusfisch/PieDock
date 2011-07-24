@@ -25,6 +25,35 @@
 using namespace PieDock;
 
 /**
+ * Returns the mouse button functions for the given menu and icon
+ */
+Settings::ButtonFunctions Settings::getButtonFunctions(const std::string &menu,
+	MenuItem *item)
+{
+	// Normally, the first matching button function will be used,
+	// so start with defnitions that will override the others.
+	ButtonFunctions functions;
+
+	// First, append item functions
+	if( itemButtonFunctions.find(item) != itemButtonFunctions.end() )
+		functions.insert(functions.end(),
+			itemButtonFunctions.find(item)->second.begin(),
+			itemButtonFunctions.find(item)->second.end());
+
+	// Menu functions
+	if( menuButtonFunctions.find(menu) != menuButtonFunctions.end() )
+		functions.insert(functions.end(),
+			menuButtonFunctions.find(menu)->second.begin(),
+			menuButtonFunctions.find(menu)->second.end());
+
+	// Default functions
+	functions.insert(functions.end(), buttonFunctions.begin(),
+		buttonFunctions.end());
+
+	return functions;
+}
+
+/**
  * Set configuration file from binary
  *
  * @param b - name of binary
@@ -53,6 +82,8 @@ void Settings::load( Display *d )
 		keys.clear();
 		buttons.clear();
 		buttonFunctions.clear();
+		itemButtonFunctions.clear();
+		menuButtonFunctions.clear();
 		keyFunctions.clear();
 		iconMap.reset();
 		clearMenus();
@@ -207,44 +238,17 @@ void Settings::load( Display *d )
 			else
 			{
 				ButtonFunction bf = { 0, Settings::NoAction };
-				int button = atoi( (*++i).c_str() );
-
-				switch( button )
-				{
-					case 0:
-						throwParsingError(
-							"invalid button number",
-							line );
-						break;
-					case 1:
-						bf.button = Button1;
-						break;
-					case 2:
-						bf.button = Button2;
-						break;
-					case 3:
-						bf.button = Button3;
-						break;
-					case 4:
-						bf.button = Button4;
-						break;
-					case 5:
-						bf.button = Button5;
-						break;
-					default:
-						// not defined by X11
-						bf.button = button;
-						break;
-				}
-
-				if( bf.button &&
-					(bf.action = resolveActionString( *++i )) !=
-						Settings::NoAction )
-					buttonFunctions.push_back( bf );
-				else
+				if ( (bf.button = resolveButtonCode( *++i )) == 0 )
+					throwParsingError(
+						"invalid button number",
+						line );
+				if ( (bf.action = resolveActionString( *++i )) ==
+					Settings::NoAction )
 					throwParsingError(
 						"invalid button action",
 						line );
+
+				buttonFunctions.push_back( bf );
 			}
 		}
 		else if( !(*i).compare( "key" ) ||
@@ -743,6 +747,7 @@ void Settings::load( Display *d )
 int Settings::readMenu( std::istream &in, int line, std::string menuName )
 {
 	Statement statement;
+	std::string context = "menu";
 
 	for( ; getline( in, statement ); line++ )
 	{
@@ -773,6 +778,8 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 			menus[menuName].push_back(
 				new MenuItem( iconName, ":"+subMenuName ) );
+
+			context = "menu";
 		}
 		else if( !(*i).compare( 0, 1, "*" ) )
 		{
@@ -783,6 +790,8 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 			if( !(*i).compare( "***" ) )
 				menus[menuName].setOnlyFromActive( true );
+
+			context = "menu";
 		}
 		else if( !(*i).compare( "icon" ) )
 		{
@@ -802,6 +811,34 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 				menus[menuName].push_back(
 					new MenuItem( name, command ) );
+
+				context = "icon";
+			}
+		}
+		else if( !(*i).compare( "button" ) ) // Invidual menu or icon button definitions
+		{
+			if( tokens.size() != 3 )
+				throwParsingError(
+					"insufficient arguments to button directive",
+					line );
+			else
+			{
+				ButtonFunction bf = { 0, Settings::NoAction };
+				if ( (bf.button = resolveButtonCode( *++i )) == 0 )
+					throwParsingError(
+						"invalid button number",
+						line );
+				if ( (bf.action = resolveActionString( *++i )) ==
+					Settings::NoAction )
+					throwParsingError(
+						"invalid button action",
+						line );
+
+				// Assign to menu or icon, depending on the current context
+				if ( context == "menu" )
+					menuButtonFunctions[menuName].push_back(bf);
+				else if ( context == "icon" && !menus[menuName].empty() )
+					itemButtonFunctions[menus[menuName].back()].push_back(bf);
 			}
 		}
 	}
@@ -859,6 +896,36 @@ Settings::Action Settings::resolveActionString( std::string s )
 		return Disappear;
 
 	return NoAction;
+}
+
+/**
+ * Resolve X11 mouse button code
+ *
+ * @param s - String
+ */
+unsigned int Settings::resolveButtonCode( std::string s )
+{
+	int button = atoi( s.c_str() );
+	switch( button )
+	{
+		case 0:
+			return 0;
+		case 1:
+			return Button1;
+		case 2:
+			return Button2;
+		case 3:
+			return Button3;
+		case 4:
+			return Button4;
+		case 5:
+			return Button5;
+		default:
+			// not defined by X11
+			return button;
+	}
+
+	return 0;
 }
 
 /**
