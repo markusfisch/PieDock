@@ -43,6 +43,8 @@ bool Menu::update( std::string menuName )
 	if( !(menuItems = app->getSettings()->getMenu( menuName )) )
 		return false;
 
+	name = menuName;
+
 	// multiple windows per icon
 	typedef std::map<Icon *, MenuItem *> IconToItem;
 	IconToItem iconToItem;
@@ -242,7 +244,6 @@ bool Menu::update( std::string menuName )
 		}
 	}
 
-	name = menuName;
 	return true;
 }
 
