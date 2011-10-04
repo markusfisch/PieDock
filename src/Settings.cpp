@@ -139,6 +139,9 @@ void Settings::load( Display *d )
 
 		// split statement into tokens
 		std::vector<std::string> tokens = statement.split();
+		if( tokens.empty() )
+			continue;
+
 		std::vector<std::string>::iterator i = tokens.begin();
 
 		if( !(*i).compare( "size" ) )
@@ -1019,40 +1022,50 @@ void Settings::Statement::cutComments( const char delimiter )
 std::vector<std::string> Settings::Statement::split( const char *delimiter )
 {
 	std::vector<std::string> v;
-	std::string::size_type last = 0;
-	std::string::size_type until;
+	std::string::size_type pos = 0;
+	std::string::size_type n;
 
 	// skip leading delimiters
 	{
 		std::string::size_type p;
 
 		if( (p = find_first_not_of( delimiter )) != std::string::npos )
-			last = p;
+			pos = p;
 	}
 
-	for( ;
-		(until = lengthUntil( delimiter, last )) != std::string::npos;
-		last = ++until )
-		v.push_back( trim( substr( last, until-last ) ) );
-
-	v.push_back( trim( substr( last ) ) );
+	while( tokenize( delimiter, pos, n ) )
+	{
+		v.push_back( trim( substr( pos, n ) ) );
+		pos += n;
+	}
 
 	return v;
 }
 
 /**
- * Calculate the length of the initial segment of this string
- * which consists entirely of characters not in reject; respect
- * quoting
+ * Calculate the position and size of the next token in string.
  *
- * @param reject - character that may appear within the span
- * @param offset - offset in string (optional)
+ * @param delimiters - characters delimiting individual tokens
+ * @param pos - in: initial offset, out: position of next token
+ * @param n - out: size of next token
+ * @returns true if a token has been found, false otherwise
  */
-std::string::size_type Settings::Statement::lengthUntil(
-	const char *reject,
-	std::string::size_type offset )
+bool Settings::Statement::tokenize(
+		const char *delimiters,
+		std::string::size_type &pos,
+		std::string::size_type &n )
 {
-	for( const char *s = c_str()+offset; *s; s++ )
+	const char *s = c_str()+pos;
+	bool ok = true;
+
+	// Skip leading delimiters
+	while ( *s && strchr( delimiters, *s ) )
+		s++;
+
+	pos = s-c_str();
+
+	// Jump to end of token
+	for( ; *s; s++ )
 	{
 		if( *s == '\\' )
 		{
@@ -1079,12 +1092,12 @@ std::string::size_type Settings::Statement::lengthUntil(
 				break;
 		}
 
-		for( const char *r = reject; *r; r++ )
-			if( *r == *s )
-				return s-c_str();
+		if( strchr( delimiters, *s ) )
+			break;
 	}
 
-	return std::string::npos;
+	n = s-c_str() - pos;
+	return n > 0;
 }
 
 /**
