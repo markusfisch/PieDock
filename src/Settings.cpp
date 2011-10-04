@@ -139,6 +139,9 @@ void Settings::load( Display *d )
 
 		// split statement into tokens
 		std::vector<std::string> tokens = statement.split();
+		if( tokens.empty() )
+			continue;
+
 		std::vector<std::string>::iterator i = tokens.begin();
 
 		if( !(*i).compare( "size" ) )
