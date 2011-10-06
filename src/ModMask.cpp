@@ -56,7 +56,7 @@ ModMask::ModMask( Display *display )
 	XModifierKeymap *xmkm = XGetModifierMapping( display );
 
 	// first, get the name and the KeySym
-	for( int key = 0; key < modKeyCount; key++ )
+	for( int key = 0; key < modKeyCount; ++key )
 	{
 		modKey[key].name = keyName[key];
 		modKey[key].code = XKeysymToKeycode(
@@ -73,10 +73,10 @@ ModMask::ModMask( Display *display )
 	for( int mod = 8; mod--; )
 	{
 		// iterate over all keys that can create this modifier-type
-		for( int key = 0; key < xmkm->max_keypermod; key++ )
+		for( int key = 0; key < xmkm->max_keypermod; ++key )
 		{
 			// iterate over all key-names; match up KeyCode and ModBit
-			for( int code = 0; code < modKeyCount; code++ )
+			for( int code = 0; code < modKeyCount; ++code )
 			{
 				if( !modKey[code].code )
 					// key doesn't exist, try next
@@ -92,7 +92,7 @@ ModMask::ModMask( Display *display )
 					// order. colour me bollocks.
 					for( int i = 0;
 						i < sizeof( xlat )/sizeof( XlatEntry );
-						i++ )
+						++i )
 						if( xlat[i].index == mod )
 						{
 							char *n;

@@ -129,7 +129,7 @@ void Settings::load( Display *d )
 	// parse file
 	Statement statement;
 
-	for( int line = 1; getline( in, statement ); line++ )
+	for( int line = 1; getline( in, statement ); ++line )
 	{
 		statement.cutComments();
 
@@ -608,7 +608,7 @@ void Settings::load( Display *d )
 	// add additional triggers for masks to ignore
 	for( MasksToIgnore::iterator mi = masksToIgnore.begin();
 		mi != masksToIgnore.end();
-		mi++ )
+		++mi )
 	{
 		// duplicate keys
 		{
@@ -616,7 +616,7 @@ void Settings::load( Display *d )
 
 			for( Keys::iterator ki = keys.begin();
 				ki != keys.end();
-				ki++ )
+				++ki )
 				if( (*ki).modifier != AnyModifier &&
 					!((*ki).modifier & (*mi)) )
 				{
@@ -631,7 +631,7 @@ void Settings::load( Display *d )
 
 			for( Keys::iterator ki = keysToAdd.begin();
 				ki != keysToAdd.end();
-				ki++ )
+				++ki )
 				keys.push_back( (*ki) );
 		}
 
@@ -641,7 +641,7 @@ void Settings::load( Display *d )
 
 			for( Buttons::iterator bi = buttons.begin();
 				bi != buttons.end();
-				bi++ )
+				++bi )
 				if( (*bi).modifier != AnyModifier &&
 					!((*bi).modifier & (*mi)) )
 				{
@@ -656,7 +656,7 @@ void Settings::load( Display *d )
 
 			for( Keys::iterator bi = buttonsToAdd.begin();
 				bi != buttonsToAdd.end();
-				bi++ )
+				++bi )
 				buttons.push_back( (*bi) );
 		}
 	}
@@ -718,11 +718,11 @@ void Settings::load( Display *d )
 			case PreloadMenus:
 				for( Menus::const_iterator m = menus.begin();
 					m != menus.end();
-					m++ )
+					++m )
 					for( MenuItems::const_iterator i =
 							(*m).second.begin();
 						i != (*m).second.end();
-						i++ )
+						++i )
 					{
 						Icon *icon = iconMap.getIconByName(
 							(*i)->getTitle() );
@@ -762,7 +762,7 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 	for( Statement statement;
 		getline( in, statement );
-		line++ )
+		++line )
 	{
 		statement.cutComments();
 
@@ -882,11 +882,11 @@ void Settings::clearMenus()
 {
 	for( Menus::const_iterator m = menus.begin();
 		m != menus.end();
-		m++ )
+		++m )
 		for( MenuItems::const_iterator i =
 				(*m).second.begin();
 			i != (*m).second.end();
-			i++ )
+			++i )
 			delete (*i);
 
 	menus.clear();
@@ -1052,7 +1052,7 @@ std::string::size_type Settings::Statement::lengthUntil(
 	const char *reject,
 	std::string::size_type offset )
 {
-	for( const char *s = c_str()+offset; *s; s++ )
+	for( const char *s = c_str()+offset; *s; ++s )
 	{
 		if( *s == '\\' )
 		{
@@ -1065,8 +1065,8 @@ std::string::size_type Settings::Statement::lengthUntil(
 		if( *s == '"' )
 		{
 			for( ++s;
-				 *s && *s != '"';
-				 s++ )
+				*s && *s != '"';
+				++s )
 				if( *s == '\\' )
 				{
 					if( !*(++s) )
@@ -1079,7 +1079,7 @@ std::string::size_type Settings::Statement::lengthUntil(
 				break;
 		}
 
-		for( const char *r = reject; *r; r++ )
+		for( const char *r = reject; *r; ++r )
 			if( *r == *s )
 				return s-c_str();
 	}

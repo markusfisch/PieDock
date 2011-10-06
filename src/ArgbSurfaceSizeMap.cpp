@@ -80,7 +80,7 @@ void ArgbSurfaceSizeMap::clear()
 {
 	for( SurfaceMap::iterator i = surfaceMap.begin();
 		i != surfaceMap.end();
-		i++ )
+		++i )
 		delete (*i).second;
 
 	surfaceMap.clear();

@@ -61,7 +61,7 @@ bool Menu::update( std::string menuName )
 
 		for( MenuItems::iterator i = menuItems->begin();
 			i != menuItems->end();
-			i++ )
+			++i )
 		{
 			Icon *icon;
 
@@ -118,7 +118,7 @@ bool Menu::update( std::string menuName )
 
 		for( WindowManager::WindowList::iterator i = wl.begin();
 			i != wl.end();
-			i++ )
+			++i )
 		{
 			if( !WindowManager::isNormalWindow( app->getDisplay(), (*i) ) )
 				continue;

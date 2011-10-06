@@ -755,7 +755,7 @@ Icon *IconMap::getIconByTitle( std::string t )
 	// resolve alias to filename
 	for( AliasToFile::iterator i = titleToFile.begin();
 		i != titleToFile.end();
-		i++ )
+		++i )
 		if( WildcardCompare::match( t.c_str(), (*i).first.c_str() ) )
 			return getIconByName( (*i).second );
 
@@ -845,7 +845,7 @@ void IconMap::freeIcons()
 {
 	for( FileToIcon::iterator i = cache.begin();
 		i != cache.end();
-		i++ )
+		++i )
 		delete (*i).second;
 
 	cache.clear();

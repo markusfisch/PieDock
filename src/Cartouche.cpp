@@ -144,7 +144,7 @@ void Cartouche::drawRoundedRectangle( int left, int top, int right, int bottom,
 		}
 
 		d += 2*y+1;
-		y++;
+		++y;
 
 		if( d > 0 )
 		{
@@ -232,13 +232,13 @@ void Cartouche::drawCurveSlices( Details &d, int x, int y, unsigned char n )
 	for( int *s = reinterpret_cast<int *>( t+l ),
 			*e = reinterpret_cast<int *>( t+r );
 		s <= e;
-		s++ )
+		++s )
 		*s = d.color;
 
 	// bottom
 	for( int *s = reinterpret_cast<int *>( b+l ),
 			*e = reinterpret_cast<int *>( b+r );
 		s <= e;
-		s++ )
+		++s )
 		*s = d.color;
 }

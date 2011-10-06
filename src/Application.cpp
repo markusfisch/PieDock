@@ -270,7 +270,7 @@ int Application::run( bool *stopFlag )
 			{
 				for( Settings::Keys::iterator i = settings->getKeys().begin();
 					i != settings->getKeys().end();
-					i++ )
+					++i )
 					if( XKeysymToKeycode( event.xany.display, (*i).keySym ) ==
 							event.xkey.keycode &&
 						(
@@ -290,7 +290,7 @@ int Application::run( bool *stopFlag )
 				for( Settings::Buttons::iterator i =
 						settings->getButtons().begin();
 					i != settings->getButtons().end();
-					i++ )
+					++i )
 					if( (*i).button == event.xbutton.button &&
 						(
 							// AnyModifier (32768 in X.h) cannot be used
@@ -359,7 +359,7 @@ void Application::grabTriggers()
 	// buttons
 	for( Settings::Buttons::iterator i = settings->getButtons().begin();
 		i != settings->getButtons().end();
-		i++ )
+		++i )
 		XGrabButton(
 			display,
 			(*i).button,
@@ -375,7 +375,7 @@ void Application::grabTriggers()
 	// keys
 	for( Settings::Keys::iterator i = settings->getKeys().begin();
 		i != settings->getKeys().end();
-		i++ )
+		++i )
 		XGrabKey(
 			display,
 			XKeysymToKeycode( display, (*i).keySym ),
@@ -394,7 +394,7 @@ void Application::ungrabTriggers()
 	// buttons
 	for( Settings::Buttons::iterator i = settings->getButtons().begin();
 		i != settings->getButtons().end();
-		i++ )
+		++i )
 		XUngrabButton(
 			display,
 			(*i).button,
@@ -404,7 +404,7 @@ void Application::ungrabTriggers()
 	// keys
 	for( Settings::Keys::iterator i = settings->getKeys().begin();
 		i != settings->getKeys().end();
-		i++ )
+		++i )
 		XUngrabKey(
 			display,
 			XKeysymToKeycode( display, (*i).keySym ),

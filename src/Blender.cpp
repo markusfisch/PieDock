@@ -253,7 +253,7 @@ void Blender::blendInto24Bit( Details &details )
 				*(dest++) = *(src++);
 				*(dest++) = *(src++);
 				*(dest++) = *(src++);
-				src++;
+				++src;
 			}
 			else
 			{

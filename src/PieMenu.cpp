@@ -174,7 +174,7 @@ void PieMenu::draw( int x, int y )
 
 				maxWeight = M_PI_2+pow( M_PI, m );
 
-				for( int n = 0; n < numberOfIcons; n++ )
+				for( int n = 0; n < numberOfIcons; ++n )
 				{
 					double d = fabs( getAngleDifference( a, cursorAngle ) );
 
@@ -245,7 +245,7 @@ void PieMenu::draw( int x, int y )
 				int previousRight = closestIcon;
 				int previousLeft = closestIcon;
 
-				for( int n = 0; ; n++ )
+				for( int n = 0; ; ++n )
 				{
 					if( (--left) < 0 )
 						left = numberOfIcons-1;
@@ -307,7 +307,7 @@ void PieMenu::draw( int x, int y )
 
 		for( MenuItems::iterator i = menuItems->begin();
 			i != menuItems->end();
-			i++, n++ )
+			++i, ++n )
 		{
 			const int size = static_cast<int>( iconGeometries[n].size )>>1<<1;
 			const ArgbSurface *surface =
@@ -419,7 +419,7 @@ void PieMenu::turn( int c )
 
 	if( turnStack )
 	{
-		for( ; *turnBy != 0.0; turnBy++ )
+		for( ; *turnBy != 0.0; ++turnBy )
 			f += *turnBy;
 
 		delete turnStack;
@@ -432,7 +432,7 @@ void PieMenu::turn( int c )
 	double *t = turnStack;
 	const double *s = turnSteps;
 
-	for( ; ; t++, s++ )
+	for( ; ; ++t, ++s )
 	{
 		*t = f*(*s);
 		if( *s == 0.0 )

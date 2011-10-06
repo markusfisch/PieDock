@@ -86,17 +86,17 @@ void Resampler::biLinear( ArgbSurface &dest, ArgbSurface &src )
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()]+
 							uRatio*sp[src.getBytesPerLine()+4])*vRatio );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()]+
 							uRatio*sp[src.getBytesPerLine()+4])*vRatio );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()]+
 							uRatio*sp[src.getBytesPerLine()+4])*vRatio );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()]+
@@ -107,15 +107,15 @@ void Resampler::biLinear( ArgbSurface &dest, ArgbSurface &src )
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()])*vRatio );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()])*vRatio );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()])*vRatio );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0])*vOpposite +
 						(uOpposite*sp[src.getBytesPerLine()])*vRatio );
@@ -129,13 +129,13 @@ void Resampler::biLinear( ArgbSurface &dest, ArgbSurface &src )
 					// pixel has a horizontal neighbor
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>(
 						(uOpposite*sp[0]+uRatio*sp[4])*vOpposite );
 				}
@@ -143,11 +143,11 @@ void Resampler::biLinear( ArgbSurface &dest, ArgbSurface &src )
 				{
 					// last source pixel
 					*d++ = static_cast<int>( (uOpposite*sp[0])*vOpposite );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>( (uOpposite*sp[0])*vOpposite );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>( (uOpposite*sp[0])*vOpposite );
-					sp++;
+					++sp;
 					*d++ = static_cast<int>( (uOpposite*sp[0])*vOpposite );
 				}
 			}
@@ -205,10 +205,10 @@ void Resampler::areaAveraging( ArgbSurface &dest, ArgbSurface &src )
 
 			for( int sy = 0;
 				sy < height;
-				sy++, sp += skip )
+				++sy, sp += skip )
 				for( int sx = 0;
 					sx < width;
-					sx++ )
+					++sx )
 				{
 					double b = *sp++;
 					double g = *sp++;

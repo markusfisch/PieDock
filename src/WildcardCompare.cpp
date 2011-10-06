@@ -36,7 +36,7 @@ const bool WildcardCompare::match( const char *literal,
 					const char *match = pattern;
 
 					while( *match == '*' || *match == '?' )
-						match++;
+						++match;
 
 					if( !*match )
 						return true;
@@ -58,12 +58,12 @@ const bool WildcardCompare::match( const char *literal,
 					if( caseSensitive )
 						for( pos = literal;
 							(pos = strstr( pos, match ));
-							pos++ )
+							++pos )
 							last = pos;
 					else
 						for( pos = literal;
 							(pos = strcasestr( pos, match ));
-							pos++ )
+							++pos )
 							last = pos;
 
 					if( wildcard )
@@ -88,7 +88,7 @@ const bool WildcardCompare::match( const char *literal,
 			case '?':
 				if( !*(literal++) )
 					return false;
-				pattern++;
+				++pattern;
 				break;
 			default:
 				if( !*literal )
@@ -113,8 +113,8 @@ const bool WildcardCompare::match( const char *literal,
 						return false;
 				}
 
-				literal++;
-				pattern++;
+				++literal;
+				++pattern;
 				break;
 		}
 	}

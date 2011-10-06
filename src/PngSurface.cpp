@@ -89,7 +89,7 @@ void PngSurface::load( std::istream &in )
 	for( int y = 0, *src, *dest = reinterpret_cast<int *>( getData() ); 
 		y < h && 
 			(src = reinterpret_cast<int *>( rows[y] )); 
-		y++, dest += w )
+		++y, dest += w )
 		memcpy( dest, src, w<<2 );
 
 	// convert grayscale image to argb

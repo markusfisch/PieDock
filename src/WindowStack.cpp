@@ -50,7 +50,7 @@ const Window WindowStack::getNextWindow()
 
 	for( WindowAttributes::iterator i = windowAttributes.begin();
 		i != windowAttributes.end();
-		i++ )
+		++i )
 		if( (*i).window == last )
 		{
 			if( ++i == windowAttributes.end() )
@@ -76,7 +76,7 @@ const Window WindowStack::getPreviousWindow()
 
 	for( WindowAttributes::iterator i = windowAttributes.begin();
 		i != windowAttributes.end();
-		i++ )
+		++i )
 		if( (*i).window == last )
 		{
 			if( i == windowAttributes.begin() )
@@ -99,7 +99,7 @@ const bool WindowStack::isUnmapped()
 {
 	for( WindowAttributes::iterator i = windowAttributes.begin();
 		i != windowAttributes.end();
-		i++ )
+		++i )
 		if( (*i).state != IsUnmapped )
 			return false;
 

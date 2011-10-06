@@ -56,7 +56,7 @@ PieMenuWindow::~PieMenuWindow()
 
 	for( CartoucheMap::iterator i = cartoucheMap.begin();
 		i != cartoucheMap.end();
-		i++ )
+		++i )
 		delete i->second;
 }
 
@@ -126,7 +126,7 @@ bool PieMenuWindow::processEvent( XEvent &event )
 
 				for( Settings::ButtonFunctions::iterator i = bf.begin();
 					i != bf.end();
-					i++ )
+					++i )
 					if( (*i).button == event.xbutton.button )
 						return performAction( (*i).action );
 			}
@@ -139,7 +139,7 @@ bool PieMenuWindow::processEvent( XEvent &event )
 
 				for( Settings::KeyFunctions::iterator i = kf->begin();
 					i != kf->end();
-					i++ )
+					++i )
 					if( event.type == (*i).eventType &&
 						XKeysymToKeycode( event.xkey.display, (*i).keySym ) ==
 							event.xkey.keycode )
