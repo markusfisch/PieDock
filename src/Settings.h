@@ -165,8 +165,9 @@ namespace PieDock
 					std::vector<std::string> split( const char * = " \t" );
 
 				private:
-					std::string::size_type lengthUntil( const char *,
-						 std::string::size_type = 0 );
+					bool tokenize( const char *,
+						std::string::size_type &,
+						std::string::size_type & );
 					std::string trim( std::string,
 						const char * = " \t\r\n\"" );
 			};

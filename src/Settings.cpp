@@ -79,7 +79,7 @@ void Settings::load( Display *d )
 
 	if( !in ||
 		!in.good() )
-		throw "cannot read configuration file !";
+		throw "cannot read configuration file!";
 
 	// reset settings to default values
 	{
@@ -139,6 +139,10 @@ void Settings::load( Display *d )
 
 		// split statement into tokens
 		std::vector<std::string> tokens = statement.split();
+
+		if( tokens.empty() )
+			continue;
+
 		std::vector<std::string>::iterator i = tokens.begin();
 
 		if( !(*i).compare( "size" ) )
@@ -686,7 +690,7 @@ void Settings::load( Display *d )
 						DIR *d = opendir( (*i).c_str() );
 
 						if( !d )
-							throw "cannot open image directory !";
+							throw "cannot open image directory!";
 
 						for( struct dirent *e; (e = readdir( d )); )
 						{
@@ -772,6 +776,10 @@ int Settings::readMenu( std::istream &in, int line, std::string menuName )
 
 		// split statement into tokens
 		std::vector<std::string> tokens = statement.split();
+
+		if( tokens.empty() )
+			continue;
+
 		std::vector<std::string>::iterator i = tokens.begin();
 
 		if( !(*i).compare( "end" ) )
@@ -1019,40 +1027,40 @@ void Settings::Statement::cutComments( const char delimiter )
 std::vector<std::string> Settings::Statement::split( const char *delimiter )
 {
 	std::vector<std::string> v;
-	std::string::size_type last = 0;
-	std::string::size_type until;
 
-	// skip leading delimiters
-	{
-		std::string::size_type p;
-
-		if( (p = find_first_not_of( delimiter )) != std::string::npos )
-			last = p;
-	}
-
-	for( ;
-		(until = lengthUntil( delimiter, last )) != std::string::npos;
-		last = ++until )
-		v.push_back( trim( substr( last, until-last ) ) );
-
-	v.push_back( trim( substr( last ) ) );
+	for( std::string::size_type p = 0, l;
+		tokenize( delimiter, p, l );
+		p += l )
+		v.push_back( trim( substr( p, l ) ) );
 
 	return v;
 }
 
 /**
- * Calculate the length of the initial segment of this string
- * which consists entirely of characters not in reject; respect
- * quoting
+ * Calculate the position and size of the next token in string
  *
- * @param reject - character that may appear within the span
- * @param offset - offset in string (optional)
+ * @param delimiters - characters delimiting individual tokens
+ * @param offset - in: initial offset, out: position of next token
+ * @param length - out: size of next token
+ * @returns true if a token has been found, false otherwise
  */
-std::string::size_type Settings::Statement::lengthUntil(
-	const char *reject,
-	std::string::size_type offset )
+bool Settings::Statement::tokenize(
+	const char *delimiters,
+	std::string::size_type &offset,
+	std::string::size_type &length )
 {
-	for( const char *s = c_str()+offset; *s; ++s )
+	const char *s = c_str()+offset;
+
+	// skip leading delimiters
+	while( *s && strchr( delimiters, *s ) )
+		++s;
+
+	// shift offset after leading delimiters
+	offset = s-c_str();
+
+	const char *b = s;
+
+	for( ; *s; ++s )
 	{
 		if( *s == '\\' )
 		{
@@ -1079,12 +1087,11 @@ std::string::size_type Settings::Statement::lengthUntil(
 				break;
 		}
 
-		for( const char *r = reject; *r; ++r )
-			if( *r == *s )
-				return s-c_str();
+		if( strchr( delimiters, *s ) )
+			break;
 	}
 
-	return std::string::npos;
+	return (length = s-b);
 }
 
 /**
