@@ -100,6 +100,8 @@ int main( int argc, char **argv )
 								std::endl <<
 								"* Custom button actions for menus and icons" <<
 								std::endl <<
+								"* Better tokenization of settings statements" <<
+								std::endl <<
 								std::endl <<
 								"Licensed under the MIT license:" <<
 								std::endl <<
