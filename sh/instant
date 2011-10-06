@@ -5,21 +5,18 @@ TEMPLATE=PieDockInstant
 
 [ -d $TEMPLATE ] && {
 	echo "$TEMPLATE already exists"
-	exit -1
+	exit 1
 }
 
 touch $PACKAGE || {
 	echo "$PACKAGE cannot be created"
-	exit -1
+	exit 1
 }
 
-if ! mkdir $TEMPLATE ||
-	! mkdir "$TEMPLATE/bin" ||
-	! mkdir "$TEMPLATE/conf" ||
-	! mkdir "$TEMPLATE/icons"; then
+mkdir $TEMPLATE "$TEMPLATE/bin" "$TEMPLATE/conf" "$TEMPLATE/icons" || {
 	echo "$TEMPLATE cannot be created"
-	exit -1
-fi
+	exit 1
+}
 
 # copy setup script
 {
@@ -27,12 +24,12 @@ fi
 
 	[ -x "$SETUP" ] || {
 		echo "$SETUP script not found"
-		exit -1
+		exit 1
 	}
 
 	cp $SETUP $TEMPLATE/setup || {
 		echo "cannot move $SETUP in place"
-		exit -1
+		exit 1
 	}
 }
 
@@ -40,7 +37,7 @@ for B in src/PieDock utils/PieDockUtils
 do
 	[ -r $B ] || {
 		echo "$B not found, use ./configure && make to build it"
-		exit -1
+		exit 1
 	}
 
 	strip $B
@@ -55,15 +52,15 @@ BIN=PieDock
 
 [ -z "\$1" ] && {
 	echo "usage: \`basename \$0\` (start|stop|status|restart)..."
-	exit -1
+	exit 1
 }
 
-function start()
+start()
 {
 	cd \`dirname \$0\`
 
-	F="\${BIN}rc"
-	RC="\${HOME}/.\$F"
+	local F="\${BIN}rc"
+	local RC="\${HOME}/.\$F"
 
 	# check for rc file in home first
 	[ -f "\$RC" ] || {
@@ -72,7 +69,8 @@ function start()
 		# realize local configuration template
 		[ -f "\$RC" ] &&
 			grep "${TEMPLATE}/icons\"" "\$RC" &>/dev/null && {
-				T="conf/.tmp"
+				local T="conf/.tmp"
+
 				cp \$RC \$T &&
 					cat \$T | sed -e "s_\".*${TEMPLATE}/icons\"_\"\`pwd\`/icons\"_g;" > \$RC &&
 					rm \$T
@@ -82,12 +80,12 @@ function start()
 	bin/\$BIN -r \$RC &
 }
 
-function stop()
+stop()
 {
 	pkill \$BIN
 }
 
-function status()
+status()
 {
 	pgrep \$BIN
 }

@@ -10,21 +10,21 @@ root password or to run this as root.
 Do you want to build, install and run PieDock now (y/n)?
 EOF
 
-read A && [[ $A != y ]] && exit -1
+read A && [[ $A != y ]] && exit 1
 
 # check we're in the right place
 [ -x configure ] || {
 	cd ..
 	[ -x configure ] || {
 		echo "error: missing configure script"
-		exit -1
+		exit 1
 	}
 }
 
 # and have a setup script
 [ -x sh/setup ] || {
 	echo "error: missing setup script"
-	exit -1
+	exit 1
 }
 
 # check for sudo if not run as root
@@ -33,7 +33,7 @@ SUDO=
 	SUDO=sudo
 	which $SUDO &>/dev/null || {
 		echo "error: "
-		exit -1
+		exit 1
 	}
 }
 
@@ -43,22 +43,22 @@ do
 	./configure && {
 		make || {
 			echo "error: build failed, check the top most error"
-			exit -1
+			exit 1
 		}
 
 		$SUDO make install || {
 			echo "error: installation failed, check the top most error"
-			exit -1
+			exit 1
 		}
 
 		sh/setup || {
 			echo "error: setup failed"
-			exit -1
+			exit 1
 		}
 
 		PieDock || {
 			echo "error: PieDock failed to start $HOME/.PieDockrc"
-			exit -1
+			exit 1
 		}
 
 		cat <<EOF
@@ -95,7 +95,7 @@ EOF
 			libfreetype6-dev \
 			libpng-dev || {
 			echo $ERROR_STRING
-			exit -1
+			exit 1
 		}
 
 		continue
@@ -112,7 +112,7 @@ EOF
 			freetype2-devel \
 			libpng14-devel || {
 			echo $ERROR_STRING
-			exit -1
+			exit 1
 		}
 
 		continue
@@ -129,7 +129,7 @@ EOF
 			freetype-devel \
 			libpng-devel || {
 			echo $ERROR_STRING
-			exit -1
+			exit 1
 		}
 
 		continue
@@ -143,12 +143,12 @@ EOF
 			libXft \
 			freetype || {
 			echo $ERROR_STRING
-			exit -1
+			exit 1
 		}
 
 		continue
 	}
 
 	echo "error: sorry, your package management system is not supported."
-	exit -1
+	exit 1
 done
