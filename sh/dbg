@@ -1,24 +1,26 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
+[ "$1" ] || {
 	echo "usage: `basename $0` (start|stop|status|restart|new|clean)..."
-	exit
-fi
+	exit 1
+}
 
-BIN=PieDock
+readonly BIN=PieDock
 
-if [ -d src ]; then
+if [ -d src ]
+then
 	CMD="src/$BIN -r sh/dbgrc"
-elif [ -d ../sh ]; then
+elif [ -d ../sh ]
+then
 	CMD="./$BIN -r ../sh/dbgrc"
 else
 	echo "run this script either from inside src or from the project root"
-	exit
+	exit 1
 fi
 
-function each()
+each()
 {
-	[ -z "$1" ] && return
+	[ "$1" ] || return
 
 	ps ax | grep "$CMD" | grep -v grep | while read PID REST
 	do
@@ -26,14 +28,23 @@ function each()
 	done
 }
 
-function stop()
+stop()
 {
 	each "kill"
 }
 
-function start()
+start()
 {
+	[ -x "${CMD%% *}" ] || build
+
 	$CMD
+}
+
+build()
+{
+	[ -f Makefile ] || ./configure || return 1
+
+	make
 }
 
 for ARG in $@
@@ -58,12 +69,12 @@ do
 		new|a*)
 			stop
 			[ $ARG == "anew" ] && make clean
-			make || exit
+			build || exit 1
 			start
 			;;
 		*)
 			echo "unknown argument \"$ARG\""
-			exit
+			exit 1
 			;;
 	esac
 done
