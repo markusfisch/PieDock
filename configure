@@ -2731,7 +2731,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=PieDock
- VERSION=1.4.1
+ VERSION=1.4.2
 
 
 cat >>confdefs.h <<_ACEOF
