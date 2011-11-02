@@ -148,6 +148,7 @@ bool Menu::update( std::string menuName )
 				xch.res_class,
 				xch.res_name );
 
+			// handle missing icons
 			if( !icon ||
 				icon->getType() == Icon::Missing )
 			{
@@ -155,10 +156,28 @@ bool Menu::update( std::string menuName )
 
 				if( (s = WindowManager::getIcon( app->getDisplay(), (*i) )) )
 				{
-					icon = iconMap->createIcon(
-						*s,
-						xch.res_name,
-						Icon::Window );
+					MenuItem *item = 0;
+
+					if( icon )
+					{
+						IconToItem::iterator m;
+
+						if( (m = iconToItem.find( icon )) != iconToItem.end() )
+						{
+							item = (*m).second;
+							iconToItem.erase( m );
+						}
+					}
+
+					if( (icon = iconMap->createIcon(
+							*s,
+							xch.res_name,
+							Icon::Window )) &&
+						item )
+					{
+						iconToItem[icon] = item;
+						item->setIcon( icon );
+					}
 
 					delete s;
 				}
