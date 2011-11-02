@@ -44,8 +44,6 @@ key L SpinNext
 
 path "~/.PieDock/applications" "~/.PieDock/actions" "/usr/share/pixmaps"
 
-alias title "*- VIM" vim
-alias title "* OpenOffice.org Writer" ooo-writer
 alias title "* OpenOffice.org Calc" ooo-calc
 alias title "* OpenOffice.org Draw" ooo-draw
 alias title "* OpenOffice.org Impress" ooo-impress
