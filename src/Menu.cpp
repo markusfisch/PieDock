@@ -156,28 +156,16 @@ bool Menu::update( std::string menuName )
 
 				if( (s = WindowManager::getIcon( app->getDisplay(), (*i) )) )
 				{
-					MenuItem *item = 0;
-
 					if( icon )
 					{
-						IconToItem::iterator m;
-
-						if( (m = iconToItem.find( icon )) != iconToItem.end() )
-						{
-							item = (*m).second;
-							iconToItem.erase( m );
-						}
+						icon->setSurface( *s );
+						icon->setType( Icon::Window );
 					}
-
-					if( (icon = iconMap->createIcon(
+					else
+						icon = iconMap->createIcon(
 							*s,
 							xch.res_name,
-							Icon::Window )) &&
-						item )
-					{
-						iconToItem[icon] = item;
-						item->setIcon( icon );
-					}
+							Icon::Window );
 
 					delete s;
 				}
