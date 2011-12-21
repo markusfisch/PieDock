@@ -44,25 +44,23 @@ key L SpinNext
 
 path "~/.PieDock/applications" "~/.PieDock/actions" "/usr/share/pixmaps"
 
-alias title "* OpenOffice.org Calc" ooo-calc
-alias title "* OpenOffice.org Draw" ooo-draw
-alias title "* OpenOffice.org Impress" ooo-impress
-alias title "* OpenOffice.org Base" ooo-base
-alias title "* OpenOffice.org Math" ooo-math
 alias class "Firefox" firefox
 alias class "NEdit" nedit
 alias class "Xpdf" xpdf
 alias class "MPlayer" mplayer
+alias class "Opera" opera
+alias "urxvt" terminal
 alias "aterm" terminal
 alias "xterm" terminal
 alias "xfce4-terminal" terminal
+alias "chromium-browser" chrome
 alias "chromium" chrome
 alias "googleearth-bin" googleearth
 alias "Blender" blender
 alias "Blender:Render" blender
 
 menu
-	icon aterm
+	icon urxvt
 	icon nedit
 	icon opera
 	icon chromium
