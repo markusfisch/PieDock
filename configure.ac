@@ -1,7 +1,7 @@
 # Initialize autoconf and automake
 AC_PREREQ([2.65])
 AC_INIT(src/main.cpp)
-AM_INIT_AUTOMAKE(PieDock, 1.4.2)
+AM_INIT_AUTOMAKE(PieDock, 1.4.3)
 
 # Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
