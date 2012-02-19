@@ -12,7 +12,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 #include "ActiveIndicator.h"
-#include "PngSurface.h"
+#include "Png.h"
 
 using namespace PieDock;
 
@@ -24,8 +24,9 @@ using namespace PieDock;
 void ActiveIndicator::load( std::string f )
 {
 	clear();
-	PngSurface s( f );
+	ArgbSurface *s = Png::load( f );
 	sizeMap = new ArgbSurfaceSizeMap( s );
+	delete s;
 }
 
 /**
