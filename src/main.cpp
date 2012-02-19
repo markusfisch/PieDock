@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -19,6 +19,11 @@
 #include <signal.h>
 #include <libgen.h>
 #include <stdlib.h>
+
+#ifdef HAVE_GTK
+#include <gtk/gtk.h>
+#endif
+
 #include <iostream>
 
 bool stop = false;
@@ -56,6 +61,10 @@ int main( int argc, char **argv )
 {
 	try
 	{
+#ifdef HAVE_GTK
+		gtk_init( &argc, &argv );
+#endif
+
 		PieDock::Settings settings;
 		char *menuName = 0;
 
@@ -84,9 +93,9 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.4.3" <<
+								binary << " 1.5.0" <<
 								std::endl <<
-								"Copyright (c) 2007-2011" <<
+								"Copyright (c) 2007-2012" <<
 								std::endl <<
 								"Markus Fisch <mf@markusfisch.de>" <<
 								std::endl <<

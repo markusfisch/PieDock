@@ -6,18 +6,23 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
  */
 #include "IconMap.h"
 #include "WildcardCompare.h"
-#include "PngSurface.h"
+#include "Png.h"
 
 #include <algorithm>
 #include <sstream>
 #include <sys/stat.h>
+
+#ifdef HAVE_GTK
+#include <stdint.h>
+#include <gtk/gtk.h>
+#endif
 
 using namespace PieDock;
 
@@ -716,11 +721,84 @@ Icon *IconMap::getIconByName( std::string n )
 
 		if( stat( file.c_str(), &buf ) > -1 )
 		{
-			PngSurface s( file );
-
-			return createIcon( s, n, Icon::File );
+			ArgbSurface *s = Png::load( file );
+			Icon *icon = createIcon( s, n, Icon::File );
+			delete s;
+			return icon;
 		}
 	}
+
+#ifdef HAVE_GTK
+	// ask GNOME for icon
+	{
+		GtkIconTheme *theme = gtk_icon_theme_get_for_screen(
+			gdk_screen_get_default() );
+		GdkPixbuf *pixbuf = 0;
+
+		// theme look up
+		{
+			GtkIconInfo *iconInfo = gtk_icon_theme_lookup_icon(
+				theme,
+				n.c_str(),
+				128,
+				GTK_ICON_LOOKUP_USE_BUILTIN );
+
+			if( iconInfo )
+			{
+				pixbuf = gdk_pixbuf_new_from_file_at_size(
+					gtk_icon_info_get_filename( iconInfo ),
+					128,
+					-1,
+					0 );
+
+				gtk_icon_info_free( iconInfo );
+			}
+		}
+
+		// otherwise try to load the icon blindly
+		if( !pixbuf )
+			pixbuf = gtk_icon_theme_load_icon(
+				theme,
+				n.c_str(),
+				128,
+				GTK_ICON_LOOKUP_FORCE_SVG,
+				0 );
+
+		if( pixbuf &&
+			gdk_pixbuf_get_colorspace( pixbuf ) == GDK_COLORSPACE_RGB &&
+			gdk_pixbuf_get_bits_per_sample( pixbuf ) == 8 &&
+			gdk_pixbuf_get_n_channels( pixbuf ) == 4 &&
+			gdk_pixbuf_get_has_alpha( pixbuf ) )
+		{
+			unsigned char *src = reinterpret_cast<unsigned char *>(
+				gdk_pixbuf_get_pixels( pixbuf ) );
+			int w = gdk_pixbuf_get_width( pixbuf );
+			int h = gdk_pixbuf_get_height( pixbuf );
+			int p = gdk_pixbuf_get_rowstride( pixbuf )-(w<<2);
+			ArgbSurface s( w, h );
+			unsigned char *dest = reinterpret_cast<unsigned char *>(
+				s.getData() );
+			int dp = s.getPadding();
+
+			// only 4-byte alignments are sane for 32 bits per pixel
+			if( p%4 ||
+				dp%4 )
+				return 0;
+
+			for( int y = s.getHeight(); y--; src += p, dest += dp )
+				for( int x = s.getWidth(); x--; src += 4, dest += 4 )
+				{
+					// swap Red with Blue; GdkPixbuf has BGR order 
+					dest[0] = src[2];
+					dest[1] = src[1];
+					dest[2] = src[0];
+					dest[3] = src[3];
+				}
+
+			return createIcon( &s, n, Icon::File );
+		}
+	}
+#endif
 
 	return 0;
 }
@@ -776,7 +854,7 @@ Icon *IconMap::getMissingIcon( std::string n )
 		if( !fileForMissing.empty() &&
 			stat( fileForMissing.c_str(), &buf ) > -1 )
 		{
-			if( !(missingSurface = new PngSurface( fileForMissing )) )
+			if( !(missingSurface = Png::load( fileForMissing )) )
 				return 0;
 		}
 		else
@@ -784,12 +862,12 @@ Icon *IconMap::getMissingIcon( std::string n )
 			std::string d( fallbackPng, sizeof( fallbackPng ) );
 			std::istringstream iss( d, std::ios::binary );
 
-			if( !(missingSurface = new PngSurface( iss )) )
+			if( !(missingSurface = Png::load( iss )) )
 				return 0;
 		}
 	}
 
-	return createIcon( *missingSurface, n, Icon::Missing );
+	return createIcon( missingSurface, n, Icon::Missing );
 }
 
 /**
@@ -804,7 +882,7 @@ Icon *IconMap::getFillerIcon()
 		if( !fileForFiller.empty() &&
 			stat( fileForFiller.c_str(), &buf ) > -1 )
 		{
-			if( !(fillerSurface = new PngSurface( fileForFiller )) )
+			if( !(fillerSurface = Png::load( fileForFiller )) )
 				return 0;
 		}
 		else
@@ -820,7 +898,7 @@ Icon *IconMap::getFillerIcon()
 		}
 	}
 
-	return createIcon( *fillerSurface, "", Icon::Filler );
+	return createIcon( fillerSurface, "", Icon::Filler );
 }
 
 /**
@@ -830,7 +908,7 @@ Icon *IconMap::getFillerIcon()
  * @param n - resource name of window
  * @param t - icon type
  */
-Icon *IconMap::createIcon( ArgbSurface &s, std::string n, Icon::Type t )
+Icon *IconMap::createIcon( ArgbSurface *s, std::string n, Icon::Type t )
 {
 	Icon *icon = new Icon( s, t );
 	cache[n] = icon;
