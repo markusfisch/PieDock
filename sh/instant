@@ -33,7 +33,7 @@ mkdir $TEMPLATE "$TEMPLATE/bin" "$TEMPLATE/conf" "$TEMPLATE/icons" || {
 	}
 }
 
-for B in src/PieDock utils/PieDockUtils
+for B in src/piedock utils/piedockutils
 do
 	[ -r $B ] || {
 		echo "$B not found, use ./configure && make to build it"
@@ -48,7 +48,7 @@ done
 cat <<EOF > $TEMPLATE/pd
 #!/bin/bash
 
-BIN=PieDock
+BIN=piedock
 
 [ -z "\$1" ] && {
 	echo "usage: \`basename \$0\` (start|stop|status|restart)..."
@@ -131,7 +131,7 @@ sed -e '1,/^exit\$/d' "\$0" | tar xzf -
 echo "ok"
 
 echo -n "Configuring ... "
-RC=$TEMPLATE/conf/PieDockrc ICON_PATH=$TEMPLATE/icons $TEMPLATE/setup
+RC=$TEMPLATE/conf/piedockrc ICON_PATH=$TEMPLATE/icons $TEMPLATE/setup
 rm -f $TEMPLATE/setup
 echo "ok"
 
@@ -144,12 +144,12 @@ cat <<EEOF
 If you got "X Error of failed request:  BadAccess", some other program
 have grabbed one of those keys or buttons already. In that case you'll
 have to modify
-$TEMPLATE/conf/PieDockrc
+$TEMPLATE/conf/piedockrc
 to use other keys. Restart after doing so.
 
 If the menu isn't transparent (you have a black box behind the menu),
 you have to remove the line "compositing 1" from
-$TEMPLATE/conf/PieDockrc
+$TEMPLATE/conf/piedockrc
 and start again.
 
 Start PieDock if it is not running:

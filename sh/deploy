@@ -56,8 +56,8 @@ do
 			exit 1
 		}
 
-		PieDock || {
-			echo "error: PieDock failed to start $HOME/.PieDockrc"
+		piedock || {
+			echo "error: piedock failed to start $HOME/.piedockrc"
 			exit 1
 		}
 
@@ -74,7 +74,7 @@ appear:
 
 To fine-tune the experience, check out the configuration file at
 
-$HOME/.PieDockrc
+$HOME/.piedockrc
 
 You may now erase this directory.
 

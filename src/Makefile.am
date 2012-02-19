@@ -1,10 +1,10 @@
-bin_PROGRAMS = PieDock
-PieDock_SOURCES = \
+bin_PROGRAMS = piedock
+piedock_SOURCES = \
 	Surface.cpp Surface.h \
 	ArgbSurface.cpp ArgbSurface.h \
 	ArgbSurfaceSizeMap.cpp ArgbSurfaceSizeMap.h \
 	XSurface.cpp XSurface.h \
-	PngSurface.cpp PngSurface.h \
+	Png.cpp Png.h \
 	Blender.cpp Blender.h \
 	Resampler.cpp Resampler.h \
 	WildcardCompare.cpp WildcardCompare.h \
@@ -21,6 +21,7 @@ PieDock_SOURCES = \
 	Menu.cpp Menu.h \
 	PieMenu.cpp PieMenu.h \
 	PieMenuWindow.cpp PieMenuWindow.h \
+	WorkspaceLayout.cpp WorkspaceLayout.h \
 	WindowManager.cpp WindowManager.h \
 	ModMask.cpp ModMask.h \
 	Environment.cpp Environment.h \

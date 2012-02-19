@@ -32,7 +32,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = PieDockUtils$(EXEEXT)
+bin_PROGRAMS = piedockutils$(EXEEXT)
 subdir = utils
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -44,10 +44,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_PieDockUtils_OBJECTS = Surface.$(OBJEXT) ArgbSurface.$(OBJEXT) \
-	WindowManager.$(OBJEXT) Utilities.$(OBJEXT) main.$(OBJEXT)
-PieDockUtils_OBJECTS = $(am_PieDockUtils_OBJECTS)
-PieDockUtils_LDADD = $(LDADD)
+am_piedockutils_OBJECTS = Surface.$(OBJEXT) ArgbSurface.$(OBJEXT) \
+	WorkspaceLayout.$(OBJEXT) WindowManager.$(OBJEXT) \
+	Utilities.$(OBJEXT) main.$(OBJEXT)
+piedockutils_OBJECTS = $(am_piedockutils_OBJECTS)
+piedockutils_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -61,8 +62,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(PieDockUtils_SOURCES)
-DIST_SOURCES = $(PieDockUtils_SOURCES)
+SOURCES = $(piedockutils_SOURCES)
+DIST_SOURCES = $(piedockutils_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -90,6 +91,8 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FREETYPE_CONFIG = @FREETYPE_CONFIG@
 GREP = @GREP@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -110,6 +113,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -158,9 +164,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-PieDockUtils_SOURCES = \
+piedockutils_SOURCES = \
 	../src/Surface.cpp ../src/Surface.h \
 	../src/ArgbSurface.cpp ../src/ArgbSurface.h \
+	../src/WorkspaceLayout.cpp ../src/WorkspaceLayout.h \
 	../src/WindowManager.cpp ../src/WindowManager.h \
 	Utilities.cpp Utilities.h \
 	main.cpp
@@ -236,9 +243,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-PieDockUtils$(EXEEXT): $(PieDockUtils_OBJECTS) $(PieDockUtils_DEPENDENCIES) 
-	@rm -f PieDockUtils$(EXEEXT)
-	$(CXXLINK) $(PieDockUtils_OBJECTS) $(PieDockUtils_LDADD) $(LIBS)
+piedockutils$(EXEEXT): $(piedockutils_OBJECTS) $(piedockutils_DEPENDENCIES) 
+	@rm -f piedockutils$(EXEEXT)
+	$(CXXLINK) $(piedockutils_OBJECTS) $(piedockutils_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -250,6 +257,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Surface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Utilities.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WindowManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WorkspaceLayout.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:
@@ -293,6 +301,20 @@ ArgbSurface.obj: ../src/ArgbSurface.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../src/ArgbSurface.cpp' object='ArgbSurface.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ArgbSurface.obj `if test -f '../src/ArgbSurface.cpp'; then $(CYGPATH_W) '../src/ArgbSurface.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/ArgbSurface.cpp'; fi`
+
+WorkspaceLayout.o: ../src/WorkspaceLayout.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT WorkspaceLayout.o -MD -MP -MF $(DEPDIR)/WorkspaceLayout.Tpo -c -o WorkspaceLayout.o `test -f '../src/WorkspaceLayout.cpp' || echo '$(srcdir)/'`../src/WorkspaceLayout.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/WorkspaceLayout.Tpo $(DEPDIR)/WorkspaceLayout.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../src/WorkspaceLayout.cpp' object='WorkspaceLayout.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o WorkspaceLayout.o `test -f '../src/WorkspaceLayout.cpp' || echo '$(srcdir)/'`../src/WorkspaceLayout.cpp
+
+WorkspaceLayout.obj: ../src/WorkspaceLayout.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT WorkspaceLayout.obj -MD -MP -MF $(DEPDIR)/WorkspaceLayout.Tpo -c -o WorkspaceLayout.obj `if test -f '../src/WorkspaceLayout.cpp'; then $(CYGPATH_W) '../src/WorkspaceLayout.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/WorkspaceLayout.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/WorkspaceLayout.Tpo $(DEPDIR)/WorkspaceLayout.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../src/WorkspaceLayout.cpp' object='WorkspaceLayout.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o WorkspaceLayout.obj `if test -f '../src/WorkspaceLayout.cpp'; then $(CYGPATH_W) '../src/WorkspaceLayout.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/WorkspaceLayout.cpp'; fi`
 
 WindowManager.o: ../src/WindowManager.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT WindowManager.o -MD -MP -MF $(DEPDIR)/WindowManager.Tpo -c -o WindowManager.o `test -f '../src/WindowManager.cpp' || echo '$(srcdir)/'`../src/WindowManager.cpp

@@ -5,7 +5,7 @@
 	exit 1
 }
 
-readonly BIN=PieDock
+readonly BIN=piedock
 
 if [ -d src ]
 then

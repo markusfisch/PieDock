@@ -1,7 +1,7 @@
 #!/bin/bash
 
-readonly RC=${RC:=${HOME}/.PieDockrc}
-readonly ICON_PATH=${ICON_PATH:=${HOME}/.PieDock/icons}
+readonly RC=${RC:=${HOME}/.piedockrc}
+readonly ICON_PATH=${ICON_PATH:=${HOME}/.piedock/icons}
 
 # abort if there's already a config file
 [ -f "$RC" ] && exit
@@ -227,7 +227,7 @@ path "/usr/share/icons/gnome/32x32/apps"
 path "/usr/share/pixmaps"
 
 # you may specify windows to ignore, those windows will never show up in
-# the window list, find the window name with "utils/PieDockUtils -l"
+# the window list, find the window name with "utils/piedockutils -l"
 # usage: ignore-window NAME
 #ignore-window "gnome-panel"
 

@@ -32,7 +32,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = PieDock$(EXEEXT)
+bin_PROGRAMS = piedock$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -44,19 +44,19 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_PieDock_OBJECTS = Surface.$(OBJEXT) ArgbSurface.$(OBJEXT) \
-	ArgbSurfaceSizeMap.$(OBJEXT) XSurface.$(OBJEXT) \
-	PngSurface.$(OBJEXT) Blender.$(OBJEXT) Resampler.$(OBJEXT) \
+am_piedock_OBJECTS = Surface.$(OBJEXT) ArgbSurface.$(OBJEXT) \
+	ArgbSurfaceSizeMap.$(OBJEXT) XSurface.$(OBJEXT) Png.$(OBJEXT) \
+	Blender.$(OBJEXT) Resampler.$(OBJEXT) \
 	WildcardCompare.$(OBJEXT) IconMap.$(OBJEXT) \
 	ActiveIndicator.$(OBJEXT) Hotspot.$(OBJEXT) \
 	TransparentWindow.$(OBJEXT) Cartouche.$(OBJEXT) Text.$(OBJEXT) \
 	WindowStack.$(OBJEXT) MenuItem.$(OBJEXT) Menu.$(OBJEXT) \
 	PieMenu.$(OBJEXT) PieMenuWindow.$(OBJEXT) \
-	WindowManager.$(OBJEXT) ModMask.$(OBJEXT) \
-	Environment.$(OBJEXT) Settings.$(OBJEXT) Application.$(OBJEXT) \
-	main.$(OBJEXT)
-PieDock_OBJECTS = $(am_PieDock_OBJECTS)
-PieDock_LDADD = $(LDADD)
+	WorkspaceLayout.$(OBJEXT) WindowManager.$(OBJEXT) \
+	ModMask.$(OBJEXT) Environment.$(OBJEXT) Settings.$(OBJEXT) \
+	Application.$(OBJEXT) main.$(OBJEXT)
+piedock_OBJECTS = $(am_piedock_OBJECTS)
+piedock_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -70,8 +70,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(PieDock_SOURCES)
-DIST_SOURCES = $(PieDock_SOURCES)
+SOURCES = $(piedock_SOURCES)
+DIST_SOURCES = $(piedock_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -99,6 +99,8 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FREETYPE_CONFIG = @FREETYPE_CONFIG@
 GREP = @GREP@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -119,6 +121,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -167,12 +172,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-PieDock_SOURCES = \
+piedock_SOURCES = \
 	Surface.cpp Surface.h \
 	ArgbSurface.cpp ArgbSurface.h \
 	ArgbSurfaceSizeMap.cpp ArgbSurfaceSizeMap.h \
 	XSurface.cpp XSurface.h \
-	PngSurface.cpp PngSurface.h \
+	Png.cpp Png.h \
 	Blender.cpp Blender.h \
 	Resampler.cpp Resampler.h \
 	WildcardCompare.cpp WildcardCompare.h \
@@ -189,6 +194,7 @@ PieDock_SOURCES = \
 	Menu.cpp Menu.h \
 	PieMenu.cpp PieMenu.h \
 	PieMenuWindow.cpp PieMenuWindow.h \
+	WorkspaceLayout.cpp WorkspaceLayout.h \
 	WindowManager.cpp WindowManager.h \
 	ModMask.cpp ModMask.h \
 	Environment.cpp Environment.h \
@@ -267,9 +273,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-PieDock$(EXEEXT): $(PieDock_OBJECTS) $(PieDock_DEPENDENCIES) 
-	@rm -f PieDock$(EXEEXT)
-	$(CXXLINK) $(PieDock_OBJECTS) $(PieDock_LDADD) $(LIBS)
+piedock$(EXEEXT): $(piedock_OBJECTS) $(piedock_DEPENDENCIES) 
+	@rm -f piedock$(EXEEXT)
+	$(CXXLINK) $(piedock_OBJECTS) $(piedock_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -291,7 +297,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ModMask.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieMenuWindow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PngSurface.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Png.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Resampler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Settings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Surface.Po@am__quote@
@@ -300,6 +306,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WildcardCompare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WindowManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WindowStack.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WorkspaceLayout.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XSurface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
