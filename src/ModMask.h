@@ -23,9 +23,7 @@ namespace PieDock
 			virtual ~ModMask();
 			unsigned int getModMaskFor( const char * );
 
-		protected:
-			Display *display;
-
+		private:
 			struct XlatEntry
 			{
 				const char *name;
@@ -41,6 +39,7 @@ namespace PieDock
 				char *type;
 			};
 
+			Display *display;
 			int modKeyCount;
 			ModKeyEntry *modKey;
 	};
