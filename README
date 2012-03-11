@@ -15,4 +15,4 @@ Configuration options for building:
 
 Run-time setup:
 
-  Copy res/PieDockrc.sample to ~/.PieDockrc and modify it to meet your needs
+  Copy res/piedockrc.sample to ~/.piedockrc and modify it to meet your needs
