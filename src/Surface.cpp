@@ -22,7 +22,7 @@ using namespace PieDock;
  *
  * @param s - some surface
  */
-Surface::Surface( Surface &s ) :
+Surface::Surface( const Surface &s ) :
 	// because data will be deleted in operator=()
 	data( 0 )
 {
@@ -42,7 +42,7 @@ Surface::~Surface()
  *
  * @param s - some surface
  */
-Surface &Surface::operator=( Surface &s )
+Surface &Surface::operator=( const Surface &s )
 {
 	freeData();
 

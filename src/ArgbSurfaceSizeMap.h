@@ -29,18 +29,21 @@ namespace PieDock
 	class ArgbSurfaceSizeMap
 	{
 		public:
-			ArgbSurfaceSizeMap( ArgbSurface & );
+			ArgbSurfaceSizeMap( ArgbSurface * );
 			virtual ~ArgbSurfaceSizeMap();
+			inline const ArgbSurface &getSurface() const {
+				return surface; }
 			virtual const ArgbSurface *getSurface( int, int );
-			virtual void setSurface( ArgbSurface & );
+			virtual void setSurface( ArgbSurface * );
 
 		protected:
+			virtual void clear();
+
+		private:
 			typedef std::map<int, ArgbSurface *> SurfaceMap;
 
 			ArgbSurface surface;
 			SurfaceMap surfaceMap;
-
-			virtual void clear();
 	};
 }
 

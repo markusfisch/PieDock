@@ -35,14 +35,15 @@ namespace PieDock
 			inline Visual *getVisual() const { return visual; }
 
 		protected:
+			virtual int determineBitsPerPixel( int );
+			virtual void allocateData();
+			virtual void freeData();
+
+		private:
 			Display *display;
 			Visual *visual;
 			int orginalDepth;
 			XImage *resource;
-
-			virtual int determineBitsPerPixel( int );
-			virtual void allocateData();
-			virtual void freeData();
 	};
 }
 

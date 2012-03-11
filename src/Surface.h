@@ -32,7 +32,7 @@ namespace PieDock
 				ARGB = 32
 			};
 
-			Surface( Surface & );
+			Surface( const Surface & );
 			virtual ~Surface();
 			inline unsigned char *getData() const { return data; }
 			inline const int &getWidth() const { return width; }
@@ -42,9 +42,16 @@ namespace PieDock
 			inline const int &getBytesPerLine() const { return bytesPerLine; }
 			inline const int &getPadding() const { return padding; }
 			inline const int &getSize() const { return size; }
-			Surface &operator=( Surface & );
+			Surface &operator=( const Surface & );
 
 		protected:
+			Surface();
+			inline void setData( unsigned char *d ) { data = d; }
+			virtual void calculateSize( int, int, int = ARGB );
+			virtual void allocateData();
+			virtual void freeData();
+
+		private:
 			unsigned char *data;
 			int width;
 			int height;
@@ -53,11 +60,6 @@ namespace PieDock
 			int bytesPerLine;
 			int padding;
 			int size;
-
-			Surface();
-			virtual void calculateSize( int, int, int = ARGB );
-			virtual void allocateData();
-			virtual void freeData();
 	};
 }
 

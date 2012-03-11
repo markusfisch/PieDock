@@ -84,9 +84,11 @@ int XSurface::determineBitsPerPixel( int depth )
  */
 void XSurface::allocateData()
 {
-	if( !(data = reinterpret_cast<unsigned char *>( calloc(
-			size,
-			sizeof( char ) ) )) )
+	setData( reinterpret_cast<unsigned char *>( calloc(
+		getSize(),
+		sizeof( char ) ) ) );
+
+	if( !getData() )
 		throw "cannot allocate memory";
 
 	if( !(resource = XCreateImage(
@@ -95,9 +97,9 @@ void XSurface::allocateData()
 			orginalDepth,
 			ZPixmap,
 			0,
-			reinterpret_cast<char *>( data ),
-			width,
-			height,
+			reinterpret_cast<char *>( getData() ),
+			getWidth(),
+			getHeight(),
 			32,
 			0 )) )
 		throw "cannot create XImage";
@@ -111,5 +113,5 @@ void XSurface::freeData()
 	XDestroyImage( resource );
 	resource = 0;
 	// data is freed by XDestroyImage
-	data = 0;
+	setData( 0 );
 }

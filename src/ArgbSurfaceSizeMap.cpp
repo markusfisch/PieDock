@@ -21,8 +21,8 @@ using namespace PieDock;
  *
  * @param s - some ARGB surface
  */
-ArgbSurfaceSizeMap::ArgbSurfaceSizeMap( ArgbSurface &s ) :
-	surface( s )
+ArgbSurfaceSizeMap::ArgbSurfaceSizeMap( ArgbSurface *s ) :
+	surface( *s )
 {
 }
 
@@ -67,10 +67,10 @@ const ArgbSurface *ArgbSurfaceSizeMap::getSurface( int width, int height )
  *
  * @param s - some ARGB surface
  */
-void ArgbSurfaceSizeMap::setSurface( ArgbSurface &s )
+void ArgbSurfaceSizeMap::setSurface( ArgbSurface *s )
 {
 	clear();
-	surface = s;
+	surface = *s;
 }
 
 /**
