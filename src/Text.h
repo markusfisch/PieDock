@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -24,9 +24,6 @@
 
 namespace PieDock
 {
-	// forward declaration
-	class Application;
-
 	/**
 	 * Text output
 	 *
@@ -97,7 +94,7 @@ namespace PieDock
 #else
 						family = "6x10";
 #endif
-						size = 10.0;
+						size = 9.0;
 						color = Color( 0xff, 0xff, 0xff, 0xff );
 					}
 
@@ -136,14 +133,14 @@ namespace PieDock
 					int height;
 			};
 
-			Text( Application *, Drawable, Visual *, Font );
+			Text( Display *, Drawable, Visual *, Font );
 			virtual ~Text() {}
 			virtual void setColor( const Color );
 			virtual void draw( const int, const int, const std::string ) const;
 			virtual Metrics getMetrics( const std::string ) const;
 
 		private:
-			Application *app;
+			Display *display;
 #ifdef HAVE_XFT
 			XftFont *xftFont;
 			XftDraw *xftDraw;
