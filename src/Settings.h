@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -18,6 +18,7 @@
 #include "IconMap.h"
 #include "ActiveIndicator.h"
 #include "Text.h"
+#include "WorkspaceLayout.h"
 
 #include <X11/Xlib.h>
 #include <vector>
@@ -40,6 +41,7 @@ namespace PieDock
 				Launch,
 				ShowNext,
 				ShowPrevious,
+				ShowWindows,
 				Hide,
 				Close,
 				SpinUp,
@@ -87,6 +89,14 @@ namespace PieDock
 				int alpha;
 				unsigned int color;
 			} CartoucheSettings;
+
+			typedef struct
+			{
+				bool visible;
+				WorkspaceLayout::PreferredVirtualLayout preferredLayout;
+				unsigned int workspaceColor;
+				unsigned int windowColor;
+			} WorkspaceDisplaySettings;
 
 			typedef std::vector<Key> Keys;
 			typedef std::vector<Button> Buttons;
@@ -136,6 +146,9 @@ namespace PieDock
 			inline const CartoucheSettings &getCartoucheSettings() const {
 				return cartoucheSettings; }
 			inline const int &getMinimumNumber() const { return minimumNumber; }
+			inline const WorkspaceDisplaySettings
+				&getWorkspaceDisplaySettings() const {
+				return workspaceDisplaySettings; }
 			virtual void setConfigurationFileFromBinary( std::string );
 			virtual ButtonFunctions getButtonFunctions(
 				const std::string &menu = std::string(),
@@ -196,6 +209,7 @@ namespace PieDock
 			Text::Font titleFont;
 			CartoucheSettings cartoucheSettings;
 			int minimumNumber;
+			WorkspaceDisplaySettings workspaceDisplaySettings;
 #ifdef HAVE_XRENDER
 			bool compositing;
 #endif

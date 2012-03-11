@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -83,7 +83,7 @@ void Settings::load( Display *d )
 
 	// reset settings to default values
 	{
-		width = height = 256;
+		width = height = 320;
 		keys.clear();
 		buttons.clear();
 		buttonFunctions.clear();
@@ -95,7 +95,7 @@ void Settings::load( Display *d )
 		activeIndicator.reset();
 		focusedAlpha = unfocusedAlpha = 0xff;
 		startRadius = .9;
-		fitts = false;
+		fitts = true;
 		zoomModifier = 1.0;
 		spinStep = .5;
 		centerAction = CenterDisappear;
@@ -105,6 +105,10 @@ void Settings::load( Display *d )
 		cartoucheSettings.alpha = 196;
 		cartoucheSettings.color = 0xff000000;
 		minimumNumber = 0;
+		workspaceDisplaySettings.visible = true;
+		workspaceDisplaySettings.preferredLayout = WorkspaceLayout::Square;
+		workspaceDisplaySettings.workspaceColor = 0x88000000;
+		workspaceDisplaySettings.windowColor = 0xbfffffff;
 #ifdef HAVE_XRENDER
 		compositing = false;
 #endif
@@ -149,7 +153,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to size directive",
+					"insufficient arguments for size directive",
 					line );
 			else
 				width = height = atoi( (*i).c_str() );
@@ -158,7 +162,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to width directive",
+					"insufficient arguments for width directive",
 					line );
 			else
 				width = atoi( (*i).c_str() );
@@ -167,7 +171,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to width directive",
+					"insufficient arguments for width directive",
 					line );
 			else
 				height = atoi( (*i).c_str() );
@@ -176,7 +180,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to ignore-mask directive",
+					"insufficient arguments for ignore-mask directive",
 					line );
 			else
 				masksToIgnore.push_back(
@@ -189,7 +193,7 @@ void Settings::load( Display *d )
 			if( n < 3 ||
 				n > 6 )
 				throwParsingError(
-					"insufficient arguments to trigger directive",
+					"insufficient arguments for trigger directive",
 					line );
 			else
 			{
@@ -242,7 +246,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 3 )
 				throwParsingError(
-					"insufficient arguments to button directive",
+					"insufficient arguments for button directive",
 					line );
 			else
 			{
@@ -267,7 +271,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 3 )
 				throwParsingError(
-					"insufficient arguments to key directive",
+					"insufficient arguments for key directive",
 					line );
 			else
 			{
@@ -290,7 +294,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() < 2 )
 				throwParsingError(
-					"insufficient arguments to path directive",
+					"insufficient arguments for path directive",
 					line );
 
 			while( ++i != tokens.end() )
@@ -312,7 +316,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to ignore-window directive",
+					"insufficient arguments for ignore-window directive",
 					line );
 			else
 				windowsToIgnore[(*i)] = true;
@@ -323,7 +327,7 @@ void Settings::load( Display *d )
 			{
 				default:
 					throwParsingError(
-						"insufficient arguments to alias directive",
+						"insufficient arguments for alias directive",
 						line );
 					break;
 				case 3:
@@ -364,7 +368,7 @@ void Settings::load( Display *d )
 
 			if( n > 2 )
 				throwParsingError(
-					"insufficient arguments to menu directive",
+					"insufficient arguments for menu directive",
 					line );
 			else if( n > 1 )
 				menuName = (*++i);
@@ -375,7 +379,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to preload directive",
+					"insufficient arguments for preload directive",
 					line );
 			else
 			{
@@ -389,7 +393,7 @@ void Settings::load( Display *d )
 					preload = PreloadNone;
 				else
 					throwParsingError(
-						"unknown argument to preload directive",
+						"unknown argument for preload directive",
 						line );
 			}
 		}
@@ -397,7 +401,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to active-indicator directive",
+					"insufficient arguments for active-indicator directive",
 					line );
 			else
 			{
@@ -425,7 +429,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to missing-icon directive",
+					"insufficient arguments for missing-icon directive",
 					line );
 			else
 			{
@@ -442,7 +446,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to filler-icon directive",
+					"insufficient arguments for filler-icon directive",
 					line );
 			else
 			{
@@ -459,7 +463,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to focused directive",
+					"insufficient arguments for focused directive",
 					line );
 			else
 				focusedAlpha = atoi( (*i).c_str() ) % 256;
@@ -468,7 +472,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to unfocused directive",
+					"insufficient arguments for unfocused directive",
 					line );
 			else
 				unfocusedAlpha = atoi( (*i).c_str() ) % 256;
@@ -477,7 +481,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to start-radius directive",
+					"insufficient arguments for start-radius directive",
 					line );
 			else if( (startRadius = atof( (*i).c_str() )) > 1 ||
 				startRadius < 0.1 )
@@ -488,7 +492,7 @@ void Settings::load( Display *d )
 		{
 			if( ++i == tokens.end() )
 				throwParsingError(
-					"insufficient arguments to center directive",
+					"insufficient arguments for center directive",
 					line );
 			else
 			{
@@ -508,7 +512,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 2 )
 				throwParsingError(
-					"insufficient arguments to fitts directive",
+					"insufficient arguments for fitts directive",
 					line );
 			else
 				fitts = static_cast<bool>( atoi( (*++i).c_str() ) );
@@ -517,7 +521,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 2 )
 				throwParsingError(
-					"insufficient arguments to zoom directive",
+					"insufficient arguments for zoom directive",
 					line );
 			else
 				zoomModifier = atof( (*++i).c_str() );
@@ -526,7 +530,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 2 )
 				throwParsingError(
-					"insufficient arguments to spin-step directive",
+					"insufficient arguments for spin-step directive",
 					line );
 			else
 				spinStep = atof( (*++i).c_str() );
@@ -535,7 +539,7 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 2 )
 				throwParsingError(
-					"insufficient arguments to title directive",
+					"insufficient arguments for title directive",
 					line );
 			else
 				showTitle = static_cast<bool>( atoi( (*++i).c_str() ) );
@@ -547,7 +551,7 @@ void Settings::load( Display *d )
 			if( n < 3 ||
 				n > 4 )
 				throwParsingError(
-					"insufficient arguments to font directive",
+					"insufficient arguments for font directive",
 					line );
 			else
 			{
@@ -565,7 +569,7 @@ void Settings::load( Display *d )
 			if( n < 2 ||
 				n > 4 )
 				throwParsingError(
-					"insufficient arguments to cartouche directive",
+					"insufficient arguments for cartouche directive",
 					line );
 			else
 			{
@@ -587,17 +591,61 @@ void Settings::load( Display *d )
 		{
 			if( tokens.size() != 2 )
 				throwParsingError(
-					"insufficient arguments to minimum directive",
+					"insufficient arguments for minimum directive",
 					line );
 			else
 				minimumNumber = atoi( (*++i).c_str() );
+		}
+		else if( !(*i).compare( "show-workspace" ) )
+		{
+			int n = tokens.size();
+
+			if( n < 2 ||
+				n > 4 )
+				throwParsingError(
+					"insufficient arguments for workspace directive",
+					line );
+			else
+			{
+				if( !(*++i).compare( "no" ) )
+					workspaceDisplaySettings.visible = false;
+				else
+				{
+					workspaceDisplaySettings.visible = true;
+					workspaceDisplaySettings.workspaceColor =
+						Text::Color( (*i).c_str() ).getColor();
+
+					if( n > 2 )
+						workspaceDisplaySettings.windowColor =
+							Text::Color( (*++i).c_str() ).getColor();
+
+					if( n > 3 )
+					{
+						++i;
+
+						if( !(*i).compare( "horizontal" ) )
+							workspaceDisplaySettings.preferredLayout =
+								WorkspaceLayout::Horizontal;
+						else if( !(*i).compare( "vertical" ) )
+							workspaceDisplaySettings.preferredLayout =
+								WorkspaceLayout::Vertical;
+						else if( !(*i).compare( "square" ) )
+							workspaceDisplaySettings.preferredLayout =
+								WorkspaceLayout::Square;
+						else
+							throwParsingError(
+								"unknown argument for preferred layout of workspaces",
+								line );
+					}
+				}
+			}
 		}
 #ifdef HAVE_XRENDER
 		else if( !(*i).compare( "compositing" ) )
 		{
 			if( tokens.size() != 2 )
 				throwParsingError(
-					"insufficient arguments to compositing directive",
+					"insufficient arguments for compositing directive",
 					line );
 			else
 				compositing = static_cast<bool>( atoi( (*++i).c_str() ) );
@@ -913,6 +961,8 @@ Settings::Action Settings::resolveActionString( const std::string &s ) const
 		return ShowNext;
 	else if( !s.compare( "ShowPrevious" ) )
 		return ShowPrevious;
+	else if( !s.compare( "ShowWindows" ) )
+		return ShowWindows;
 	else if( !s.compare( "Hide" ) )
 		return Hide;
 	else if( !s.compare( "Close" ) )
