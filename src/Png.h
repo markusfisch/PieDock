@@ -32,8 +32,8 @@ namespace PieDock
 			virtual ~Png() {}
 			static ArgbSurface *load( const std::string & );
 			static ArgbSurface *load( std::istream & );
-			static void save( const std::string &, ArgbSurface * );
-			static void save( std::ostream &, ArgbSurface * );
+			static void save( const std::string &, const ArgbSurface * );
+			static void save( std::ostream &, const ArgbSurface * );
 
 		protected:
 			static void read( png_structp, png_bytep, png_size_t );

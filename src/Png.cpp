@@ -127,7 +127,7 @@ ArgbSurface *Png::load( std::istream &in )
  * @param f - path and filename of PNG
  * @param s - surface to save
  */
-void Png::save( const std::string &f, ArgbSurface *s )
+void Png::save( const std::string &f, const ArgbSurface *s )
 {
 	std::ofstream out( f.c_str(), std::ios::out );
 
@@ -143,7 +143,7 @@ void Png::save( const std::string &f, ArgbSurface *s )
  * @param out - output stream
  * @param s - surface to save
  */
-void Png::save( std::ostream &out, ArgbSurface *s )
+void Png::save( std::ostream &out, const ArgbSurface *s )
 {
 	png_structp png = 0;
 	png_infop info = 0;

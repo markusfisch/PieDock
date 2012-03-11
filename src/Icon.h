@@ -34,7 +34,7 @@ namespace PieDock
 				Window
 			};
 
-			Icon( ArgbSurface &s, Type t = File ) :
+			Icon( const ArgbSurface *s, Type t = File ) :
 				ArgbSurfaceSizeMap( s ),
 				type( t ) {}
 			virtual ~Icon() {}

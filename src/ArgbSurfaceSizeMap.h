@@ -29,7 +29,7 @@ namespace PieDock
 	class ArgbSurfaceSizeMap
 	{
 		public:
-			ArgbSurfaceSizeMap( ArgbSurface * );
+			ArgbSurfaceSizeMap( const ArgbSurface * );
 			virtual ~ArgbSurfaceSizeMap();
 			inline const ArgbSurface &getSurface() const {
 				return surface; }
