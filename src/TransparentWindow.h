@@ -41,6 +41,37 @@ namespace PieDock
 			virtual bool processEvent( XEvent & ) { return false; }
 
 		protected:
+			inline Application *getApp() const { return app; }
+			inline const int &getWidth() const { return width; }
+			inline const int &getHeight() const { return height; }
+			inline XSurface *getCanvas() const { return canvas; }
+			inline const GC &getGc() const { return gc; }
+#ifdef HAVE_XRENDER
+			inline const Pixmap &getAlphaPixmap() const { return alphaPixmap; }
+			inline virtual void composite() const
+			{
+				XRenderComposite(
+					app->getDisplay(),
+					PictOpOver,
+					windowPicture,
+					None,
+					alphaPicture,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					width,
+					height );
+			}
+#endif
+			virtual void show();
+			virtual void hide() const;
+			virtual void clear();
+			virtual void update() const;
+
+		private:
 			Application *app;
 			Window window;
 			int width;
@@ -52,33 +83,7 @@ namespace PieDock
 			Pixmap alphaPixmap;
 			Picture windowPicture;
 			Picture alphaPicture;
-
-			/**
-			 * Composite
-			 */
-			inline virtual void composite() const
-			{
-				XRenderComposite(
-					app->getDisplay(),
-					PictOpOver,
-					alphaPicture,
-					None,
-					windowPicture,
-					0,
-					0,
-					0,
-					0,
-					0,
-					0,
-					width,
-					height );
-			}
 #endif
-
-			virtual void show();
-			virtual void hide() const;
-			virtual void clear();
-			virtual void update() const;
 	};
 }
 
