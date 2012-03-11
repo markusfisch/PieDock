@@ -62,7 +62,7 @@ fi
 AC_MSG_CHECKING([whether to have Xrender support])
 AC_ARG_ENABLE(
   xrender,
-[  --enable-xrender        Xrender (transparent) support [default=yes]],
+[  --enable-xrender    Xrender support [default=yes]],
 	if test x$enableval = "xyes"; then
 		AC_MSG_RESULT([yes])
 		AC_CHECK_LIB(Xrender, XRenderCreatePicture,
@@ -97,7 +97,7 @@ AC_ARG_ENABLE(
 )
 
 # Check if user wants GNOME integration
-AC_ARG_WITH([gtk], AS_HELP_STRING([--enable-gtk],
+AC_ARG_ENABLE([gtk], AS_HELP_STRING([--enable-gtk],
 	[ask GTK for icons]))
 
 AS_IF([test "x$enable_gtk" = "xyes"], [

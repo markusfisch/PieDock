@@ -703,7 +703,7 @@ enable_dependency_tracking
 enable_xft
 enable_xrender
 enable_xmu
-with_gtk
+enable_gtk
 with_x
 '
       ac_precious_vars='build_alias
@@ -1345,13 +1345,13 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-xft        Xft support default=yes
-  --enable-xrender        Xrender (transparent) support default=yes
+  --enable-xrender    Xrender support default=yes
   --enable-xmu        use libXmu default=yes
+  --enable-gtk            ask GTK for icons
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --enable-gtk            ask GTK for icons
   --with-x                use the X Window System
 
 Some influential environment variables:
@@ -4779,10 +4779,9 @@ fi
 
 
 # Check if user wants GNOME integration
-
-# Check whether --with-gtk was given.
-if test "${with_gtk+set}" = set; then :
-  withval=$with_gtk;
+# Check whether --enable-gtk was given.
+if test "${enable_gtk+set}" = set; then :
+  enableval=$enable_gtk;
 fi
 
 
