@@ -54,14 +54,15 @@ namespace PieDock
 				int alpha;
 			} Details;
 
+			virtual void blendInto32Bit( Details & );
+			virtual void blendInto24Bit( Details & );
+			virtual void blendInto16Bit( Details & );
+
+		private:
 			Surface *canvas;
 #ifdef HAVE_XRENDER
 			bool compositing;
 #endif
-
-			virtual void blendInto32Bit( Details & );
-			virtual void blendInto24Bit( Details & );
-			virtual void blendInto16Bit( Details & );
 	};
 }
 
