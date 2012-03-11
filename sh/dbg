@@ -50,7 +50,7 @@ build()
 for ARG in $@
 do
 	case $ARG in
-		star*)
+		star*|ru*)
 			start
 			;;
 		sto*)
