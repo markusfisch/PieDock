@@ -24,13 +24,13 @@ using namespace PieDock;
  */
 PieMenuWindow::PieMenuWindow( Application &a ) :
 	TransparentWindow( a ),
-	menu( &a, *canvas ),
+	menu( &a, *getCanvas() ),
 	text( 0 ),
 	textCanvas( 0 )
 {
 	XSelectInput(
-		app->getDisplay(),
-		window,
+		getApp()->getDisplay(),
+		getWindow(),
 		LeaveWindowMask |
 			ButtonReleaseMask |
 			ButtonPressMask |
@@ -38,8 +38,8 @@ PieMenuWindow::PieMenuWindow( Application &a ) :
 			KeyReleaseMask );
 
 	WindowManager::setWindowType(
-		app->getDisplay(),
-		window,
+		getApp()->getDisplay(),
+		getWindow(),
 		"_NET_WM_WINDOW_TYPE_DOCK" );
 }
 
@@ -50,7 +50,7 @@ PieMenuWindow::~PieMenuWindow()
 {
 	if( text )
 	{
-		XFreePixmap( app->getDisplay(), textCanvas );
+		XFreePixmap( getApp()->getDisplay(), textCanvas );
 		delete text;
 	}
 
@@ -85,7 +85,7 @@ bool PieMenuWindow::appear( std::string n,
  */
 void PieMenuWindow::draw()
 {
-	Hotspot p( app->getDisplay(), window );
+	Hotspot p( getApp()->getDisplay(), getWindow() );
 
 	if( !menu.isObsolete( p.getX(), p.getY() ) )
 		return;
@@ -93,7 +93,7 @@ void PieMenuWindow::draw()
 	clear();
 	menu.draw( p.getX(), p.getY() );
 
-	if( !app->getSettings()->getShowTitle() )
+	if( !getApp()->getSettings()->getShowTitle() )
 		update();
 	else
 		updateWithText();
@@ -110,8 +110,8 @@ bool PieMenuWindow::processEvent( XEvent &event )
 	switch( event.type )
 	{
 		case LeaveNotify:
-			if( event.xany.window == window &&
-				!app->getSettings()->isFitts() )
+			if( event.xany.window == getWindow() &&
+				!getApp()->getSettings()->isFitts() )
 			{
 				hide();
 				return false;
@@ -120,7 +120,7 @@ bool PieMenuWindow::processEvent( XEvent &event )
 		case ButtonRelease:
 			{
 				Settings::ButtonFunctions bf =
-					app->getSettings()->getButtonFunctions(
+					getApp()->getSettings()->getButtonFunctions(
 						menu.getName(),
 						menu.getSelected() );
 
@@ -135,7 +135,7 @@ bool PieMenuWindow::processEvent( XEvent &event )
 		case KeyRelease:
 			{
 				Settings::KeyFunctions *kf =
-					&app->getSettings()->getKeyFunctions();
+					&getApp()->getSettings()->getKeyFunctions();
 
 				for( Settings::KeyFunctions::iterator i = kf->begin();
 					i != kf->end();
@@ -163,10 +163,11 @@ bool PieMenuWindow::performAction( Settings::Action action )
 		case Settings::Launch:
 		case Settings::ShowNext:
 		case Settings::ShowPrevious:
+		case Settings::ShowWindows:
 		case Settings::Hide:
 		case Settings::Close:
 			if( menu.cursorInCenter() )
-				switch( app->getSettings()->getCenterAction() )
+				switch( getApp()->getSettings()->getCenterAction() )
 				{
 					default:
 					case Settings::CenterNearestIcon:
@@ -182,10 +183,10 @@ bool PieMenuWindow::performAction( Settings::Action action )
 			menu.execute( action );
 			return false;
 		case Settings::SpinUp:
-			menu.turn( app->getSettings()->getSpinStep() );
+			menu.turn( getApp()->getSettings()->getSpinStep() );
 			break;
 		case Settings::SpinDown:
-			menu.turn( -app->getSettings()->getSpinStep() );
+			menu.turn( -getApp()->getSettings()->getSpinStep() );
 			break;
 		case Settings::SpinNext:
 			menu.turn( 1 );
@@ -211,20 +212,20 @@ bool PieMenuWindow::performAction( Settings::Action action )
  */
 void PieMenuWindow::show( PieMenuWindow::Placement p )
 {
-	if( app->getSettings()->isFitts() ||
-		app->getSettings()->getKeyFunctions().size() )
+	if( getApp()->getSettings()->isFitts() ||
+		getApp()->getSettings()->getKeyFunctions().size() )
 	{
 		XGrabKeyboard(
-			app->getDisplay(),
-			DefaultRootWindow( app->getDisplay() ),
+			getApp()->getDisplay(),
+			DefaultRootWindow( getApp()->getDisplay() ),
 			true,
 			GrabModeAsync,
 			GrabModeAsync,
 			CurrentTime );
 
 		XGrabPointer(
-			app->getDisplay(),
-			DefaultRootWindow( app->getDisplay() ),
+			getApp()->getDisplay(),
+			DefaultRootWindow( getApp()->getDisplay() ),
 			true,
 			ButtonPressMask | ButtonReleaseMask,
 			GrabModeAsync,
@@ -243,11 +244,11 @@ void PieMenuWindow::show( PieMenuWindow::Placement p )
  */
 void PieMenuWindow::hide()
 {
-	if( app->getSettings()->isFitts() ||
-		app->getSettings()->getKeyFunctions().size() )
+	if( getApp()->getSettings()->isFitts() ||
+		getApp()->getSettings()->getKeyFunctions().size() )
 	{
-		XUngrabPointer( app->getDisplay(), CurrentTime );
-		XUngrabKeyboard( app->getDisplay(), CurrentTime );
+		XUngrabPointer( getApp()->getDisplay(), CurrentTime );
+		XUngrabKeyboard( getApp()->getDisplay(), CurrentTime );
 	}
 
 	TransparentWindow::hide();
@@ -271,23 +272,24 @@ void PieMenuWindow::updateWithText()
 		// since Xft requires a Drawable, there needs to be this
 		// detour through a Pixmap
 		if(	!(textCanvas = XCreatePixmap(
-				app->getDisplay(),
-				window,
-				width,
-				height,
-				canvas->getResource()->depth )) ||
+				getApp()->getDisplay(),
+				getWindow(),
+				getWidth(),
+				getHeight(),
+				getCanvas()->getResource()->depth )) ||
 			!(text = new Text(
-				app,
+				getApp()->getDisplay(),
 				textCanvas,
-				canvas->getVisual(),
-				app->getSettings()->getTitleFont() )) )
+				getCanvas()->getVisual(),
+				getApp()->getSettings()->getTitleFont() )) )
 			throw "out of memory";
 	}
 
-	// shorten title string since it fits inside the circle
 	Text::Metrics m;
 
-	for( int w = (width>>1)-40; title.length(); )
+	// shorten title string until it fits inside the circle
+	for( int w = static_cast<int>( (getWidth()-.3*getWidth())*.525321989 );
+		title.length(); )
 	{
 		Text::Metrics p = text->getMetrics( title );
 
@@ -300,7 +302,7 @@ void PieMenuWindow::updateWithText()
 		title.erase( --title.end() );
 	}
 
-	int r = app->getSettings()->getCartoucheSettings().cornerRadius;
+	int r = getApp()->getSettings()->getCartoucheSettings().cornerRadius;
 
 	// text should have always the same height to avoid flickering
 	{
@@ -322,62 +324,62 @@ void PieMenuWindow::updateWithText()
 				m.getWidth()+rr,
 				m.getHeight()+rr,
 				r,
-				app->getSettings()->getCartoucheSettings().color );
+				getApp()->getSettings()->getCartoucheSettings().color );
 		}
 		else
 			c = i->second;
 
 		menu.getBlender()->blend(
 			*c,
-			((width-c->getWidth())>>1),
-			((height-c->getHeight())>>1),
-			app->getSettings()->getCartoucheSettings().alpha );
+			((getWidth()-c->getWidth())>>1),
+			((getHeight()-c->getHeight())>>1),
+			getApp()->getSettings()->getCartoucheSettings().alpha );
 	}
 
 	// XftDrawString/XDrawString requires a Drawable (Window or Pixmap),
 	// but update() deals only with XImage, hence this detour over the
 	// textCanvas-Pixmap
 	XPutImage(
-		app->getDisplay(),
+		getApp()->getDisplay(),
 		textCanvas,
-		gc,
-		canvas->getResource(),
+		getGc(),
+		getCanvas()->getResource(),
 		0,
 		0,
 		0,
 		0,
-		width,
-		height );
+		getWidth(),
+		getHeight() );
 
 	text->draw(
-		((width-m.getWidth())>>1)+m.getX(),
-		((height-m.getHeight())>>1)+m.getY(),
+		((getWidth()-m.getWidth())>>1)+m.getX(),
+		((getHeight()-m.getHeight())>>1)+m.getY(),
 		title );
 
 	XCopyArea(
-		app->getDisplay(),
+		getApp()->getDisplay(),
 		textCanvas,
-		window,
-		gc,
+		getWindow(),
+		getGc(),
 		0,
 		0,
-		width,
-		height,
+		getWidth(),
+		getHeight(),
 		0,
 		0 );
 
 #ifdef HAVE_XRENDER
-	if( app->getSettings()->useCompositing() )
+	if( getApp()->getSettings()->useCompositing() )
 	{
 		XCopyArea(
-			app->getDisplay(),
+			getApp()->getDisplay(),
 			textCanvas,
-			alphaPixmap,
-			gc,
+			getAlphaPixmap(),
+			getGc(),
 			0,
 			0,
-			width,
-			height,
+			getWidth(),
+			getHeight(),
 			0,
 			0 );
 
@@ -393,30 +395,30 @@ void PieMenuWindow::updateWithText()
  */
 void PieMenuWindow::place( PieMenuWindow::Placement placement )
 {
-	int screen = DefaultScreen( app->getDisplay() );
-	int desktopWidth = DisplayWidth( app->getDisplay(), screen );
-	int desktopHeight = DisplayHeight( app->getDisplay(), screen );
-	Hotspot p( app->getDisplay() );
+	int screen = DefaultScreen( getApp()->getDisplay() );
+	int desktopWidth = DisplayWidth( getApp()->getDisplay(), screen );
+	int desktopHeight = DisplayHeight( getApp()->getDisplay(), screen );
+	Hotspot p( getApp()->getDisplay() );
 	int x = p.getX();
 	int y = p.getY();
 
 	menu.setWindowBelowCursor( p.getChild() );
 
-	x -= width>>1;
-	y -= height>>1;
+	x -= getWidth()>>1;
+	y -= getHeight()>>1;
 
 	if( placement == IconBelowCursor )
 		x -= menu.getRadius();
 
 	if( x < 0 )
 		x = 0;
-	else if( x+width >= desktopWidth )
-		x = desktopWidth-width;
+	else if( x+getWidth() >= desktopWidth )
+		x = desktopWidth-getWidth();
 
 	if( y < 0 )
 		y = 0;
-	else if( y+height >= desktopHeight )
-		y = desktopHeight-height;
+	else if( y+getHeight() >= desktopHeight )
+		y = desktopHeight-getHeight();
 
-	XMoveWindow( app->getDisplay(), window, x, y );
+	XMoveWindow( getApp()->getDisplay(), getWindow(), x, y );
 }

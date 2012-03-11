@@ -53,7 +53,7 @@ Text::Color::Color( const char *s ) :
 				&red,
 				&green,
 				&blue );
-					break;
+			break;
 		default:
 			throw "invalid color";
 	}
@@ -62,18 +62,18 @@ Text::Color::Color( const char *s ) :
 /**
  * Text
  *
- * @param a - Application object
- * @param d - drawable
+ * @param d - display
+ * @param da - drawable
  * @param v - visual
  * @param f - font object
  */
-Text::Text( Application *a, Drawable d, Visual *v, Text::Font f ) :
-	app( a )
+Text::Text( Display *d, Drawable da, Visual *v, Text::Font f ) :
+	display( d )
 {
 #ifdef HAVE_XFT
 	if( !(xftFont = XftFontOpen(
-			app->getDisplay(),
-			DefaultScreen( app->getDisplay() ),
+			display,
+			DefaultScreen( display ),
 			XFT_FAMILY,
 			XftTypeString,
 			f.getFamily().c_str(),
@@ -82,16 +82,16 @@ Text::Text( Application *a, Drawable d, Visual *v, Text::Font f ) :
 			f.getSize(),
 			NULL )) ||
 		!(xftDraw = XftDrawCreate(
-			app->getDisplay(),
-			d,
+			display,
+			da,
 			v,
 			DefaultColormap(
-				app->getDisplay(),
-				DefaultScreen( app->getDisplay() ) ) )) )
+				display,
+				DefaultScreen( display ) ) )) )
 		throw "cannot open font";
 #else
 	if( !(fontInfo = XLoadQueryFont(
-			app->getDisplay(),
+			display,
 			const_cast<char *>( f.getFamily().c_str() ) )) )
 		throw "cannot open font";
 
@@ -102,13 +102,13 @@ Text::Text( Application *a, Drawable d, Visual *v, Text::Font f ) :
 		values.font = fontInfo->fid;
 
 		gc = XCreateGC(
-			app->getDisplay(),
-			d,
+			display,
+			da,
 			GCFont,
 			&values );
 	}
 
-	drawable = d;
+	drawable = da;
 #endif
 
 	setColor( f.getColor() );
@@ -148,7 +148,7 @@ void Text::draw( const int x, const int y, const std::string s ) const
 		s.length() );
 #else
 	XDrawString(
-		app->getDisplay(),
+		display,
 		drawable,
 		gc,
 		x,
@@ -169,7 +169,7 @@ Text::Metrics Text::getMetrics( const std::string s ) const
 	XGlyphInfo extents;
 
 	XftTextExtents8(
-		app->getDisplay(),
+		display,
 		xftFont,
 		reinterpret_cast<const XftChar8 *>( s.c_str() ),
 		s.length(),
@@ -187,7 +187,7 @@ Text::Metrics Text::getMetrics( const std::string s ) const
 	XCharStruct overall;
 
 	XQueryTextExtents(
-		app->getDisplay(),
+		display,
 		fontInfo->fid,
 		const_cast<char *>( s.c_str() ),
 		s.length(),
@@ -225,13 +225,13 @@ void Text::translateColor( const Text::Color &src, XColor *dest )
 	renderColor.alpha = src.getAlpha()*257;
 
 	XftColorAllocValue(
-		app->getDisplay(),
+		display,
 		DefaultVisual(
-			app->getDisplay(),
-			DefaultScreen( app->getDisplay() ) ),
+			display,
+			DefaultScreen( display ) ),
 		DefaultColormap(
-			app->getDisplay(),
-			DefaultScreen( app->getDisplay() ) ),
+			display,
+			DefaultScreen( display ) ),
 		&renderColor,
 		dest );
 #else
@@ -242,16 +242,16 @@ void Text::translateColor( const Text::Color &src, XColor *dest )
 	dest->blue = src.getBlue()*257;
 
 	XAllocColor(
-		app->getDisplay(),
+		display,
 		DefaultColormap(
-			app->getDisplay(),
-			DefaultScreen( app->getDisplay() ) ),
+			display,
+			DefaultScreen( display ) ),
 		dest );
 
 	values.foreground = dest->pixel;
 
 	XChangeGC(
-		app->getDisplay(),
+		display,
 		gc,
 		GCForeground,
 		&values );

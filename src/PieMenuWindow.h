@@ -19,6 +19,8 @@
 #include "Text.h"
 #include "Cartouche.h"
 
+#include <time.h>
+
 namespace PieDock
 {
 	/**
@@ -44,17 +46,18 @@ namespace PieDock
 		protected:
 			typedef std::map<int, Cartouche *> CartoucheMap;
 
-			static const std::string ShowMessage;
-			PieMenu menu;
-			Pixmap textCanvas;
-			Text *text;
-			CartoucheMap cartoucheMap;
-
 			virtual void show( Placement = AroundCursor );
 			virtual void hide();
 			virtual void updateWithText();
 			virtual bool performAction( Settings::Action );
 			virtual void place( Placement );
+
+		private:
+			static const std::string ShowMessage;
+			PieMenu menu;
+			Pixmap textCanvas;
+			Text *text;
+			CartoucheMap cartoucheMap;
 	};
 }
 

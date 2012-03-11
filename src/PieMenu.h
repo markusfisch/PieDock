@@ -35,10 +35,12 @@ namespace PieDock
 		public:
 			PieMenu( Application *, Surface & );
 			virtual ~PieMenu() {}
-			inline const bool cursorInCenter() const { return (selected == 0); }
+			inline const bool cursorInCenter() const {
+				return (getSelected() == 0); }
 			inline const int &getRadius() const { return maxRadius; }
 			inline Blender *getBlender() { return &blender; }
-			virtual bool update( std::string = "" );
+			inline void invalidate() { lastX = lastY = -1; }
+			virtual bool update( std::string = "", Window = 0 );
 			virtual bool isObsolete( int, int );
 			virtual void draw( int, int );
 			virtual void turn( double );
@@ -46,21 +48,6 @@ namespace PieDock
 			virtual void setTwistForSelection();
 
 		protected:
-			static const double radiansPerCircle;
-			static const double turnSteps[];
-
-			Blender blender;
-			int size;
-			int maxRadius;
-			int radius;
-			double twist;
-			int centerX;
-			int centerY;
-			int lastX;
-			int lastY;
-			double *turnStack;
-			double *turnBy;
-
 			/**
 			 * Return the difference of two angles in radians; implemented
 			 * here to ensure the method will be compiled inline
@@ -99,6 +86,22 @@ namespace PieDock
 
 				return a;
 			}
+
+		private:
+			static const double radiansPerCircle;
+			static const double turnSteps[];
+
+			Blender blender;
+			int size;
+			int maxRadius;
+			int radius;
+			double twist;
+			int centerX;
+			int centerY;
+			int lastX;
+			int lastY;
+			double *turnStack;
+			double *turnBy;
 	};
 }
 

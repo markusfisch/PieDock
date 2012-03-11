@@ -61,13 +61,15 @@ PieMenu::PieMenu( Application *a, Surface &s ) :
  * Reset and update menu
  *
  * @param n - menu name (optional)
+ * @param w - window id (optional)
  */
-bool PieMenu::update( std::string n )
+bool PieMenu::update( std::string n, Window w )
 {
 	radius = static_cast<int>(
-		app->getSettings()->getStartRadius()*maxRadius );
+		getApp()->getSettings()->getStartRadius()*maxRadius );
 	twist = -.05*static_cast<double>( (maxRadius-radius)>>1 );
-	lastX = lastY = -1;
+
+	invalidate();
 
 	if( turnStack )
 	{
@@ -75,7 +77,7 @@ bool PieMenu::update( std::string n )
 		turnStack = 0;
 	}
 
-	return Menu::update( n );
+	return Menu::update( n, w );
 }
 
 /**
@@ -112,7 +114,7 @@ bool PieMenu::isObsolete( int x, int y )
  */
 void PieMenu::draw( int x, int y )
 {
-	int numberOfIcons = menuItems->size();
+	int numberOfIcons = getMenuItems()->size();
 	int closestIcon = 0;
 	bool cursorNearCenter = false;
 	struct
@@ -125,7 +127,7 @@ void PieMenu::draw( int x, int y )
 	} iconGeometries[numberOfIcons];
 
 	// reset selected icon
-	selected = 0;
+	setSelected( 0 );
 
 	// don't do anything if there are no icons
 	if( !numberOfIcons )
@@ -149,7 +151,7 @@ void PieMenu::draw( int x, int y )
 			double cursorRadius = sqrt(
 				(centeredY*centeredY)+(centeredX*centeredX) );
 			double infieldRadius = radius>>1;
-			double z = app->getSettings()->getZoomModifier();
+			double z = getApp()->getSettings()->getZoomModifier();
 			double f = cursorRadius/infieldRadius*z;
 
 			if( f > z )
@@ -295,18 +297,18 @@ void PieMenu::draw( int x, int y )
 	// draw icons
 	{
 		const ActiveIndicator *activeIndicator =
-			&app->getSettings()->getActiveIndicator();
+			&getApp()->getSettings()->getActiveIndicator();
 		ArgbSurfaceSizeMap *activeIndicatorSizeMap =
 			activeIndicator->getSizeMap();
 		const bool selectInCenter =
-			(app->getSettings()->getCenterAction() ==
+			(getApp()->getSettings()->getCenterAction() ==
 				Settings::CenterNearestIcon ?
 				true :
 				false);
 		int n = 0;
 
-		for( MenuItems::iterator i = menuItems->begin();
-			i != menuItems->end();
+		for( MenuItems::iterator i = getMenuItems()->begin();
+			i != getMenuItems()->end();
 			++i, ++n )
 		{
 			const int size = static_cast<int>( iconGeometries[n].size )>>1<<1;
@@ -324,11 +326,11 @@ void PieMenu::draw( int x, int y )
 				(!cursorNearCenter ||
 					selectInCenter) )
 			{
-				selected = *i;
-				opacity = app->getSettings()->getFocusedAlpha();
+				setSelected( *i );
+				opacity = getApp()->getSettings()->getFocusedAlpha();
 			}
 			else
-				opacity = app->getSettings()->getUnfocusedAlpha();
+				opacity = getApp()->getSettings()->getUnfocusedAlpha();
 
 			blender.blend(
 				*surface,
@@ -402,8 +404,7 @@ void PieMenu::turn( double r )
 	else if( twist < 0 )
 		twist += radiansPerCircle;
 
-	// force redraw
-	lastX = lastY = -1;
+	invalidate();
 }
 
 /**
@@ -414,7 +415,7 @@ void PieMenu::turn( double r )
 void PieMenu::turn( int c )
 {
 	double f = radiansPerCircle/
-		static_cast<double>( menuItems->size() )*
+		static_cast<double>( getMenuItems()->size() )*
 		static_cast<double>( c );
 
 	if( turnStack )
@@ -445,20 +446,20 @@ void PieMenu::turn( int c )
  */
 void PieMenu::setTwistForSelection()
 {
-	if( !selected )
+	if( !getSelected() )
 		return;
 
 	int n = 0;
 	double f = radiansPerCircle/
-		static_cast<double>( menuItems->size() );
+		static_cast<double>( getMenuItems()->size() );
 
-	for( MenuItems::iterator i = menuItems->begin();
-		i != menuItems->end();
+	for( MenuItems::iterator i = getMenuItems()->begin();
+		i != getMenuItems()->end();
 		++i, ++n )
-		if( *i == selected )
+		if( *i == getSelected() )
 		{
-			if( menuItems->oneIconPerWindow() &&
-				++n >= menuItems->size() )
+			if( getMenuItems()->oneIconPerWindow() &&
+				++n >= getMenuItems()->size() )
 				break;
 
 			if( n )
