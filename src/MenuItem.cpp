@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -16,7 +16,7 @@
 using namespace PieDock;
 
 /**
- * Create a new, but iconless, menu item
+ * Create a new menu item without pre-defined icon
  *
  * @param t - title
  * @param c - command
