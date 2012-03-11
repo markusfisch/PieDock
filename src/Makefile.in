@@ -50,11 +50,12 @@ am_piedock_OBJECTS = Surface.$(OBJEXT) ArgbSurface.$(OBJEXT) \
 	WildcardCompare.$(OBJEXT) IconMap.$(OBJEXT) \
 	ActiveIndicator.$(OBJEXT) Hotspot.$(OBJEXT) \
 	TransparentWindow.$(OBJEXT) Cartouche.$(OBJEXT) Text.$(OBJEXT) \
-	WindowStack.$(OBJEXT) MenuItem.$(OBJEXT) Menu.$(OBJEXT) \
-	PieMenu.$(OBJEXT) PieMenuWindow.$(OBJEXT) \
-	WorkspaceLayout.$(OBJEXT) WindowManager.$(OBJEXT) \
-	ModMask.$(OBJEXT) Environment.$(OBJEXT) Settings.$(OBJEXT) \
-	Application.$(OBJEXT) main.$(OBJEXT)
+	WindowStack.$(OBJEXT) MenuItemWithWorkspaces.$(OBJEXT) \
+	MenuItem.$(OBJEXT) Menu.$(OBJEXT) PieMenu.$(OBJEXT) \
+	PieMenuWindow.$(OBJEXT) WorkspaceLayout.$(OBJEXT) \
+	WindowManager.$(OBJEXT) ModMask.$(OBJEXT) \
+	Environment.$(OBJEXT) Settings.$(OBJEXT) Application.$(OBJEXT) \
+	main.$(OBJEXT)
 piedock_OBJECTS = $(am_piedock_OBJECTS)
 piedock_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -189,6 +190,7 @@ piedock_SOURCES = \
 	Text.cpp Text.h \
 	WindowStack.cpp WindowStack.h \
 	Icon.h \
+	MenuItemWithWorkspaces.cpp MenuItemWithWorkspaces.h \
 	MenuItem.cpp MenuItem.h \
 	MenuItems.h \
 	Menu.cpp Menu.h \
@@ -294,6 +296,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IconMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Menu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MenuItem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MenuItemWithWorkspaces.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ModMask.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieMenu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieMenuWindow.Po@am__quote@

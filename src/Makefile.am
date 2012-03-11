@@ -16,6 +16,7 @@ piedock_SOURCES = \
 	Text.cpp Text.h \
 	WindowStack.cpp WindowStack.h \
 	Icon.h \
+	MenuItemWithWorkspaces.cpp MenuItemWithWorkspaces.h \
 	MenuItem.cpp MenuItem.h \
 	MenuItems.h \
 	Menu.cpp Menu.h \
