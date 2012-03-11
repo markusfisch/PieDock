@@ -44,8 +44,7 @@ Application::Application( Settings &s ) :
 
 	socketFile =
 		s.getConfigurationFile()+
-		std::string( "-" )+
-		DisplayString( display );
+		std::string( "-socket" );
 }
 
 /**
@@ -231,7 +230,7 @@ int Application::run( bool *stopFlag )
 									menuName = message.substr( ++p );
 							}
 
-							// why ? see below
+							// why? see below
 							ungrabTriggers();
 
 							if( w.appear(
@@ -260,7 +259,7 @@ int Application::run( bool *stopFlag )
 				event.type == ButtonRelease ||
 				event.type == KeyPress) )
 		{
-			// valid ? read below, see button event masks
+			// valid? read below, see button event masks
 			bool valid = false;
 
 			// find menu name from trigger
