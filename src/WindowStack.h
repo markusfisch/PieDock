@@ -31,30 +31,25 @@ namespace PieDock
 			typedef struct
 			{
 				Window window;
-				int left;
-				int top;
-				int right;
-				int bottom;
-				int workspace;
-				int state;
-			} WindowAttribute;
+				XWindowAttributes attributes;
+			} WindowInfo;
 
-			typedef std::vector<WindowAttribute> WindowAttributes;
+			typedef std::vector<WindowInfo> WindowInfos;
 
 			WindowStack() : last( 0 ) {}
 			virtual ~WindowStack() {}
-			inline WindowAttributes &getWindowAttributes() {
-				return windowAttributes; }
+			inline WindowInfos &getWindowInfos() {
+				return windowInfos; }
 			inline const bool hasWindows() const {
-				return windowAttributes.empty()^true; }
-			inline void clearWindows() { windowAttributes.clear(); }
+				return windowInfos.empty()^true; }
+			inline void clearWindows() { windowInfos.clear(); }
 			void addWindow( Display *, Window );
 			const Window getNextWindow();
 			const Window getPreviousWindow();
 			const bool isUnmapped();
 
 		private:
-			WindowAttributes windowAttributes;
+			WindowInfos windowInfos;
 			Window last;
 	};
 }

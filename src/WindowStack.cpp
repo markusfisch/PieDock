@@ -24,20 +24,11 @@ using namespace PieDock;
  */
 void WindowStack::addWindow( Display *d, Window w )
 {
-	XWindowAttributes xwa;
+	WindowInfo wa = { w };
 
-	XGetWindowAttributes( d, w, &xwa );
+	XGetWindowAttributes( d, w, &wa.attributes );
 
-	WindowAttribute wa = {
-		w,
-		xwa.x,
-		xwa.y,
-		xwa.x+xwa.width,
-		xwa.y+xwa.height,
-		WindowManager::getWorkspace( d, w ),
-		xwa.map_state };
-
-	windowAttributes.push_back( wa );
+	windowInfos.push_back( wa );
 }
 
 /**
@@ -48,20 +39,20 @@ const Window WindowStack::getNextWindow()
 	if( !hasWindows() )
 		return 0;
 
-	for( WindowAttributes::iterator i = windowAttributes.begin();
-		i != windowAttributes.end();
+	for( WindowInfos::iterator i = windowInfos.begin();
+		i != windowInfos.end();
 		++i )
 		if( (*i).window == last )
 		{
-			if( ++i == windowAttributes.end() )
-				i = windowAttributes.begin();
+			if( ++i == windowInfos.end() )
+				i = windowInfos.begin();
 
 			last = (*i).window;
 
 			return last;
 		}
 
-	last = (*windowAttributes.begin()).window;
+	last = (*windowInfos.begin()).window;
 
 	return last;
 }
@@ -74,20 +65,20 @@ const Window WindowStack::getPreviousWindow()
 	if( !hasWindows() )
 		return 0;
 
-	for( WindowAttributes::iterator i = windowAttributes.begin();
-		i != windowAttributes.end();
+	for( WindowInfos::iterator i = windowInfos.begin();
+		i != windowInfos.end();
 		++i )
 		if( (*i).window == last )
 		{
-			if( i == windowAttributes.begin() )
-				last = windowAttributes.back().window;
+			if( i == windowInfos.begin() )
+				last = windowInfos.back().window;
 			else
 				last = (*--i).window;
 
 			return last;
 		}
 
-	last = windowAttributes.back().window;
+	last = windowInfos.back().window;
 
 	return last;
 }
@@ -97,10 +88,10 @@ const Window WindowStack::getPreviousWindow()
  */
 const bool WindowStack::isUnmapped()
 {
-	for( WindowAttributes::iterator i = windowAttributes.begin();
-		i != windowAttributes.end();
+	for( WindowInfos::iterator i = windowInfos.begin();
+		i != windowInfos.end();
 		++i )
-		if( (*i).state != IsUnmapped )
+		if( (*i).attributes.map_state != IsUnmapped )
 			return false;
 
 	return true;

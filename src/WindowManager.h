@@ -55,6 +55,13 @@ namespace PieDock
 			static ArgbSurface *getIcon( Display *, Window );
 			static unsigned long getWorkspace( Display *, Window );
 			static unsigned long getNumberOfWorkspaces( Display * );
+			static unsigned long getCurrentWorkspace( Display * );
+			static bool getWorkspacePosition( Display *,
+				unsigned long &,
+				unsigned long & );
+			static bool getDesktopGeometry( Display *,
+				unsigned long &,
+				unsigned long & );
 			static bool isNormalWindow( Display *, Window );
 			static void setWindowType( Display *, Window, const char * );
 			static void sendClientMessage( Display *, Window, const char *,
@@ -141,6 +148,7 @@ namespace PieDock
 			static StringToAtom stringToAtom;
 
 			WindowManager() {}
+			WindowManager &operator=( const WindowManager & ) { return *this; }
 	};
 }
 

@@ -6,13 +6,14 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
  */
 #include "WindowManager.h"
 #include "ArgbSurface.h"
+#include "WorkspaceLayout.h"
 
 #include <X11/Xutil.h>
 
@@ -54,88 +55,29 @@ void WindowManager::WindowList::addClientsOf( Display *d )
  */
 void WindowManager::activate( Display *d, Window w )
 {
-	Window root = DefaultRootWindow( d );
-
 	// switch to workspace
-	{
-		Property <unsigned long> p( d, root );
+	Window root = DefaultRootWindow( d );
+	WorkspaceLayout *wsl = WorkspaceLayout::getWorkspaceLayout( d );
+	WorkspaceLayout::WorkspacePosition p;
 
-		if( p.fetch( XA_CARDINAL, "_NET_NUMBER_OF_DESKTOPS" ) &&
-			*p.getData() == 1 )
-		{
-			XWindowAttributes desktop;
-			XWindowAttributes window;
-
-			// get desktop geometry, can't use _NET_WORKAREA here because
-			// it returns the geometry minus dock windows; nor does
-			// _NET_DESKTOP_GEOMETRY fit because it returns the dimensions
-			// of the large desktop
-			if( XGetWindowAttributes( d, root, &desktop ) &&
-				XGetWindowAttributes( d, w, &window ) )
-			{
-				Window dummy;
-
-				// get position of window relative to the current viewport
-				XTranslateCoordinates(
-					d,
-					w,
-					window.root,
-					-window.border_width,
-					-window.border_width,
-					&window.x,
-					&window.y,
-					&dummy );
-
-				if( (window.x < 0 ||
-						window.y < 0 ||
-						window.x > desktop.width ||
-						window.y > desktop.height) &&
-					p.fetch( XA_CARDINAL, "_NET_DESKTOP_VIEWPORT" ) )
-				{
-					struct
-					{
-						unsigned long x;
-						unsigned long y;
-					} view = { p.getData()[0], p.getData()[1] };
-
-					if( p.fetch( XA_CARDINAL, "_NET_DESKTOP_GEOMETRY" ) )
-					{
-						if( window.x < 0 &&
-							!view.x )
-							window.x += p.getData()[0];
-
-						if( window.y < 0 &&
-							!view.y )
-							window.y += p.getData()[1];
-					}
-
-					sendClientMessage(
-						d,
-						root,
-						"_NET_DESKTOP_VIEWPORT",
-						// this coordinates need to be a multiple of
-						// of the root window geometry and NOT of the
-						// workspace geometry
-						(window.x+view.x)/desktop.width*desktop.width,
-						(window.y+view.y)/desktop.height*desktop.height,
-						CurrentTime );
-				}
-			}
-		}
+	if( wsl->isOnAnotherWorkspace( w, p ) )
+		if( wsl->isVirtual() )
+			sendClientMessage(
+				d,
+				root,
+				"_NET_DESKTOP_VIEWPORT",
+				// this coordinates need to be a multiple of
+				// of the root window geometry and NOT of the
+				// workspace geometry
+				p.x/wsl->getScreenWidth()*wsl->getScreenWidth(),
+				p.y/wsl->getScreenHeight()*wsl->getScreenHeight(),
+				CurrentTime );
 		else
-		{
-			unsigned long workspace = getWorkspace( d, w );
-
-			if( (p.fetch( XA_CARDINAL, "_NET_CURRENT_DESKTOP" ) ||
-					p.fetch( XA_CARDINAL, "_WIN_WORKSPACE" )) &&
-				workspace != *p.getData() )
-				sendClientMessage(
-					d,
-					root,
-					"_NET_CURRENT_DESKTOP",
-					workspace );
-		}
-	}
+			sendClientMessage(
+				d,
+				root,
+				"_NET_CURRENT_DESKTOP",
+				p.number );
 
 	sendClientMessage(
 		d,
@@ -390,6 +332,68 @@ unsigned long WindowManager::getNumberOfWorkspaces( Display *d )
 		return *p.getData();
 
 	return 0;
+}
+
+/**
+ * Return numer of current workspace
+ *
+ * @param d - display
+ */
+unsigned long WindowManager::getCurrentWorkspace( Display *d )
+{
+	Property <unsigned long> p( d, DefaultRootWindow( d ) );
+
+	if( p.fetch( XA_CARDINAL, "_NET_CURRENT_DESKTOP" ) ||
+		p.fetch( XA_CARDINAL, "_WIN_WORKSPACE" ) )
+		return *p.getData();
+
+	return 0;
+}
+
+/**
+ * Return current view of workspace
+ *
+ * @param d - display
+ * @param x - horizontal position
+ * @param y - vertical position
+ */
+bool WindowManager::getWorkspacePosition(
+	Display *d,
+	unsigned long &x,
+	unsigned long &y )
+{
+	Property <unsigned long> p( d, DefaultRootWindow( d ) );
+
+	if( !p.fetch( XA_CARDINAL, "_NET_DESKTOP_VIEWPORT" ) )
+		return false;
+
+	x = p.getData()[0];
+	y = p.getData()[1];
+
+	return true;
+}
+
+/**
+ * Return dimensions of all workspaces
+ *
+ * @param d - display
+ * @param w - sum of the width of all workspaces
+ * @param h - sum of the height of all workspaces
+ */
+bool WindowManager::getDesktopGeometry(
+	Display *d,
+	unsigned long &w,
+	unsigned long &h )
+{
+	Property <unsigned long> p( d, DefaultRootWindow( d ) );
+
+	if( !p.fetch( XA_CARDINAL, "_NET_DESKTOP_GEOMETRY" ) )
+		return false;
+
+	w = p.getData()[0];
+	h = p.getData()[1];
+
+	return true;
 }
 
 /**
