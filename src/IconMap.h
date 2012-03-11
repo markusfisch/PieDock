@@ -36,15 +36,15 @@ namespace PieDock
 				missingSurface( 0 ),
 				fillerSurface( 0 ) {}
 			virtual ~IconMap();
-			virtual inline void addPath( std::string p ) {
+			virtual inline void addPath( const std::string p ) {
 				paths.push_back( p ); }
 			virtual inline const Paths &getPath() const {
 				return paths; }
-			virtual inline void setFileForMissing( std::string f ) {
+			virtual inline void setFileForMissing( const std::string f ) {
 				fileForMissing = f; }
 			virtual inline const std::string &getFileForMissing() const {
 				return fileForMissing; }
-			virtual inline void setFileForFiller( std::string f ) {
+			virtual inline void setFileForFiller( const std::string f ) {
 				fileForFiller = f; }
 			virtual inline const std::string &getFileForFiller() const {
 				return fileForFiller; }
@@ -54,11 +54,14 @@ namespace PieDock
 			virtual void addTitleAlias( std::string, std::string );
 			virtual Icon *getIcon( std::string, std::string, std::string );
 			virtual Icon *getIconByName( std::string );
-			virtual Icon *getIconByClass( std::string );
-			virtual Icon *getIconByTitle( std::string );
-			virtual Icon *getMissingIcon( std::string );
+			virtual Icon *getIconByClass( const std::string );
+			virtual Icon *getIconByTitle( const std::string );
+			virtual Icon *getMissingIcon( const std::string );
 			virtual Icon *getFillerIcon();
-			virtual Icon *createIcon( ArgbSurface &, std::string, Icon::Type );
+			virtual Icon *createIcon( const ArgbSurface *, const std::string,
+				Icon::Type );
+			virtual void saveIcon( const ArgbSurface *,
+				const std::string ) const;
 
 		protected:
 			typedef std::map<std::string, std::string> AliasToFile;

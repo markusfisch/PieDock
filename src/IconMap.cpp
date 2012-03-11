@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 #include <sys/stat.h>
 
 #ifdef HAVE_GTK
@@ -708,23 +709,28 @@ Icon *IconMap::getIconByName( std::string n )
 	}
 
 	// load PNG file from disk
-	for( Paths::iterator i = paths.begin();
-		i != paths.end();
-		++i )
 	{
-		std::string file = n;
-		struct stat buf;
+		std::string file = n+".png";
+		std::transform(
+			file.begin(),
+			file.end(),
+			file.begin(),
+			::tolower );
 
-		// look only for lower case
-		std::transform( file.begin(), file.end(), file.begin(), ::tolower );
-		file = *i+file+".png";
-
-		if( stat( file.c_str(), &buf ) > -1 )
+		for( Paths::const_iterator i = paths.begin();
+			i != paths.end();
+			++i )
 		{
-			ArgbSurface *s = Png::load( file );
-			Icon *icon = createIcon( s, n, Icon::File );
-			delete s;
-			return icon;
+			std::string path = *i+file;
+			struct stat buf;
+
+			if( stat( path.c_str(), &buf ) > -1 )
+			{
+				ArgbSurface *s = Png::load( path );
+				Icon *icon = createIcon( s, n, Icon::File );
+				delete s;
+				return icon;
+			}
 		}
 	}
 
@@ -808,7 +814,7 @@ Icon *IconMap::getIconByName( std::string n )
  *
  * @param c - resource class of window
  */
-Icon *IconMap::getIconByClass( std::string c )
+Icon *IconMap::getIconByClass( const std::string c )
 {
 	// resolve alias to filename
 	AliasToFile::iterator i;
@@ -828,7 +834,7 @@ Icon *IconMap::getIconByClass( std::string c )
  *
  * @param t - window title (may contain wildcards)
  */
-Icon *IconMap::getIconByTitle( std::string t )
+Icon *IconMap::getIconByTitle( const std::string t )
 {
 	// resolve alias to filename
 	for( AliasToFile::iterator i = titleToFile.begin();
@@ -845,7 +851,7 @@ Icon *IconMap::getIconByTitle( std::string t )
  *
  * @param n - resource name of window for which there is no icon
  */
-Icon *IconMap::getMissingIcon( std::string n )
+Icon *IconMap::getMissingIcon( const std::string n )
 {
 	if( !missingSurface )
 	{
@@ -908,12 +914,50 @@ Icon *IconMap::getFillerIcon()
  * @param n - resource name of window
  * @param t - icon type
  */
-Icon *IconMap::createIcon( ArgbSurface *s, std::string n, Icon::Type t )
+Icon *IconMap::createIcon(
+	const ArgbSurface *s,
+	const std::string n,
+	const Icon::Type t )
 {
 	Icon *icon = new Icon( s, t );
 	cache[n] = icon;
 
 	return icon;
+}
+
+/**
+ * Save icon
+ *
+ * @param s - ARGB surface for icon
+ * @param n - resource name of window
+ */
+void IconMap::saveIcon( const ArgbSurface *s, const std::string n ) const
+{
+	std::string file = n+".png";
+	std::transform(
+		file.begin(),
+		file.end(),
+		file.begin(),
+		::tolower );
+
+	for( Paths::const_iterator i = paths.begin();
+		i != paths.end();
+		++i )
+	{
+		std::string path = *i+file;
+		struct stat buf;
+
+		if( stat( path.c_str(), &buf ) == -1 )
+		{
+			std::ofstream out( path.c_str(), std::ios::out );
+
+			if( out.good() )
+				Png::save( out, s );
+		}
+
+		// try first directory only
+		break;
+	}
 }
 
 /**
