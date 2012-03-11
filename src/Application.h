@@ -33,6 +33,7 @@ namespace PieDock
 			virtual ~Application();
 			inline Display *getDisplay() const { return display; }
 			inline Settings *getSettings() { return settings; }
+
 			bool remote( const char * = 0 ) const;
 			int run( bool * );
 
