@@ -1,3 +1,8 @@
+1.5.0
+All binaries are now lower case to comply with the Debian packaging rules.
+Show workspaces with window positions for one-icon-per-window menus if the
+corresponding window is not on the current workspace.
+
 1.4.0
 Custom button actions for menus and icons (by jonas.gehring@boolsoft.org)
 
@@ -10,7 +15,7 @@ Switch through the windows of only one application.
 1.1.0
 Now it's easier to switch between applications from the keyboard (for example
 by Mod4+Tab). By using the key-up directive, you're able to trigger some action
-on the release of a key. See res/PieDockrc.sample for details.
+on the release of a key. See res/piedockrc.sample for details.
 
 1.0.0
 First official release.

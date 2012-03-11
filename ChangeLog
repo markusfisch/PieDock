@@ -1,3 +1,14 @@
+1.5.0
+	show windows on workspaces for one-icon-per-window icons
+	new action (ShowWindows) that shows a menu of windows for the selected icon
+	binaries are now all lower case to comply with Debian packaging rules
+	option to ask Gtk for icons (--enable-gtk)
+	icons gathered from windows are now saved by default
+	use Fitts' Law by default
+	default size is now 320px
+	default Xft font size in titles is now 9.0
+	socket file doesn't include DISPLAY anymore
+
 1.4.3
 	fixed assignment of icons from window manager for menu items with aliases
 
@@ -70,4 +81,4 @@
 	improved keyboard control when the menu is open
 
 0.1.7
-	first complete, working version
+	first useable release
