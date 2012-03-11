@@ -1,5 +1,5 @@
-size 320
-fitts 1
+#size 320
+#fitts 1
 
 title 1
 #font Impact 10.0
@@ -10,6 +10,7 @@ title 1
 ignore-mask Num_Lock
 
 compositing 1
+#show-workspace 88000000 bfffffff
 
 #trigger button 8
 #trigger button Mod4 1
@@ -22,15 +23,14 @@ trigger menu launchers button Mod1 2
 trigger menu open-windows key Mod4 S
 trigger menu windows-of-active key Mod4 L
 
-button 1 ShowNext
-button 2 ShowPrevious
+button 1 ShowWindows
 button 3 Launch
 button 4 SpinNext
 button 5 SpinPrevious
 
 key Escape Disappear
-key Return ShowNext
-key-up Super_L ShowNext
+key Return ShowWindows
+key-up Super_L ShowWindows
 key Up SpinNext
 key Down SpinPrevious
 key S SpinNext
@@ -38,11 +38,11 @@ key L SpinNext
 
 #minimum-number 8
 
-#active-indicator "~/.PieDock/active-indicators/gnome-emblem-new.png" right bottom
-#missing-icon "~/.PieDock/applications/generic/PixelPressIcons/TheJollyRoger.png"
-#filler-icon "~/.PieDock/applications/generic/PixelPressIcons/DoNotDisturb.png"
+#active-indicator "~/.piedock/active-indicators/gnome-emblem-new.png" right bottom
+#missing-icon "~/.piedock/applications/generic/PixelPressIcons/TheJollyRoger.png"
+#filler-icon "~/.piedock/applications/generic/PixelPressIcons/DoNotDisturb.png"
 
-path "~/.PieDock/applications" "~/.PieDock/actions" "/usr/share/pixmaps"
+path "~/.piedock/applications" "~/.piedock/actions" "/usr/share/pixmaps"
 
 alias class "Firefox" firefox
 alias class "NEdit" nedit
@@ -83,16 +83,16 @@ menu
 end
 
 menu window-control
-	icon close "PieDockUtils -c $WID"
-	icon iconify "PieDockUtils -i $WID"
-	icon fullscreen "PieDockUtils -f $WID"
-	icon lower "PieDockUtils -o $WID"
-	icon stick "PieDockUtils -s $WID"
-	icon shade "PieDockUtils -d $WID"
+	icon close "piedockutils -c $WID"
+	icon iconify "piedockutils -i $WID"
+	icon fullscreen "piedockutils -f $WID"
+	icon lower "piedockutils -o $WID"
+	icon stick "piedockutils -s $WID"
+	icon shade "piedockutils -d $WID"
 end
 
 menu launchers
-	icon aterm
+	icon urxvt
 	icon nedit
 	menu net
 		icon opera
