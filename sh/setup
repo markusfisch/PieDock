@@ -130,6 +130,12 @@ title 1
 # COLOR - hex code of color
 #cartouche 6 192 000000
 
+# display workspace position for windows that are on another workspace
+# usage: show-workspace no|WORKSPACE [WINDOW] [(horizontal|vertical|square)]
+# WORKSPACE - hex code of ARGB color for the workspaces
+# WINDOW - hex code of ARGB color for the window
+#show-workspace 88323232 88888888 square
+
 # zoom icons on mouse-over?
 # usage: zoom VALUE
 # VALUE can be any float from 0.0 (no zoom) - 1.0 (full zoom)

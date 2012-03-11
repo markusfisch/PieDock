@@ -37,10 +37,22 @@ SUDO=
 	}
 }
 
+# check whether GNOME is running
+OPTIONS=
+which pgrep &>/dev/null && {
+	for M in gnome-session
+	do
+		pgrep $M &>/dev/null || continue
+
+		OPTIONS="$OPTIONS${OPTIONS:+ }--enable-gtk"
+		break
+	done
+}
+
 for (( RUNS=2; RUNS--; ))
 do
 	# try to configure build for this system
-	./configure && {
+	./configure $OPTIONS && {
 		make || {
 			echo "error: build failed, check the top most error"
 			exit 1
