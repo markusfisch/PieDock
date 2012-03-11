@@ -13,6 +13,8 @@
  */
 #include "Menu.h"
 #include "WindowManager.h"
+#include "WorkspaceLayout.h"
+#include "MenuItemWithWorkspaces.h"
 
 #include <X11/Xutil.h>
 #include <unistd.h>
@@ -31,17 +33,24 @@ Menu::Menu( Application *a ) :
 	selected( 0 ),
 	menuItems( 0 )
 {
+	openWindows.setOneIconPerWindow( true );
 }
 
 /**
  * Update menu
  *
  * @param menuName - menu name
+ * @param forWindow - first window of a list of open windows that belong
+ *                    to the same application (optional)
  */
-bool Menu::update( std::string menuName )
+bool Menu::update( std::string menuName, Window forWindow )
 {
-	if( !(menuItems = app->getSettings()->getMenu( menuName )) )
+	if( !forWindow &&
+		!(menuItems = app->getSettings()->getMenu( menuName )) )
 		return false;
+
+	if( forWindow )
+		menuItems = &openWindows;
 
 	name = menuName;
 
@@ -54,6 +63,13 @@ bool Menu::update( std::string menuName )
 	WindowToItem windowToItem;
 
 	IconMap *iconMap = &app->getSettings()->getIconMap();
+
+	// display workspaces
+	const Settings::WorkspaceDisplaySettings wsds =
+		app->getSettings()->getWorkspaceDisplaySettings();
+	WorkspaceLayout *wsl = WorkspaceLayout::getWorkspaceLayout(
+		app->getDisplay(),
+		wsds.preferredLayout );
 
 	// clear windows and make sure all items have valid icons
 	{
@@ -96,9 +112,12 @@ bool Menu::update( std::string menuName )
 	// get filter
 	std::string classFilter;
 
-	if( menuItems->onlyFromActive() )
+	if( forWindow ||
+		menuItems->onlyFromActive() )
 	{
-		Window w = WindowManager::getActive( app->getDisplay() );
+		Window w = forWindow ?
+			forWindow :
+			WindowManager::getActive( app->getDisplay() );
 		XClassHint xch;
 
 		if( w &&
@@ -130,7 +149,7 @@ bool Menu::update( std::string menuName )
 
 			if( (!menuItems->oneIconPerWindow() &&
 					app->getSettings()->ignoreWindow( xch.res_name )) ||
-				(menuItems->onlyFromActive() &&
+				((forWindow || menuItems->onlyFromActive()) &&
 					classFilter.compare( xch.res_class )) )
 			{
 				XFree( xch.res_name );
@@ -158,15 +177,16 @@ bool Menu::update( std::string menuName )
 				{
 					if( icon )
 					{
-						icon->setSurface( *s );
+						icon->setSurface( s );
 						icon->setType( Icon::Window );
 					}
 					else
 						icon = iconMap->createIcon(
-							*s,
+							s,
 							xch.res_name,
 							Icon::Window );
 
+					iconMap->saveIcon( s, xch.res_name );
 					delete s;
 				}
 				else if( !icon )
@@ -179,27 +199,35 @@ bool Menu::update( std::string menuName )
 			if( menuItems->oneIconPerWindow() )
 			{
 				WindowToItem::iterator w;
+				MenuItem *item;
 
-				// use existing icon
+				// try to use existing icon
 				if( (w = windowToItem.find( (*i) )) != windowToItem.end() )
 				{
+					item = (*w).second;
+
 					// always get icon anew when reusing a window ID
-					if( icon )
-					{
-						(*w).second->setIcon( icon );
-						(*w).second->setTitle( windowTitle );
-					}
-
-					(*w).second->addWindow( app->getDisplay(), (*i) );
-					continue;
+					item->setIcon( icon );
 				}
+				else
+					menuItems->push_back(
+						(item = new MenuItemWithWorkspaces( icon )) );
 
-				// create new icon
-				MenuItem *item = new MenuItem( icon );
 				item->addWindow( app->getDisplay(), (*i) );
 				item->setTitle( windowTitle );
 
-				menuItems->push_back( item );
+				if( wsds.visible )
+				{
+					MenuItemWithWorkspaces *w =
+						dynamic_cast<MenuItemWithWorkspaces *>( item );
+
+					if( w )
+						w->showWorkspace(
+							wsl,
+							wsds.workspaceColor,
+							wsds.windowColor );
+				}
+
 				continue;
 			}
 
@@ -265,7 +293,8 @@ bool Menu::change( Settings::Action a )
 		(
 			a != Settings::Launch &&
 			a != Settings::ShowNext &&
-			a != Settings::ShowPrevious
+			a != Settings::ShowPrevious &&
+			a != Settings::ShowWindows
 		) )
 		return false;
 
@@ -275,6 +304,15 @@ bool Menu::change( Settings::Action a )
 	if( !cmd.compare( 0, 1, ":" ) )
 	{
 		update( cmd.substr( 1 ) );
+		return true;
+	}
+	else if( a == Settings::ShowWindows )
+	{
+		// skip menu if there's only one window
+		if( selected->getWindowInfos().size() < 2 )
+			return false;
+
+		update( "", selected->getNextWindow() );
 		return true;
 	}
 
@@ -296,7 +334,8 @@ void Menu::execute( Settings::Action a )
 	{
 		if( a != Settings::Launch &&
 			a != Settings::ShowNext &&
-			a != Settings::ShowPrevious )
+			a != Settings::ShowPrevious &&
+			a != Settings::ShowWindows )
 			return;
 
 		a = Settings::Launch;
@@ -330,6 +369,7 @@ void Menu::execute( Settings::Action a )
 				run( cmd );
 			}
 			break;
+		case Settings::ShowWindows:
 		case Settings::ShowNext:
 			WindowManager::activate(
 				app->getDisplay(),
