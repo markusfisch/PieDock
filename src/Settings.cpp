@@ -107,7 +107,7 @@ void Settings::load( Display *d )
 		minimumNumber = 0;
 		workspaceDisplaySettings.visible = true;
 		workspaceDisplaySettings.preferredLayout = WorkspaceLayout::Square;
-		workspaceDisplaySettings.workspaceColor = 0x88000000;
+		workspaceDisplaySettings.workspaceColor = 0xc4000000;
 		workspaceDisplaySettings.windowColor = 0xbfffffff;
 #ifdef HAVE_XRENDER
 		compositing = false;
