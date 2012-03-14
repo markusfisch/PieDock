@@ -124,7 +124,7 @@ void MenuItemWithWorkspaces::showWorkspace(
 		else
 		{
 			f = static_cast<double>( s.getHeight() )/wsl->getTotalHeight();
-			paddingY =
+			paddingX =
 				(s.getWidth()-
 				static_cast<int>( f*wsl->getTotalWidth() ))>>1;
 		}
@@ -156,7 +156,7 @@ void MenuItemWithWorkspaces::showWorkspace(
 
 		// draw window in the right workspace
 		{
-			Geometry r = { 0, 0, 0, 0 };
+			Geometry r = { g.x, g.y, 0, 0 };
 			int xe = g.x+g.width;
 			int ye = g.y+g.height;
 
@@ -164,19 +164,25 @@ void MenuItemWithWorkspaces::showWorkspace(
 			{
 				r.width = xe-wsl->getTotalWidth();
 				g.width = wsl->getTotalWidth()-g.x;
+				r.x = 0;
+				r.height = g.height;
 			}
 
 			if( ye > wsl->getTotalHeight() )
 			{
 				r.height = ye-wsl->getTotalHeight();
 				g.height = wsl->getTotalHeight()-g.y;
+				r.y = 0;
+				r.width = g.width;
 			}
 
 			for( ;; )
 			{
+				int w = static_cast<int>( f*g.width );
+				int h = static_cast<int>( f*g.height );
 				Cartouche window(
-					static_cast<int>( f*g.width ),
-					static_cast<int>( f*g.height ),
+					w < 1 ? 1 : w,
+					h < 1 ? 1 : h,
 					0,
 					windowColor );
 
@@ -214,3 +220,4 @@ void MenuItemWithWorkspaces::freeWorkspaceIcon()
 	delete workspaceIcon;
 	workspaceIcon = 0;
 }
+
