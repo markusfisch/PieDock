@@ -27,7 +27,8 @@ ArgbSurface *Png::load( const std::string &f )
 	std::ifstream in( f.c_str(), std::ios::in );
 
 	if( !in.good() )
-		throw ("cannot open \""+f+"\"").c_str();
+		// strdup() is required to not return a local pointer
+		throw strdup( ("cannot open \""+f+"\"").c_str() );
 
 	return load( in );
 }
