@@ -1,7 +1,7 @@
 # Initialize autoconf and automake
 AC_PREREQ([2.65])
 AC_INIT(src/main.cpp)
-AM_INIT_AUTOMAKE(PieDock, 1.5.0)
+AM_INIT_AUTOMAKE(PieDock, 1.6.0)
 
 # Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -104,9 +104,24 @@ AS_IF([test "x$enable_gtk" = "xyes"], [
 	PKG_CHECK_MODULES(GTK,
 		[gtk+-2.0 >= 2.4.0],
 		[AC_DEFINE([HAVE_GTK], 1, [GTK+ is supported])],
-		exit)
+		exit 1)
 	LIBS="$LIBS $GTK_LIBS"
 	CXXFLAGS="$CXXFLAGS $GTK_CFLAGS"
+])
+
+# Check if user wants KDE integration
+AC_ARG_ENABLE([kde], AS_HELP_STRING([--enable-kde],
+	[ask KDE for icons]))
+
+AS_IF([test "x$enable_kde" = "xyes"], [
+	AC_CHECK_LIB([kdecore], [main], , AC_MSG_ERROR([kdecore not found]))
+	AC_CHECK_LIB([kdeui], [main], , AC_MSG_ERROR([kdeui not found]))
+	PKG_CHECK_MODULES(QT,
+		[QtGui],
+		[AC_DEFINE([HAVE_KDE], 1, [KDE is supported])],
+		exit 1)
+	LIBS="$LIBS $QT_LIBS"
+	CXXFLAGS="$CXXFLAGS $QT_CFLAGS"
 ])
 
 # Checks for header files.

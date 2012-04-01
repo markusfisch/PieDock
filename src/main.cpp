@@ -11,6 +11,10 @@
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
  */
+#ifdef HAVE_KDE
+#include <QApplication>
+#endif
+
 #include "Application.h"
 
 #include <sys/wait.h>
@@ -65,6 +69,10 @@ int main( int argc, char **argv )
 		gtk_init( &argc, &argv );
 #endif
 
+#ifdef HAVE_KDE
+		QApplication q( argc, argv );
+#endif
+
 		PieDock::Settings settings;
 		char *menuName = 0;
 
@@ -93,7 +101,7 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.5.0" <<
+								binary << " 1.6.0" <<
 								std::endl <<
 								"Copyright (c) 2007-2012" <<
 								std::endl <<
@@ -166,7 +174,13 @@ int main( int argc, char **argv )
 		signal( SIGINT, signalHandler );
 		signal( SIGTERM, signalHandler );
 
+#ifdef HAVE_KDE
+		int r = a.run( &stop );
+		q.quit();
+		return r;
+#else
 		return a.run( &stop );
+#endif
 	}
 	catch( const char *e )
 	{

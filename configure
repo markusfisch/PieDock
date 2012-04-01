@@ -607,6 +607,8 @@ EGREP
 GREP
 CXXCPP
 XMKMF
+QT_LIBS
+QT_CFLAGS
 GTK_LIBS
 GTK_CFLAGS
 PKG_CONFIG_LIBDIR
@@ -704,6 +706,7 @@ enable_xft
 enable_xrender
 enable_xmu
 enable_gtk
+enable_kde
 with_x
 '
       ac_precious_vars='build_alias
@@ -722,6 +725,8 @@ PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 GTK_CFLAGS
 GTK_LIBS
+QT_CFLAGS
+QT_LIBS
 XMKMF
 CXXCPP'
 
@@ -1348,6 +1353,7 @@ Optional Features:
   --enable-xrender    Xrender support default=yes
   --enable-xmu        use libXmu default=yes
   --enable-gtk            ask GTK for icons
+  --enable-kde            ask KDE for icons
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1371,6 +1377,8 @@ Some influential environment variables:
               path overriding pkg-config's built-in search path
   GTK_CFLAGS  C compiler flags for GTK, overriding pkg-config
   GTK_LIBS    linker flags for GTK, overriding pkg-config
+  QT_CFLAGS   C compiler flags for QT, overriding pkg-config
+  QT_LIBS     linker flags for QT, overriding pkg-config
   XMKMF       Path to xmkmf, Makefile generator for X Window System
   CXXCPP      C++ preprocessor
 
@@ -2765,7 +2773,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=PieDock
- VERSION=1.5.0
+ VERSION=1.6.0
 
 
 cat >>confdefs.h <<_ACEOF
@@ -4966,11 +4974,11 @@ fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GTK_PKG_ERRORS" >&5
 
-	exit
+	exit 1
 elif test $pkg_failed = untried; then
      	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-	exit
+	exit 1
 else
 	GTK_CFLAGS=$pkg_cv_GTK_CFLAGS
 	GTK_LIBS=$pkg_cv_GTK_LIBS
@@ -4982,6 +4990,175 @@ $as_echo "#define HAVE_GTK 1" >>confdefs.h
 fi
 	LIBS="$LIBS $GTK_LIBS"
 	CXXFLAGS="$CXXFLAGS $GTK_CFLAGS"
+
+fi
+
+# Check if user wants KDE integration
+# Check whether --enable-kde was given.
+if test "${enable_kde+set}" = set; then :
+  enableval=$enable_kde;
+fi
+
+
+if test "x$enable_kde" = "xyes"; then :
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lkdecore" >&5
+$as_echo_n "checking for main in -lkdecore... " >&6; }
+if ${ac_cv_lib_kdecore_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lkdecore  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_kdecore_main=yes
+else
+  ac_cv_lib_kdecore_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_kdecore_main" >&5
+$as_echo "$ac_cv_lib_kdecore_main" >&6; }
+if test "x$ac_cv_lib_kdecore_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBKDECORE 1
+_ACEOF
+
+  LIBS="-lkdecore $LIBS"
+
+else
+  as_fn_error $? "kdecore not found" "$LINENO" 5
+fi
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lkdeui" >&5
+$as_echo_n "checking for main in -lkdeui... " >&6; }
+if ${ac_cv_lib_kdeui_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lkdeui  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_kdeui_main=yes
+else
+  ac_cv_lib_kdeui_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_kdeui_main" >&5
+$as_echo "$ac_cv_lib_kdeui_main" >&6; }
+if test "x$ac_cv_lib_kdeui_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBKDEUI 1
+_ACEOF
+
+  LIBS="-lkdeui $LIBS"
+
+else
+  as_fn_error $? "kdeui not found" "$LINENO" 5
+fi
+
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for QT" >&5
+$as_echo_n "checking for QT... " >&6; }
+
+if test -n "$QT_CFLAGS"; then
+    pkg_cv_QT_CFLAGS="$QT_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"QtGui\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "QtGui") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_QT_CFLAGS=`$PKG_CONFIG --cflags "QtGui" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$QT_LIBS"; then
+    pkg_cv_QT_LIBS="$QT_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"QtGui\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "QtGui") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_QT_LIBS=`$PKG_CONFIG --libs "QtGui" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        QT_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "QtGui" 2>&1`
+        else
+	        QT_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "QtGui" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$QT_PKG_ERRORS" >&5
+
+	exit 1
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	exit 1
+else
+	QT_CFLAGS=$pkg_cv_QT_CFLAGS
+	QT_LIBS=$pkg_cv_QT_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_KDE 1" >>confdefs.h
+
+fi
+	LIBS="$LIBS $QT_LIBS"
+	CXXFLAGS="$CXXFLAGS $QT_CFLAGS"
 
 fi
 

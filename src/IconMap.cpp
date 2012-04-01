@@ -25,6 +25,15 @@
 #include <gtk/gtk.h>
 #endif
 
+#ifdef HAVE_KDE
+#include <QImage>
+#include <QPixmap>
+
+#include <stdint.h>
+#include <kicon.h>
+#include <kiconloader.h>
+#endif
+
 using namespace PieDock;
 
 const char IconMap::fallbackPng[] = {
@@ -794,7 +803,7 @@ Icon *IconMap::getIconByName( std::string n )
 			for( int y = s.getHeight(); y--; src += p, dest += dp )
 				for( int x = s.getWidth(); x--; src += 4, dest += 4 )
 				{
-					// swap Red with Blue; GdkPixbuf has BGR order 
+					// swap Red with Blue; GdkPixbuf has BGR order
 					dest[0] = src[2];
 					dest[1] = src[1];
 					dest[2] = src[0];
@@ -802,6 +811,62 @@ Icon *IconMap::getIconByName( std::string n )
 				}
 
 			return createIcon( &s, n, Icon::File );
+		}
+	}
+#endif
+
+#ifdef HAVE_KDE
+	// ask KDE for icon
+	{
+		KIconLoader *loader;
+
+		if( loader = KIconLoader::global() )
+		{
+			QPixmap pixmap = loader->loadIcon(
+				n.c_str(),
+				KIconLoader::Desktop,
+				128,
+				KIconLoader::DefaultState,
+				QStringList(),
+				0L,
+				true );
+
+			if( !pixmap.isNull() )
+			{
+				QImage image = pixmap.toImage();
+
+				if( image.format() == QImage::Format_ARGB32_Premultiplied )
+				{
+					ArgbSurface s( image.width(), image.height() );
+					unsigned char *dest = reinterpret_cast<unsigned char *>(
+						s.getData() );
+					unsigned char *src = reinterpret_cast<unsigned char *>(
+						image.bits() );
+					int p = image.bytesPerLine()-(image.width()<<2);
+					int dp = s.getPadding();
+
+					if( s.getBytesPerLine() == image.bytesPerLine() )
+						memcpy( dest, src, s.getSize() );
+					else
+					{
+						// only 4-byte alignments are sane for 32 bits per pixel
+						if( p%4 ||
+							dp%4 )
+							return 0;
+
+						for( int y = s.getHeight();
+							y--;
+							src += p, dest += dp )
+							for( int x = s.getWidth();
+								x--;
+								src += 4, dest += 4 )
+								*reinterpret_cast<uint32_t *>( dest ) =
+									*reinterpret_cast<uint32_t *>( src );
+					}
+
+					return createIcon( &s, n, Icon::File );
+				}
+			}
 		}
 	}
 #endif
