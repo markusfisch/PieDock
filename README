@@ -1,18 +1,29 @@
-For copyright information see COPYING
+PieDock is a task bar and application launcher in shape of a pie menu.
+It feels a little bit like the famous OS X dock in a circle.
 
-Compile and install:
+Manual configure, compile and install:
 
-  $ ./configure
-  $ make
+	$ ./configure
 
-  and then as root
+Alternatively, for Gnome integration, run configure with:
 
-  # make install
+	$ ./configure --enable-gtk
 
-Configuration options for building:
+Or for KDE use:
 
-  Use ./configure --help to see the full list of options
+	$ ./configure --enable-kde
 
-Run-time setup:
+To compile:
 
-  Copy res/piedockrc.sample to ~/.piedockrc and modify it to meet your needs
+	$ make
+
+Then as root:
+
+	# make install-strip
+
+Finally, you may want to invoke the setup script with normal privileges:
+
+	$ sh/setup
+	
+Or manually copy res/piedockrc.sample to ~/.piedockrc and modify it to
+meet your needs.
