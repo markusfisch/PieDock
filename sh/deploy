@@ -11,6 +11,13 @@ throw_missing_libs()
 	throw 'libraries cannot be installed'
 }
 
+reset()
+{
+	OPTIONS=$@
+	ENABLE_GTK=
+	ENABLE_KDE=
+}
+
 cat <<EOF
 
 This will build, install and run PieDock. If there are libraries or tools
@@ -46,9 +53,7 @@ SUDO=
 }
 
 # try to guess optional configure options
-OPTIONS=$@
-ENABLE_GTK=
-ENABLE_KDE=
+reset $@
 which pgrep &>/dev/null && {
 	# check whether GNOME is running
 	pgrep gnome-session &>/dev/null && {
@@ -115,14 +120,14 @@ EOF
 		(( ENABLE_GTK )) && {
 			$SUDO apt-get -y --no-upgrade install \
 				gnome-devel ||
-				ENABLE_GTK=
+				reset $@
 		}
 
 		(( ENABLE_KDE )) && {
 			$SUDO apt-get -y --no-upgrade install \
 				qt4-dev-tools \
 				kdelibs5-dev ||
-				ENABLE_KDE=
+				reset $@
 		}
 
 		continue
@@ -143,13 +148,13 @@ EOF
 		(( ENABLE_GTK )) && {
 			$SUDO zypper --non-interactive install -t pattern \
 				devel_gnome ||
-				ENABLE_GTK=
+				reset $@
 		}
 
 		(( ENABLE_KDE )) && {
 			$SUDO zypper --non-interactive install -t pattern \
 				devel_kde ||
-				ENABLE_KDE=
+				reset $@
 		}
 
 		continue
@@ -169,15 +174,15 @@ EOF
 
 		(( ENABLE_GTK )) && {
 			$SUDO yum -y install \
-				gnome-devel ||
-				ENABLE_GTK=
+				gtk2-devel ||
+				reset $@
 		}
 
 		(( ENABLE_KDE )) && {
 			$SUDO yum -y install \
 				qt-devel \
-				kde-devel ||
-				ENABLE_KDE=
+				kdelibs-devel ||
+				reset $@
 		}
 
 		continue
@@ -195,14 +200,14 @@ EOF
 		(( ENABLE_GTK )) && {
 			$SUDO emerge --noreplace \
 				x11-libs/gtk+ ||
-				ENABLE_GTK=
+				reset $@
 		}
 
 		(( ENABLE_KDE )) && {
 			$SUDO emerge --noreplace \
 				qt-gui \
 				kdelibs ||
-				ENABLE_KDE=
+				reset $@
 		}
 
 		continue
