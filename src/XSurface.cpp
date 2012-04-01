@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -16,6 +16,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <X11/Xutil.h>
+
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -89,7 +91,7 @@ void XSurface::allocateData()
 		sizeof( char ) ) ) );
 
 	if( !getData() )
-		throw "cannot allocate memory";
+		throw std::runtime_error( "cannot allocate memory" );
 
 	if( !(resource = XCreateImage(
 			display,
@@ -102,7 +104,7 @@ void XSurface::allocateData()
 			getHeight(),
 			32,
 			0 )) )
-		throw "cannot create XImage";
+		throw std::runtime_error( "cannot create XImage" );
 }
 
 /**

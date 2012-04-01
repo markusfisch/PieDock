@@ -29,6 +29,7 @@
 #endif
 
 #include <iostream>
+#include <stdexcept>
 
 bool stop = false;
 
@@ -127,7 +128,8 @@ int main( int argc, char **argv )
 							return 0;
 						case 'r':
 							if( !--argc )
-								throw "missing FILE argument";
+								throw std::invalid_argument(
+									"missing FILE argument" );
 							settings.setConfigurationFile( *++argv );
 							break;
 						case 'm':
@@ -156,7 +158,7 @@ int main( int argc, char **argv )
 				// pursue in child process
 				break;
 			case -1:
-				throw "cannot fork";
+				throw std::runtime_error( "cannot fork" );
 		}
 
 		// always open display after fork
@@ -182,9 +184,9 @@ int main( int argc, char **argv )
 		return a.run( &stop );
 #endif
 	}
-	catch( const char *e )
+	catch( std::exception &e )
 	{
-		std::cerr << "error: " << e << std::endl;
+		std::cerr << "error: " << e.what() << std::endl;
 
 		return -1;
 	}

@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -14,13 +14,14 @@
 #include "Application.h"
 #include "Settings.h"
 #include "PieMenuWindow.h"
+#include "ErrnoException.h"
 
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <errno.h>
 #include <libgen.h>
 #include <stdlib.h>
+
 #include <sstream>
 
 using namespace PieDock;
@@ -40,7 +41,7 @@ Application::Application( Settings &s ) :
 	suspend( StandBy )
 {
 	if( !display )
-		throw "cannot open display";
+		throw std::runtime_error( "cannot open display" );
 
 	socketFile =
 		s.getConfigurationFile()+
@@ -72,7 +73,7 @@ bool Application::remote( const char *menu ) const
 	int s;
 
 	if( (s = socket( PF_UNIX, SOCK_DGRAM, 0 )) < 0 )
-		throw strerror( errno );
+		throw ErrnoException();
 
 	memset( &address, 0, sizeof( struct sockaddr_un ) );
 
@@ -91,7 +92,7 @@ bool Application::remote( const char *menu ) const
 		// to start anew
 		if( errno != ECONNREFUSED ||
 			unlink( socketFile.c_str() ) )
-			throw strerror( errno );
+			throw ErrnoException();
 
 		return false;
 	}
@@ -106,7 +107,7 @@ bool Application::remote( const char *menu ) const
 		cmd += StopMarker;
 
 		if( send( s, cmd.c_str(), cmd.size(), 0 ) < 0 )
-			throw strerror( errno );
+			throw ErrnoException();
 
 		close( s );
 	}
@@ -132,7 +133,7 @@ int Application::run( bool *stopFlag )
 		struct sockaddr_un address;
 
 		if( (s = socket( PF_UNIX, SOCK_DGRAM, 0 )) < 0 )
-			throw strerror( errno );
+			throw ErrnoException();
 
 		memset( &address, 0, sizeof( struct sockaddr_un ) );
 
@@ -145,7 +146,7 @@ int Application::run( bool *stopFlag )
 		if( bind( s,
 			(struct sockaddr *) &address,
 			sizeof( struct sockaddr_un ) ) < 0 )
-			throw strerror( errno );
+			throw ErrnoException();
 	}
 
 	grabTriggers();

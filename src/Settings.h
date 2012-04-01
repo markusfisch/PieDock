@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <istream>
+#include <stdexcept>
 
 namespace PieDock
 {

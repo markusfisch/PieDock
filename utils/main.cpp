@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -18,7 +18,9 @@
 #include <signal.h>
 #include <libgen.h>
 #include <stdlib.h>
+
 #include <iostream>
+#include <stdexcept>
 
 /**
  * Process entry
@@ -61,7 +63,7 @@ int main( int argc, char **argv )
 						exit( 0 );
 					case 'v':
 						std::cout <<
-							basename( binary ) << " 1.0.1" <<
+							basename( binary ) << " 1.0.2" <<
 							std::endl <<
 							"Copyright (c) 2007-2011" <<
 							std::endl <<
@@ -82,7 +84,7 @@ int main( int argc, char **argv )
 					case 'r':
 					case 's':
 						if( !--argc )
-							throw "Missing argument";
+							throw std::invalid_argument( "Missing argument" );
 						else
 						{
 							PieDock::Utilities::Action a;
@@ -127,9 +129,9 @@ int main( int argc, char **argv )
 
 		return 0;
 	}
-	catch( const char *e )
+	catch( std::exception &e )
 	{
-		std::cerr << e << std::endl;
+		std::cerr << "error: " << e.what() << std::endl;
 
 		return -1;
 	}

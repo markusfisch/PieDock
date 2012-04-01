@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -14,6 +14,8 @@
 #include "PieMenuWindow.h"
 #include "WindowManager.h"
 #include "Hotspot.h"
+
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -282,7 +284,7 @@ void PieMenuWindow::updateWithText()
 				textCanvas,
 				getCanvas()->getVisual(),
 				getApp()->getSettings()->getTitleFont() )) )
-			throw "out of memory";
+			throw std::runtime_error( "out of memory" );
 	}
 
 	Text::Metrics m;

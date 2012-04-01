@@ -16,6 +16,8 @@
 
 #include <math.h>
 
+#include <stdexcept>
+
 using namespace PieDock;
 
 WorkspaceLayout *WorkspaceLayout::singleton = 0;
@@ -160,7 +162,7 @@ WorkspaceLayout::WorkspaceLayout(
 		XWindowAttributes xwa;
 
 		if( !XGetWindowAttributes( d, root, &xwa ) )
-			throw "cannot get attributes of root window";
+			throw std::runtime_error( "cannot get attributes of root window" );
 
 		screen.width = xwa.width;
 		screen.height = xwa.height;

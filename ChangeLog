@@ -1,5 +1,6 @@
 1.6.0
 	option to ask KDE for icons (--enable-kde)
+	throw std::exception's only
 
 1.5.0
 	show windows on workspaces for one-icon-per-window icons

@@ -21,6 +21,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -79,7 +80,7 @@ void Settings::load( Display *d )
 
 	if( !in ||
 		!in.good() )
-		throw "cannot read configuration file!";
+		throw std::ios_base::failure( "cannot read configuration file" );
 
 	// reset settings to default values
 	{
@@ -738,7 +739,8 @@ void Settings::load( Display *d )
 						DIR *d = opendir( (*i).c_str() );
 
 						if( !d )
-							throw "cannot open image directory!";
+							throw std::invalid_argument(
+								"cannot open image directory" );
 
 						for( struct dirent *e; (e = readdir( d )); )
 						{
@@ -1025,8 +1027,7 @@ void Settings::throwParsingError( const char *message, unsigned int line ) const
 
 	s << message << " in line " << line;
 
-	// strdup() is required to not return a local pointer
-	throw strdup( s.str().c_str() );
+	throw std::invalid_argument( s.str() );
 }
 
 /**

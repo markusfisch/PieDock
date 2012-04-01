@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include <string>
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -55,7 +56,7 @@ Text::Color::Color( const char *s ) :
 				&blue );
 			break;
 		default:
-			throw "invalid color";
+			throw std::invalid_argument( "invalid color" );
 	}
 }
 
@@ -88,12 +89,12 @@ Text::Text( Display *d, Drawable da, Visual *v, Text::Font f ) :
 			DefaultColormap(
 				display,
 				DefaultScreen( display ) ) )) )
-		throw "cannot open font";
+		throw std::invalid_argument( "cannot open font" );
 #else
 	if( !(fontInfo = XLoadQueryFont(
 			display,
 			const_cast<char *>( f.getFamily().c_str() ) )) )
-		throw "cannot open font";
+		throw std::invalid_argument( "cannot open font" );
 
 	// set font
 	{

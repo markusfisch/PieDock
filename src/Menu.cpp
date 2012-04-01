@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -19,7 +19,9 @@
 #include <X11/Xutil.h>
 #include <unistd.h>
 #include <stdlib.h>
+
 #include <sstream>
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -414,7 +416,7 @@ int Menu::run( std::string command ) const
 	int pid = fork();
 
 	if( pid < 0 )
-		throw "fork failed";
+		throw std::runtime_error( "fork failed" );
 	else if( pid )
 		return pid;
 
@@ -426,7 +428,7 @@ int Menu::run( std::string command ) const
     setsid();
     execl( shell, shell, "-c", command.c_str(), NULL );
 
-	throw "exec failed";
+	throw std::runtime_error( "exec failed" );
 
 	// make compiler happy
 	return 0;

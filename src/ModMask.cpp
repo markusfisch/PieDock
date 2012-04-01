@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <stdexcept>
+
 using namespace PieDock;
 
 /**
@@ -51,7 +53,7 @@ ModMask::ModMask( Display *display )
 
 	if( !(modKey = (ModKeyEntry *) malloc(
 		sizeof( ModKeyEntry )*modKeyCount )) )
-		throw "out of memory";
+		throw std::runtime_error( "out of memory" );
 
 	XModifierKeymap *xmkm = XGetModifierMapping( display );
 
@@ -101,7 +103,7 @@ ModMask::ModMask( Display *display )
 							modKey[code].xlat = &xlat[i];
 
 							if( !(n = strdup( modKey[code].name )) )
-								throw "out of memory";
+								throw std::runtime_error( "out of memory" );
 
 							modKey[code].type = n;
 

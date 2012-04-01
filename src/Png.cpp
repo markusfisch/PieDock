@@ -14,6 +14,7 @@
 #include "Png.h"
 
 #include <fstream>
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -27,8 +28,7 @@ ArgbSurface *Png::load( const std::string &f )
 	std::ifstream in( f.c_str(), std::ios::in );
 
 	if( !in.good() )
-		// strdup() is required to not return a local pointer
-		throw strdup( ("cannot open \""+f+"\"").c_str() );
+		throw std::ios_base::failure( "cannot open \""+f+"\"" );
 
 	return load( in );
 }
@@ -46,16 +46,16 @@ ArgbSurface *Png::load( std::istream &in )
 	if( !(png = png_create_read_struct( 
 			PNG_LIBPNG_VER_STRING,
 			0, 0, 0 )) )
-		throw "PNG library error";
+		throw std::runtime_error( "PNG library error" );
 
 	if( !in.good() ||
 		!(info = png_create_info_struct( png )) )
-		throw "cannot read from PNG stream";
+		throw std::ios_base::failure( "cannot read from PNG stream" );
 
 	if( setjmp( png_jmpbuf( png ) ) )
 	{
 		png_destroy_read_struct( &png, &info, (png_infopp) 0 );
-		throw "PNG error";
+		throw std::runtime_error( "PNG error" );
 	}
 
 	png_set_read_fn(
@@ -72,7 +72,7 @@ ArgbSurface *Png::load( std::istream &in )
 		0 );
 
 	if( !png_get_valid( png, info, PNG_INFO_IDAT ) )
-		throw "invalid PNG stream";
+		throw std::runtime_error( "invalid PNG stream" );
 
 	png_uint_32 w = png_get_image_width( png, info );
 	png_uint_32 h = png_get_image_height( png, info );
@@ -80,7 +80,7 @@ ArgbSurface *Png::load( std::istream &in )
 	ArgbSurface *s;
 	
 	if( !(s = new ArgbSurface( w, h )) )
-		throw "cannot allocate surface";
+		throw std::runtime_error( "cannot allocate surface" );
 
 	png_bytepp rows = png_get_rows( png, info );
 
@@ -133,7 +133,7 @@ void Png::save( const std::string &f, const ArgbSurface *s )
 	std::ofstream out( f.c_str(), std::ios::out );
 
 	if( !out.good() )
-		throw ("cannot create \""+f+"\"").c_str();
+		throw std::ios_base::failure( "cannot create \""+f+"\"" );
 
 	return save( out, s );
 }
@@ -152,16 +152,16 @@ void Png::save( std::ostream &out, const ArgbSurface *s )
 	if( !(png = png_create_write_struct( 
 			PNG_LIBPNG_VER_STRING,
 			0, 0, 0 )) )
-		throw "PNG library error";
+		throw std::runtime_error( "PNG library error" );
 
 	if( !out.good() ||
 		!(info = png_create_info_struct( png )) )
-		throw "cannot write to PNG stream";
+		throw std::ios_base::failure( "cannot write to PNG stream" );
 
 	if( setjmp( png_jmpbuf( png ) ) )
 	{
 		png_destroy_write_struct( &png, &info );
-		throw "PNG error";
+		throw std::runtime_error( "PNG error" );
 	}
 
 	png_set_write_fn(

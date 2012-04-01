@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2011 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -14,6 +14,8 @@
 #include "PieMenu.h"
 
 #include <math.h>
+
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -54,7 +56,7 @@ PieMenu::PieMenu( Application *a, Surface &s ) :
 #endif
 
 	if( maxRadius < radius )
-		throw "window too small";
+		throw std::invalid_argument( "window too small" );
 }
 
 /**

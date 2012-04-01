@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -14,6 +14,8 @@
 #include "Surface.h"
 
 #include <string.h>
+
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -116,7 +118,7 @@ void Surface::calculateSize( int w, int h, int d )
 void Surface::allocateData()
 {
 	if( !(data = new unsigned char[size]) )
-		throw "cannot allocate surface memory !";
+		throw std::runtime_error( "cannot allocate surface memory" );
 }
 
 /**

@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xutil.h>
+
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -71,7 +73,8 @@ TransparentWindow::TransparentWindow( Application &a ) :
 					&majorOpcode,
 					&firstEvent,
 					&firstError ) )
-				throw "RENDER and/or Composite extension unavailable";
+				throw std::runtime_error(
+					"RENDER and/or Composite extension unavailable" );
 		}
 
 		// find visual
@@ -87,7 +90,8 @@ TransparentWindow::TransparentWindow( Application &a ) :
 					depth,
 					TrueColor,
 					&vi ) )
-				throw "cannot find a visual supporting alpha transparency";
+				throw std::runtime_error(
+					"cannot find a visual supporting alpha transparency" );
 
 			visual = vi.visual;
 
@@ -117,7 +121,7 @@ TransparentWindow::TransparentWindow( Application &a ) :
 			visual,
 			vmask,
 			&xswat )) )
-		throw "cannot create window";
+		throw std::runtime_error( "cannot create window" );
 
 #ifdef HAVE_XRENDER
 	if( app->getSettings()->useCompositing() )
@@ -144,7 +148,7 @@ TransparentWindow::TransparentWindow( Application &a ) :
 					PictStandardARGB32 ),
 				0,
 				0 )) )
-			throw "cannot create transparency pixmap";
+			throw std::runtime_error( "cannot create transparency pixmap" );
 	}
 	else
 #endif
@@ -163,14 +167,14 @@ TransparentWindow::TransparentWindow( Application &a ) :
 			visual,
 			depth )) ||
 		!(buffer = new unsigned char[canvas->getSize()]) )
-		throw "cannot create offscreen surface";
+		throw std::runtime_error( "cannot create offscreen surface" );
 
 	if( !(gc = XCreateGC(
 			app->getDisplay(),
 			window,
 			0,
 			0 )) )
-		throw "cannot create graphics context";
+		throw std::runtime_error( "cannot create graphics context" );
 
 	// you still need to select input
 }

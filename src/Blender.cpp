@@ -6,7 +6,7 @@
  *      `-;_    . -´ `.`.
  *          `._'       ´
  *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
+ * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
@@ -14,6 +14,8 @@
 #include "Blender.h"
 
 #include <stdint.h>
+
+#include <stdexcept>
 
 using namespace PieDock;
 
@@ -109,7 +111,8 @@ void Blender::blend( const ArgbSurface &src, int x, int y, int a )
 			blendInto16Bit( details );
 			break;
 		default:
-			throw "number of bytes per pixel not supported";
+			throw std::invalid_argument(
+				"number of bytes per pixel not supported" );
 	}
 }
 
@@ -143,7 +146,8 @@ void Blender::blendInto32Bit( Details &details )
 	// only 4-byte alignments are sane for 32 bits per pixel
 	if( details.destSkip%4 ||
 		details.srcSkip%4 )
-		throw "cannot deal with strange 32 bits per pixel alignment";
+		throw std::invalid_argument(
+			"cannot deal with strange 32 bits per pixel alignment" );
 
 	// bytes to uint32_t
 	details.destSkip >>= 2;
