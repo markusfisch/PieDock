@@ -1,11 +1,25 @@
 #!/bin/bash
 
+throw()
+{
+	echo 'error:' $@
+	exit 1
+}
+
+throw_missing_libs()
+{
+	throw 'libraries cannot be installed'
+}
+
 cat <<EOF
 
 This will build, install and run PieDock. If there are libraries or tools
 missing, this script will try to install them through your local package
 management system. In order to do that, you will be required to give your
-root password or to run this as root.
+root password or to run this script as root.
+
+NOTE: If you are on Ubuntu and want Gnome integration, be sure to have
+      community-maintained software sources (universe) enabled.
 
 Do you want to build, install and run PieDock now (y/n)?
 EOF
@@ -15,63 +29,55 @@ read A && [[ $A != y ]] && exit 1
 # check we're in the right place
 [ -x configure ] || {
 	cd ..
-	[ -x configure ] || {
-		echo "error: missing configure script"
-		exit 1
-	}
+	[ -x configure ] ||
+		throw 'missing configure script'
 }
 
 # and have a setup script
-[ -x sh/setup ] || {
-	echo "error: missing setup script"
-	exit 1
-}
+[ -x sh/setup ] ||
+	throw 'missing setup script'
 
 # check for sudo if not run as root
 SUDO=
 [[ $EUID -ne 0 ]] && {
 	SUDO=sudo
-	which $SUDO &>/dev/null || {
-		echo "error: "
-		exit 1
-	}
+	which $SUDO &>/dev/null ||
+		throw 'sudo not found'
 }
 
-# check whether GNOME is running
-OPTIONS=
+# try to guess optional configure options
+OPTIONS=$@
+ENABLE_GTK=
+ENABLE_KDE=
 which pgrep &>/dev/null && {
-	for M in gnome-session
-	do
-		pgrep $M &>/dev/null || continue
-
+	# check whether GNOME is running
+	pgrep gnome-session &>/dev/null && {
 		OPTIONS="$OPTIONS${OPTIONS:+ }--enable-gtk"
-		break
-	done
+		ENABLE_GTK=1
+	}
+
+	# check whether KDE is running
+	pgrep kdeinit &>/dev/null && {
+		OPTIONS="$OPTIONS${OPTIONS:+ }--enable-kde"
+		ENABLE_KDE=1
+	}
 }
 
 for (( RUNS=2; RUNS--; ))
 do
 	# try to configure build for this system
 	./configure $OPTIONS && {
-		make || {
-			echo "error: build failed, check the top most error"
-			exit 1
-		}
+		make ||
+			throw 'build failed, check the top most error'
 
-		$SUDO make install || {
-			echo "error: installation failed, check the top most error"
-			exit 1
-		}
+		$SUDO make install-strip ||
+			throw 'installation failed, check the top most error'
 
-		sh/setup || {
-			echo "error: setup failed"
-			exit 1
-		}
+		sh/setup ||
+			throw 'setup failed'
 
-		piedock || {
-			echo "error: piedock failed to start $HOME/.piedockrc"
-			exit 1
-		}
+		piedock ||
+			throw "piedock failed to start $HOME/.piedockrc"
 
 		cat <<EOF
 
@@ -95,8 +101,6 @@ EOF
 		break
 	}
 
-	ERROR_STRING="error: libraries cannot be installed"
-
 	# try to get libraries on Ubuntu or Debian
 	which apt-get &>/dev/null && {
 		$SUDO apt-get -y --no-upgrade install g++ \
@@ -105,9 +109,20 @@ EOF
 			libxrender-dev \
 			libxft2-dev \
 			libfreetype6-dev \
-			libpng-dev || {
-			echo $ERROR_STRING
-			exit 1
+			libpng-dev ||
+			throw_missing_libs
+
+		(( ENABLE_GTK )) && {
+			$SUDO apt-get -y --no-upgrade install \
+				gnome-devel ||
+				ENABLE_GTK=
+		}
+
+		(( ENABLE_KDE )) && {
+			$SUDO apt-get -y --no-upgrade install \
+				qt4-dev-tools \
+				kdelibs5-dev ||
+				ENABLE_KDE=
 		}
 
 		continue
@@ -122,9 +137,19 @@ EOF
 			xorg-x11-libXmu-devel \
 			xorg-x11-libXrender-devel \
 			freetype2-devel \
-			libpng14-devel || {
-			echo $ERROR_STRING
-			exit 1
+			libpng14-devel ||
+			throw_missing_libs
+
+		(( ENABLE_GTK )) && {
+			$SUDO zypper --non-interactive install -t pattern \
+				devel_gnome ||
+				ENABLE_GTK=
+		}
+
+		(( ENABLE_KDE )) && {
+			$SUDO zypper --non-interactive install -t pattern \
+				devel_kde ||
+				ENABLE_KDE=
 		}
 
 		continue
@@ -139,9 +164,20 @@ EOF
 			libXrender-devel \
 			libXft-devel \
 			freetype-devel \
-			libpng-devel || {
-			echo $ERROR_STRING
-			exit 1
+			libpng-devel ||
+			throw_missing_libs
+
+		(( ENABLE_GTK )) && {
+			$SUDO yum -y install \
+				gnome-devel ||
+				ENABLE_GTK=
+		}
+
+		(( ENABLE_KDE )) && {
+			$SUDO yum -y install \
+				qt-devel \
+				kde-devel ||
+				ENABLE_KDE=
 		}
 
 		continue
@@ -153,14 +189,24 @@ EOF
 		$SUDO emerge --noreplace libpng \
 			libXrender \
 			libXft \
-			freetype || {
-			echo $ERROR_STRING
-			exit 1
+			freetype ||
+			throw_missing_libs
+
+		(( ENABLE_GTK )) && {
+			$SUDO emerge --noreplace \
+				x11-libs/gtk+ ||
+				ENABLE_GTK=
+		}
+
+		(( ENABLE_KDE )) && {
+			$SUDO emerge --noreplace \
+				qt-gui \
+				kdelibs ||
+				ENABLE_KDE=
 		}
 
 		continue
 	}
 
-	echo "error: sorry, your package management system is not supported."
-	exit 1
+	throw 'sorry, your package management system is not supported.'
 done
