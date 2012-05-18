@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 using namespace PieDock;
 
