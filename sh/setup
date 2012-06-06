@@ -7,7 +7,7 @@ readonly ICON_PATH=${ICON_PATH:=${HOME}/.piedock/icons}
 [ -f "$RC" ] && exit
 
 # check for compositing
-COMPOSITING="#compositing 1"
+COMPOSITING='#compositing 1'
 which pgrep &>/dev/null && {
 	for M in compiz xcompmgr
 	do
@@ -19,13 +19,13 @@ which pgrep &>/dev/null && {
 }
 
 # search for proper indicator icon
-INDICATOR=""
+INDICATOR=''
 [ -d /usr/share/icons/ ] && {
-	CANDIDATE=""
+	CANDIDATE=''
 
-	for R in "48x48" "32x32" "16x16"
+	for R in '48x48' '32x32' '16x16'
 	do
-		CANDIDATE=`find /usr/share/icons/ -name "emblem-new.png" | grep -m 1 $R`
+		CANDIDATE=`find /usr/share/icons/ -name 'emblem-new.png' | grep -m 1 $R`
 		[ "$CANDIDATE" ] && break
 	done
 
@@ -34,7 +34,7 @@ INDICATOR=""
 }
 
 # search for applications that may have good icons
-ICONS=""
+ICONS=''
 {
 	APPS="terminal \
 		konsole \
@@ -79,7 +79,7 @@ ICONS=""
 		which $A &>/dev/null || continue
 
 		FOUND=0
-		for P in "/usr/share/icons/default.kde4/128x128/apps" "/usr/share/icons/hicolor/128x128/apps" "/usr/share/icons/gnome/256x256/apps"
+		for P in '/usr/share/icons/default.kde4/128x128/apps' '/usr/share/icons/hicolor/128x128/apps" "/usr/share/icons/gnome/256x256/apps'
 		do
 			stat $P/$A &>/dev/null || continue
 
