@@ -1,3 +1,7 @@
+1.6.1
+	improved detection of compositing in setup.sh
+	fixed compilation with GCC 4 (thanks to jonas.gehring@boolsoft.org)
+
 1.6.0
 	option to ask KDE for icons (--enable-kde)
 	throw std::exception's only
