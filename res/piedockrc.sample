@@ -157,24 +157,23 @@ path "/usr/share/pixmaps"
 # aliases
 # tweak windows having weird class names to get the right icon
 # usage: alias [(name|class|title)] VALUE APPLICATION
-alias title "* OpenOffice.org Writer" oowriter
-alias title "* OpenOffice.org Calc" oocalc
-alias title "* OpenOffice.org Draw" oodraw
-alias title "* OpenOffice.org Impress" ooimpress
+alias class "Opera" opera
 alias class "Firefox" firefox
 alias class "Thunderbird" thunderbird
 alias class "Chrome" chromium
 alias class "NEdit" nedit
+alias class "Eclipse" eclipse
 alias class "Xpdf" xpdf
 alias class "MPlayer" mplayer
 alias class "Gimp" gimp
+alias class "VirtualBox" virtualbox
 alias "aterm" terminal
 alias "xterm" terminal
 alias "xfce4-terminal" terminal
 alias "gedit" text-editor
 alias "Konsole" terminal
+alias "Blender" blender
 alias "Blender:Render" blender
-alias "realplay.bin" realplay
 alias "googleearth-bin" googleearth
 
 # menu of sticky icons
