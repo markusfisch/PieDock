@@ -3,30 +3,61 @@
 readonly RC=${RC:=${HOME}/.piedockrc}
 readonly ICON_PATH=${ICON_PATH:=${HOME}/.piedock/icons}
 
-# abort if there's already a config file
-[ -f "$RC" ] && exit
-
-# check for compositing
-COMPOSITING='#compositing 1'
-which pgrep &>/dev/null && {
-	for M in compiz xcompmgr
-	do
-		pgrep $M &>/dev/null || continue
-
-		COMPOSITING=${COMPOSITING:1}
-		break
-	done
+[ -f "$RC" ] && {
+	echo 'setup skipped, there is already a configuration file' >&2
+	exit
 }
 
-# search for proper indicator icon
-INDICATOR=''
-[ -d /usr/share/icons/ ] && {
-	CANDIDATE=''
+# check if compositing is available
+COMPOSITING='#compositing 1'
+{
+	AVAILABLE=0
 
-	for R in '48x48' '32x32' '16x16'
+	# query configuration
+	for C in \
+		'qdbus org.kde.kwin /KWin compositingActive' \
+		"gconftool-2 -g '/apps/metacity/general/compositing_manager'" \
+		'xfconf-query --channel=xfwm4 --property=/general/use_compositing'
 	do
-		CANDIDATE=`find /usr/share/icons/ -name 'emblem-new.png' | grep -m 1 $R`
-		[ "$CANDIDATE" ] && break
+		which ${C%% *} || continue
+
+		read <<EOF
+`$C`
+EOF
+
+		[ "$REPLY" == 'true' ] && {
+			AVAILABLE=1
+			break
+		}
+	done
+
+	# check processes
+	(( AVAILABLE )) || {
+		which pgrep &&
+			for P in compiz xcompmgr
+			do
+				pgrep $P || continue
+
+				AVAILABLE=1
+				break
+			done
+	}
+
+	(( AVAILABLE )) && COMPOSITING=${COMPOSITING:1}
+} &>/dev/null
+
+# search for proper active indicator icon
+INDICATOR=
+[ -d /usr/share/icons/ ] && {
+	CANDIDATE=
+
+	for I in 'emblem-new.png'
+	do
+		for R in 48x48 32x32 16x16
+		do
+			CANDIDATE=`find /usr/share/icons/ -name $I | grep -m 1 $R`
+			[ "$CANDIDATE" ] && break
+		done
 	done
 
 	[ "$CANDIDATE" ] &&
@@ -34,9 +65,18 @@ INDICATOR=''
 }
 
 # search for applications that may have good icons
-ICONS=''
+ICONS=
 {
-	APPS="terminal \
+	SVGS=/usr/share/icons/hicolor/scalable/apps/
+	[ -d "$SVGS" ] &&
+		which convert &>/dev/null &&
+		HAVE_CONVERT=1
+
+	[ -d "$ICON_PATH" ] ||
+		mkdir -p "$ICON_PATH" ||
+		HAVE_CONVERT=0
+
+	for A in terminal \
 		konsole \
 		chromium \
 		opera \
@@ -63,40 +103,41 @@ ICONS=''
 		rhythmbox \
 		banshee \
 		anjuta \
-		eclipse"
-
-	SVGS=/usr/share/icons/hicolor/scalable/apps/
-	[ -d "$SVGS" ] &&
-		which convert &>/dev/null &&
-		HAVE_CONVERT=1
-
-	[ -d "$ICON_PATH" ] ||
-		mkdir -p "$ICON_PATH" ||
-		HAVE_CONVERT=0
-
-	for A in $APPS
+		eclipse
 	do
 		which $A &>/dev/null || continue
 
-		FOUND=0
-		for P in '/usr/share/icons/default.kde4/128x128/apps' '/usr/share/icons/hicolor/128x128/apps" "/usr/share/icons/gnome/256x256/apps'
-		do
-			stat $P/$A &>/dev/null || continue
+		HAVE_ICON=0
 
-			FOUND=1
-			break
-		done
-		(( FOUND )) && continue
-
+		# check for SVG icon
 		(( HAVE_CONVERT )) && {
 			for F in ${SVGS}${A}*.svg
 			do
-				stat "$F" &>/dev/null && {
-					convert -density 128 -background transparent "$F" "${ICON_PATH}/${A}.png" &>/dev/null
-					break;
-				}
+				[ -r "$F" ] || continue
+
+				convert -density 128 \
+					-background transparent \
+					"$F" \
+					"${ICON_PATH}/${A}.png" &>/dev/null
+
+				HAVE_ICON=1
+				break
 			done
 		}
+
+		# check for PNG icon
+		(( HAVE_ICON )) ||
+			for P in /usr/share/icons/default.kde4/128x128/apps \
+				/usr/share/icons/hicolor/128x128/apps \
+				/usr/share/icons/gnome/256x256/apps
+			do
+				[ -f "${P}/${A}.png" ] || continue
+
+				HAVE_ICON=1
+				break
+			done
+
+		(( HAVE_ICON )) || continue
 
 		ICONS="${ICONS}	icon ${A}
 "
@@ -246,22 +287,22 @@ path "/usr/share/pixmaps"
 # aliases
 # tweak windows having weird class names to get the right icon
 # usage: alias [(name|class|title)] VALUE APPLICATION
-alias title "* OpenOffice.org Writer" oowriter
-alias title "* OpenOffice.org Calc" oocalc
-alias title "* OpenOffice.org Draw" oodraw
-alias title "* OpenOffice.org Impress" ooimpress
+alias class "Opera" opera
 alias class "Firefox" firefox
 alias class "Thunderbird" thunderbird
 alias class "Chrome" chromium
 alias class "NEdit" nedit
+alias class "Eclipse" eclipse
 alias class "Xpdf" xpdf
 alias class "MPlayer" mplayer
 alias class "Gimp" gimp
+alias class "VirtualBox" virtualbox
 alias "aterm" terminal
 alias "xterm" terminal
 alias "xfce4-terminal" terminal
 alias "gedit" text-editor
 alias "Konsole" terminal
+alias "Blender" blender
 alias "Blender:Render" blender
 alias "googleearth-bin" googleearth
 
