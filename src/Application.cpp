@@ -21,6 +21,7 @@
 #include <sys/un.h>
 #include <libgen.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <sstream>
 
