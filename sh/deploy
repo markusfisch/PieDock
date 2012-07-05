@@ -31,16 +31,16 @@ NOTE: If you are on Ubuntu and want Gnome integration, be sure to have
 Do you want to build, install and run PieDock now (y/n)?
 EOF
 
-read A && [[ $A != y ]] && exit 1
+read && [[ $REPLY != y ]] && exit 1
 
-# check we're in the right place
+# check if this is run in the right place
 [ -x configure ] || {
 	cd ..
 	[ -x configure ] ||
 		throw 'missing configure script'
 }
 
-# and have a setup script
+# check for the setup script
 [ -x sh/setup ] ||
 	throw 'missing setup script'
 
@@ -49,7 +49,7 @@ SUDO=
 [[ $EUID -ne 0 ]] && {
 	SUDO=sudo
 	which $SUDO &>/dev/null ||
-		throw 'sudo not found'
+		throw 'sudo not found and you are not root'
 }
 
 # try to guess optional configure options
@@ -213,5 +213,5 @@ EOF
 		continue
 	}
 
-	throw 'sorry, your package management system is not supported.'
+	throw 'sorry, your package management system is not supported'
 done
