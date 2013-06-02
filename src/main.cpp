@@ -102,7 +102,7 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.6.1" <<
+								binary << " 1.6.2" <<
 								std::endl <<
 								"Copyright (c) 2007-2012" <<
 								std::endl <<
