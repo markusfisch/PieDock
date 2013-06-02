@@ -15,6 +15,7 @@
 #include "WildcardCompare.h"
 #include "Png.h"
 
+#include <string>
 #include <algorithm>
 #include <sstream>
 #include <fstream>

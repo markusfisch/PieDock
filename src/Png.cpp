@@ -13,6 +13,7 @@
  */
 #include "Png.h"
 
+#include <string>
 #include <fstream>
 #include <stdexcept>
 
