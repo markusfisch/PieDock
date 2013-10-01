@@ -39,18 +39,18 @@ TransparentWindow::TransparentWindow( Application &a ) :
 	alphaPicture( None )
 #endif
 {
-    Visual *visual = CopyFromParent;
-    int depth = CopyFromParent;
+	Visual *visual = CopyFromParent;
+	int depth = CopyFromParent;
 	unsigned long vmask = 0;
-    XSetWindowAttributes xswat;
+	XSetWindowAttributes xswat;
 
 	memset( &xswat, 0, sizeof( xswat ) );
 
-    xswat.override_redirect = True;
-    xswat.do_not_propagate_mask =
+	xswat.override_redirect = True;
+	xswat.do_not_propagate_mask =
 		KeyPressMask | KeyReleaseMask |
 		ButtonPressMask | ButtonReleaseMask;
-    vmask = CWOverrideRedirect | CWDontPropagate;
+	vmask = CWOverrideRedirect | CWDontPropagate;
 
 #ifdef HAVE_XRENDER
 	if( app->getSettings()->useCompositing() )

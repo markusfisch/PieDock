@@ -124,7 +124,7 @@ namespace PieDock
 					inline const int &getWidth() const { return width; }
 					inline void setWidth( int w ) { width = w; }
 					inline const int &getHeight() const { return height; }
-					inline void setHeight( int h ) { height = h; }					
+					inline void setHeight( int h ) { height = h; }
 
 				private:
 					int x;

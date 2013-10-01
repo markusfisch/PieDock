@@ -66,7 +66,7 @@ Surface &Surface::operator=( const Surface &s )
 /**
  * Initialize virtual surface
  */
-Surface::Surface() : 
+Surface::Surface() :
 	data( 0 ),
 	width( 0 ),
 	height( 0 ),

@@ -42,7 +42,7 @@ namespace PieDock
 			};
 
 			virtual void drawRectangle( int, int, int, int, unsigned int );
-			virtual void drawRoundedRectangle( int, int, int, int, int, 
+			virtual void drawRoundedRectangle( int, int, int, int, int,
 				unsigned int );
 			virtual void drawCurveSlices( Details &, int, int, unsigned char );
 	};

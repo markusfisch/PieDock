@@ -42,7 +42,7 @@ const std::string Environment::getHome()
 	{
 		struct passwd *pw = getpwuid( getuid() );
 
-    	if( pw )
+		if( pw )
 			return (home = pw->pw_dir);
 	}
 

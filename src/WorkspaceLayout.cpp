@@ -71,7 +71,7 @@ bool WorkspaceLayout::isOnAnotherWorkspace(
 	// get position of window relative to the current viewport
 	{
 		Window dummy;
-		
+
 		XTranslateCoordinates(
 			display,
 			w,
@@ -101,7 +101,7 @@ bool WorkspaceLayout::isOnAnotherWorkspace(
 				!vx )
 				p.x += total.width;
 			else
-				p.x += vx;				
+				p.x += vx;
 
 			if( p.y < 0 &&
 				!vy )

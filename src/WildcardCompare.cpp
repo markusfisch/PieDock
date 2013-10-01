@@ -24,8 +24,10 @@ using namespace PieDock;
  * @param pattern - pattern with optional wildcard characters (*?)
  * @param caseSensitive - true if matching should be case-sensitive (optional)
  */
-const bool WildcardCompare::match( const char *literal, 
-	const char *pattern, bool caseSensitive )
+const bool WildcardCompare::match(
+	const char *literal,
+	const char *pattern,
+	bool caseSensitive )
 {
 	for( ; *pattern; )
 	{

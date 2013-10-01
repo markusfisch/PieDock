@@ -44,8 +44,8 @@ void signalHandler( int id )
 	{
 		case SIGCHLD:
 			// more than one process may have been terminated
-        	while( waitpid( -1, 0, WNOHANG | WUNTRACED ) > 0 );
-        	break;
+			while( waitpid( -1, 0, WNOHANG | WUNTRACED ) > 0 );
+			break;
 		case SIGHUP:
 		case SIGINT:
 		case SIGTERM:

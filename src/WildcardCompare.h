@@ -25,7 +25,7 @@ namespace PieDock
 	{
 		public:
 			virtual ~WildcardCompare() {}
-			static const bool match( const char *, const char *, 
+			static const bool match( const char *, const char *,
 				bool = false );
 
 		private:

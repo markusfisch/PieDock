@@ -425,8 +425,8 @@ int Menu::run( std::string command ) const
 	if( !shell )
 		shell = const_cast<char *>( "/bin/sh" );
 
-    setsid();
-    execl( shell, shell, "-c", command.c_str(), NULL );
+	setsid();
+	execl( shell, shell, "-c", command.c_str(), NULL );
 
 	throw std::runtime_error( "exec failed" );
 

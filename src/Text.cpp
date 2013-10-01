@@ -218,7 +218,7 @@ void Text::translateColor( const Text::Color &src, XColor *dest )
 #endif
 {
 #ifdef HAVE_XFT
-    XRenderColor renderColor;
+	XRenderColor renderColor;
 
 	renderColor.red = src.getRed()*257;
 	renderColor.green = src.getGreen()*257;

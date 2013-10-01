@@ -407,7 +407,7 @@ bool WindowManager::isNormalWindow( Display *d, Window w )
 {
 	Property<Atom> p( d, w );
 
-	if(	p.fetch( XA_ATOM, "_NET_WM_WINDOW_TYPE" ) )
+	if( p.fetch( XA_ATOM, "_NET_WM_WINDOW_TYPE" ) )
 		for( int n = p.getItems(); n > 0; --n )
 			if( *p.getData() == getAtom( d, "_NET_WM_WINDOW_TYPE_NORMAL" ) )
 				break;

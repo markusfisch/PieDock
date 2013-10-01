@@ -40,7 +40,7 @@ namespace PieDock
 			virtual void freeWorkspaceIcon();
 
 		private:
-			typedef struct 
+			typedef struct
 			{
 				int x;
 				int y;

@@ -27,8 +27,8 @@ namespace PieDock
 			struct XlatEntry
 			{
 				const char *name;
-        		int index;
-        		int mask;
+				int index;
+				int mask;
 			};
 
 			struct ModKeyEntry

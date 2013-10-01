@@ -273,7 +273,7 @@ void PieMenuWindow::updateWithText()
 	{
 		// since Xft requires a Drawable, there needs to be this
 		// detour through a Pixmap
-		if(	!(textCanvas = XCreatePixmap(
+		if( !(textCanvas = XCreatePixmap(
 				getApp()->getDisplay(),
 				getWindow(),
 				getWidth(),

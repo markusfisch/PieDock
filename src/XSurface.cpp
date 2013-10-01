@@ -67,8 +67,7 @@ int XSurface::determineBitsPerPixel( int depth )
 	{
 		int format;
 
-		for( format = formats;
-			 format--; )
+		for( format = formats; format--; )
 			if( pf[format].depth == bitsPerPixel )
 			{
 				bitsPerPixel = pf[format].bits_per_pixel;

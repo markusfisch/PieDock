@@ -44,7 +44,7 @@ ArgbSurface *Png::load( std::istream &in )
 	png_structp png = 0;
 	png_infop info = 0;
 
-	if( !(png = png_create_read_struct( 
+	if( !(png = png_create_read_struct(
 			PNG_LIBPNG_VER_STRING,
 			0, 0, 0 )) )
 		throw std::runtime_error( "PNG library error" );
@@ -65,8 +65,8 @@ ArgbSurface *Png::load( std::istream &in )
 		read );
 
 	png_set_sig_bytes( png, 0 );
-	png_read_png( png, info, 
-		PNG_TRANSFORM_IDENTITY | 
+	png_read_png( png, info,
+		PNG_TRANSFORM_IDENTITY |
 		PNG_TRANSFORM_STRIP_16 |
 		PNG_TRANSFORM_EXPAND |
 		PNG_TRANSFORM_BGR,
@@ -79,15 +79,15 @@ ArgbSurface *Png::load( std::istream &in )
 	png_uint_32 h = png_get_image_height( png, info );
 
 	ArgbSurface *s;
-	
+
 	if( !(s = new ArgbSurface( w, h )) )
 		throw std::runtime_error( "cannot allocate surface" );
 
 	png_bytepp rows = png_get_rows( png, info );
 
-	for( int y = 0, *src, *dest = reinterpret_cast<int *>( s->getData() ); 
-		y < h && 
-			(src = reinterpret_cast<int *>( rows[y] )); 
+	for( int y = 0, *src, *dest = reinterpret_cast<int *>( s->getData() );
+		y < h &&
+			(src = reinterpret_cast<int *>( rows[y] ));
 		++y, dest += w )
 		memcpy( dest, src, w<<2 );
 
@@ -96,15 +96,15 @@ ArgbSurface *Png::load( std::istream &in )
 		int ct = png_get_color_type( png, info );
 
 		if( ct == PNG_COLOR_TYPE_GRAY_ALPHA )
-			for( int y = h, 
+			for( int y = h,
 					*line = reinterpret_cast<int *>( s->getData() );
-				--y; 
+				--y;
 				line += w )
 			{
-				unsigned char *dest = 
+				unsigned char *dest =
 					reinterpret_cast<unsigned char *>( line )+
 					(w<<2);
-				unsigned char *src = 
+				unsigned char *src =
 					reinterpret_cast<unsigned char *>( line )+
 					(w<<1);
 
@@ -150,7 +150,7 @@ void Png::save( std::ostream &out, const ArgbSurface *s )
 	png_structp png = 0;
 	png_infop info = 0;
 
-	if( !(png = png_create_write_struct( 
+	if( !(png = png_create_write_struct(
 			PNG_LIBPNG_VER_STRING,
 			0, 0, 0 )) )
 		throw std::runtime_error( "PNG library error" );
@@ -184,8 +184,8 @@ void Png::save( std::ostream &out, const ArgbSurface *s )
 
 	png_bytep *rows = new png_bytep[s->getHeight()];
 
-	for( int y = 0, *src = reinterpret_cast<int *>( s->getData() ); 
-		y < s->getHeight(); 
+	for( int y = 0, *src = reinterpret_cast<int *>( s->getData() );
+		y < s->getHeight();
 		++y, src += s->getWidth() )
 		rows[y] = reinterpret_cast<png_bytep>( src );
 
@@ -206,9 +206,9 @@ void Png::save( std::ostream &out, const ArgbSurface *s )
  * @param data - pointer to data
  * @param length - data length
  */
-void Png::read( 
-	png_structp png, 
-	png_bytep data, 
+void Png::read(
+	png_structp png,
+	png_bytep data,
 	png_size_t length )
 {
 	std::istream *in = reinterpret_cast<std::istream *>(
