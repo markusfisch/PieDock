@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PACKAGE=piedock-instant-`uname -m`.bin
 TEMPLATE=piedock-instant
@@ -46,7 +46,7 @@ done
 
 # write start/stop script
 cat <<EOF > $TEMPLATE/pd
-#!/bin/bash
+#!/usr/bin/env bash
 
 BIN=piedock
 
@@ -118,7 +118,7 @@ chmod a+x $TEMPLATE/pd
 
 # write install script
 cat <<EOF > $PACKAGE
-#!/bin/bash
+#!/usr/bin/env bash
 
 cat <<EEOF
 PieDock Instant

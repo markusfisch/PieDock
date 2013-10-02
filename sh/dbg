@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 [ "$1" ] || {
 	echo "usage: `basename $0` (start|stop|status|restart|new|clean)..."

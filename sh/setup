@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 readonly RC=${RC:=${HOME}/.piedockrc}
 readonly ICON_PATH=${ICON_PATH:=${HOME}/.piedock/icons}

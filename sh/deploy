@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 throw()
 {
@@ -190,7 +190,7 @@ EOF
 
 	# build on Gentoo
 	which emerge &>/dev/null && {
-		# assuming X libraries are installed already
+		# assuming X libraries are already installed
 		$SUDO emerge --noreplace libpng \
 			libXrender \
 			libXft \
