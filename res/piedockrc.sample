@@ -53,7 +53,8 @@ ignore-mask Num_Lock
 # If you get "X Error of failed request:  BadAccess", some other program
 # have grabbed that key or button already.
 trigger button-down Mod4 1
-trigger menu launchers button Mod4 3
+trigger menu launchers button Mod4 2
+trigger menu window-control button Mod4 3
 trigger button Mod4 4
 trigger button Mod4 5
 # if you want Mod4+Tab to switch between open windows
@@ -244,6 +245,15 @@ end
 
 menu windows-of-active
 	***
+end
+
+menu window-control
+	icon close "piedockutils -c $WID"
+	icon iconify "piedockutils -i $WID"
+	icon fullscreen "piedockutils -f $WID"
+	icon lower "piedockutils -o $WID"
+	icon stick "piedockutils -s $WID"
+	icon shade "piedockutils -d $WID"
 end
 
 # preload icons
