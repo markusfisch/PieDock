@@ -1,3 +1,9 @@
+1.6.3
+	use a blind XErrorHandler to avoid crashes because of invalid windows
+
+1.6.2
+	explicitly include string.h for libpng16
+
 1.6.1
 	improved detection of compositing in setup.sh
 	fixed compilation with GCC 4 (thanks to jonas.gehring@boolsoft.org)

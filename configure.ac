@@ -1,7 +1,7 @@
 # Initialize autoconf and automake
 AC_PREREQ([2.65])
 AC_INIT(src/main.cpp)
-AM_INIT_AUTOMAKE(PieDock, 1.6.2)
+AM_INIT_AUTOMAKE(PieDock, 1.6.3)
 
 # Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -23,7 +23,7 @@ XFT=false
 
 AC_MSG_CHECKING([whether to have Xft support])
 AC_ARG_ENABLE(
-  xft,
+	xft,
 [  --enable-xft        Xft support [default=yes]],
 	if test x$enableval = "xyes"; then
 		AC_MSG_RESULT([yes])
@@ -61,7 +61,7 @@ fi
 # Checks for Xrender
 AC_MSG_CHECKING([whether to have Xrender support])
 AC_ARG_ENABLE(
-  xrender,
+	xrender,
 [  --enable-xrender    Xrender support [default=yes]],
 	if test x$enableval = "xyes"; then
 		AC_MSG_RESULT([yes])
@@ -80,7 +80,7 @@ AC_ARG_ENABLE(
 # Check for libXmu
 AC_MSG_CHECKING([whether to have libXmu])
 AC_ARG_ENABLE(
-  xmu,
+	xmu,
 [  --enable-xmu        use libXmu [default=yes]],
 	if test x$enableval = "xyes"; then
 		AC_MSG_RESULT([yes])
