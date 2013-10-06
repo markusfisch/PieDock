@@ -21,6 +21,8 @@
 #include <vector>
 #include <map>
 
+static int ignoreHandler( Display *, XErrorEvent * ) { return True; }
+
 namespace PieDock
 {
 	// forward declaration
@@ -99,6 +101,9 @@ namespace PieDock
 						unsigned long bytesAfter;
 						unsigned char *data;
 
+						XErrorHandler defaultHandler =
+							XSetErrorHandler( ignoreHandler );
+
 						if( XGetWindowProperty(
 								display,
 								window,
@@ -113,6 +118,8 @@ namespace PieDock
 								&bytesAfter,
 								&data ) != Success )
 							return false;
+
+						XSetErrorHandler( defaultHandler );
 
 						if( returnedType != type )
 						{
