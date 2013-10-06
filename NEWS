@@ -1,3 +1,6 @@
+1.6.0
+Use std::exception's only. Option to ask KDE for icons (--enable-kde).
+
 1.5.0
 All binaries are now lower case to comply with the Debian packaging rules.
 Show workspaces with window positions for one-icon-per-window menus if the
