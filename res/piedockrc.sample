@@ -37,6 +37,8 @@ title 1
 # zoom icons on mouse-over?
 # usage: zoom VALUE
 # VALUE - can be any float from 0.0 (no zoom) - 1.0 (full zoom)
+# NOTE: number format is localized! So depending on your system settings
+#       you may need to use the format 0,5
 #zoom 1.0
 
 # should clicking in the middle of the menu have any effect?
@@ -115,6 +117,8 @@ key Down SpinPrevious
 # usage: start-radius VALUE
 # VALUE - can be any float from 0.0 (start form centre) - 1.0 (no
 #         start animation)
+# NOTE: number format is localized! So depending on your system settings
+#       you may need to use the format 0,9
 #start-radius .9
 
 # should the be a minumum number of icons in a menu?
