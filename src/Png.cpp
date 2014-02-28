@@ -1,10 +1,10 @@
 /*
  *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
+ *  ï¿½ o    . -ï¿½  '     ,-
+ *   ï¿½  .ï¿½        ` . ï¿½,ï¿½
+ *     ( ï¿½   ))     . (
+ *      `-;_    . -ï¿½ `.`.
+ *          `._'       ï¿½
  *
  * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
@@ -13,7 +13,8 @@
  */
 #include "Png.h"
 
-#include <string>
+#include <string.h> // memcpy()
+
 #include <fstream>
 #include <stdexcept>
 
