@@ -1,10 +1,10 @@
 /*
  *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
+ *  ï¿½ o    . -ï¿½  '     ,-
+ *   ï¿½  .ï¿½        ` . ï¿½,ï¿½
+ *     ( ï¿½   ))     . (
+ *      `-;_    . -ï¿½ `.`.
+ *          `._'       ï¿½
  *
  * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
  *
@@ -102,7 +102,7 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.6.3" <<
+								binary << " 1.6.4" <<
 								std::endl <<
 								"Copyright (c) 2007-2012" <<
 								std::endl <<
