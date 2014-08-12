@@ -66,14 +66,6 @@ int main( int argc, char **argv )
 {
 	try
 	{
-#ifdef HAVE_GTK
-		gtk_init( &argc, &argv );
-#endif
-
-#ifdef HAVE_KDE
-		QApplication q( argc, argv );
-#endif
-
 		PieDock::Settings settings;
 		char *menuName = 0;
 
@@ -160,6 +152,14 @@ int main( int argc, char **argv )
 			case -1:
 				throw std::runtime_error( "cannot fork" );
 		}
+
+#ifdef HAVE_GTK
+		gtk_init( &argc, &argv );
+#endif
+
+#ifdef HAVE_KDE
+		QApplication q( argc, argv );
+#endif
 
 		// always open display after fork
 		PieDock::Application a( settings );
