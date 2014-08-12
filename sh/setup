@@ -200,9 +200,10 @@ ignore-mask Num_Lock
 #
 # If you get "X Error of failed request:  BadAccess", some other program
 # have grabbed that key or button already.
-trigger button Mod4 1
-trigger button Mod4 4
-trigger button Mod4 5
+trigger button-down Mod4 1
+trigger button Shift 4
+trigger button Shift 5
+trigger menu window-control button-down Shift 3
 
 # button configuration or what the mouse-buttons do while the menu is open
 # usage: button [BUTTON] [ACTION]
@@ -221,8 +222,6 @@ trigger button Mod4 5
 button 1 ShowNext
 button 2 ShowPrevious
 button 3 Launch
-button 4 SpinNext
-button 5 SpinPrevious
 
 # key configuration or what the keys on the keyboard do while the menu is open
 # usage: key KEYSYM ACTION
@@ -321,6 +320,15 @@ alias "googleearth-bin" googleearth
 menu
 $ICONS
 	*
+end
+
+menu window-control
+	icon close "piedockutils -c $WID"
+	icon iconify "piedockutils -i $WID"
+	icon fullscreen "piedockutils -f $WID"
+	icon lower "piedockutils -o $WID"
+	icon stick "piedockutils -s $WID"
+	icon shade "piedockutils -d $WID"
 end
 
 # preload icons

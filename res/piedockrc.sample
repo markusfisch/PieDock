@@ -55,10 +55,10 @@ ignore-mask Num_Lock
 # If you get "X Error of failed request:  BadAccess", some other program
 # have grabbed that key or button already.
 trigger button-down Mod4 1
+trigger button Shift 4
+trigger button Shift 5
 trigger menu launchers button Mod4 2
-trigger menu window-control button Mod4 3
-trigger button Mod4 4
-trigger button Mod4 5
+trigger menu window-control button-down Shift 3
 # if you want Mod4+Tab to switch between open windows
 #trigger menu open-windows key Mod4 Tab
 # if you want Mod4+< to switch between all windows of the active application
@@ -222,22 +222,10 @@ menu launchers
 		icon thunderbird
 		icon evolution
 	end
-	menu dev
-		icon eclipse
-		icon nedit
-	end
 	menu art
 		icon gimp
 		icon inkscape
 		icon blender
-	end
-	menu office
-		icon oowriter
-		icon oocalc
-		icon oodraw
-		icon ooimpress
-		icon oobase
-		icon oomath
 	end
 	icon hibernate "sudo /usr/sbin/hibernate"
 	icon shutdown "sudo /sbin/shutdown -h now"
