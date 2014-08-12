@@ -94,9 +94,9 @@ int main( int argc, char **argv )
 							return 0;
 						case 'v':
 							std::cout <<
-								binary << " 1.6.4" <<
+								binary << " 1.6.5" <<
 								std::endl <<
-								"Copyright (c) 2007-2012" <<
+								"Copyright (c) 2007-2014" <<
 								std::endl <<
 								"Markus Fisch <mf@markusfisch.de>" <<
 								std::endl <<

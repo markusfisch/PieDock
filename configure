@@ -2793,7 +2793,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=PieDock
- VERSION=1.6.3
+ VERSION=1.6.5
 
 
 cat >>confdefs.h <<_ACEOF
