@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 readonly RC=${RC:=${HOME}/.piedockrc}
-readonly ICON_PATH=${ICON_PATH:=${HOME}/.piedock/icons}
+readonly APP_ICONS_PATH=${APP_ICONS_PATH:=${HOME}/.piedock/applications}
+readonly ACTIONS_ICONS_PATH=${ACTIONS_ICONS_PATH:=${HOME}/.piedock/actions}
 
 [ -f "$RC" ] && {
 	echo 'setup skipped, there is already a configuration file' >&2
@@ -64,7 +65,16 @@ INDICATOR=
 		INDICATOR="active-indicator \"$CANDIDATE\" right bottom"
 }
 
-# search for applications that may have good icons
+# copy action icons if available
+{
+	ACTIONS_SRC_PATH=${0%sh/setup}'res/window-control'
+
+	[ -d "$ACTIONS_SRC_PATH" ] &&
+		mkdir -p "$ACTIONS_ICONS_PATH" &&
+		cp "$ACTIONS_SRC_PATH"/*.png "$ACTIONS_ICONS_PATH"
+}
+
+# search for some popular applications
 ICONS=
 {
 	SVGS=/usr/share/icons/hicolor/scalable/apps/
@@ -72,12 +82,13 @@ ICONS=
 		which convert &>/dev/null &&
 		HAVE_CONVERT=1
 
-	[ -d "$ICON_PATH" ] ||
-		mkdir -p "$ICON_PATH" ||
+	[ -d "$APP_ICONS_PATH" ] ||
+		mkdir -p "$APP_ICONS_PATH" ||
 		HAVE_CONVERT=0
 
 	for A in terminal \
 		konsole \
+		gnome-terminal \
 		chromium \
 		opera \
 		firefox \
@@ -118,7 +129,7 @@ ICONS=
 				convert -density 128 \
 					-background transparent \
 					"$F" \
-					"${ICON_PATH}/${A}.png" &>/dev/null
+					"${APP_ICONS_PATH}/${A}.png" &>/dev/null
 
 				HAVE_ICON=1
 				break
@@ -199,8 +210,7 @@ ignore-mask Num_Lock
 # usage: trigger [menu NAME] (button[-up]|button-down|key) [MODIFIER] (KEY|BUTTON)
 #
 # If you get "X Error of failed request:  BadAccess", some other program
-# have grabbed that key or button already.
-trigger button-down Mod4 1
+# has grabbed that key or button already.
 trigger button Shift 4
 trigger button Shift 5
 trigger menu window-control button-down Shift 3
@@ -269,7 +279,8 @@ $INDICATOR
 
 # path to PNG files, the files must be named like the application
 # usage: path PATH...
-path "$ICON_PATH"
+path "$APP_ICONS_PATH"
+path "$ACTIONS_ICONS_PATH"
 path "/usr/share/icons/default.kde4/128x128/apps"
 path "/usr/share/icons/default.kde4/32x32/apps"
 path "/usr/share/icons/hicolor/128x128/apps"
