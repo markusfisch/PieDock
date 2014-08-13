@@ -1,3 +1,6 @@
+1.6.6
+	fixed 16bit image blending
+
 1.6.5
 	initialize GTK/Qt after forking
 
