@@ -120,18 +120,12 @@ chmod a+x $TEMPLATE/pd
 cat <<EOF > $PACKAGE
 #!/usr/bin/env bash
 
-cat <<EEOF
-PieDock Instant
-http://markusfisch.de/PieDock
-
-EEOF
-
 echo -n "Extracting archive ... "
 sed -e '1,/^exit\$/d' "\$0" | tar xzf -
 echo "ok"
 
 echo -n "Configuring ... "
-RC=$TEMPLATE/conf/piedockrc ICON_PATH=$TEMPLATE/icons $TEMPLATE/setup
+RC=$TEMPLATE/conf/piedockrc APP_ICONS_PATH=$TEMPLATE/applications $TEMPLATE/setup
 rm -f $TEMPLATE/setup
 echo "ok"
 
@@ -142,15 +136,15 @@ echo "ok"
 cat <<EEOF
 
 If you got "X Error of failed request:  BadAccess", some other program
-have grabbed one of those keys or buttons already. In that case you'll
-have to modify
+has grabbed one of the trigger keys or buttons already. In that case
+you'll have to modify
 $TEMPLATE/conf/piedockrc
-to use other keys. Restart after doing so.
+to use other keys. Then restart PieDock (see below).
 
-If the menu isn't transparent (you have a black box behind the menu),
+If the menu isn't transparent (i.e. you have a black box behind the menu),
 you have to remove the line "compositing 1" from
 $TEMPLATE/conf/piedockrc
-and start again.
+and start again (see below).
 
 Start PieDock if it is not running:
 
@@ -164,12 +158,11 @@ Stop PieDock:
 
     \$ $TEMPLATE/pd stop
 
-You may press one of the following combinations to make the menu
+You may use one of the following combinations to make the menu
 appear:
 
-    Windows-key + left mouse button
-    Windows-key + scroll wheel up
-    Windows-key + scroll wheel down
+    Shift + scroll wheel up
+    Shift + scroll wheel down
 
 EEOF
 

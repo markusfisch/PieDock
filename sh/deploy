@@ -21,9 +21,8 @@ reset()
 cat <<EOF
 
 This will build, install and run PieDock. If there are libraries or tools
-missing, this script will try to install them through your local package
-management system. In order to do that, you will be required to give your
-root password or to run this script as root.
+missing, this script will try to install them with your package management
+system.
 
 NOTE: If you are on Ubuntu and want Gnome integration, be sure to have
       community-maintained software sources (universe) enabled.
@@ -86,14 +85,13 @@ do
 
 		cat <<EOF
 
-Congratulations! PieDock was successfully installed and run!
+Congratulations! PieDock was successfully installed!
 
-You may press one of the following combinations to make the menu
+You may use one of the following combinations to make the menu
 appear:
 
-    Windows-key + left mouse button
-    Windows-key + scroll wheel up
-    Windows-key + scroll wheel down
+    Shift + scroll wheel up
+    Shift + scroll wheel down
 
 To fine-tune the experience, check out the configuration file at
 
