@@ -261,7 +261,8 @@ void Blender::blendInto24Bit( Details &details )
 			}
 			else
 			{
-				mod = alphaMax/static_cast<double>( *(src+3) );
+				a >>= 24;
+				mod = alphaMax/static_cast<double>( a );
 
 				diff = *(src++);
 				diff -= *dest;
@@ -312,14 +313,14 @@ void Blender::blendInto16Bit( Details &details )
 		dest += details.destSkip, src += details.srcSkip )
 		for( int l = details.length; l--; )
 		{
-			uint32_t a = *reinterpret_cast<uint32_t *>( src ) & 0xff000000;
+			uint8_t a = *(src+3);
 
 			if( !a )
 			{
 				src += 4;
 				dest += 2;
 			}
-			else if( a == 0xff000000 &&
+			else if( a == 0xff &&
 				!useGlobalAlpha )
 			{
 				register int blue = *(src++);
@@ -336,32 +337,33 @@ void Blender::blendInto16Bit( Details &details )
 			}
 			else
 			{
-				mod = alphaMax/static_cast<double>( *(src+3) );
+				mod = alphaMax/static_cast<double>( a );
 
 				uint16_t pixel = *(reinterpret_cast<uint16_t *>( dest ));
-				register int blue = (pixel<<3)&0xf8;
-				register int green = (pixel>>3)&0xf8;
-				register int red = (pixel>>8)&0xf8;
+				register int db = (pixel<<3)&0xf8;
+				register int dg = (pixel>>3)&0xf8;
+				register int dr = (pixel>>8)&0xf8;
 
-				diff = *(src++);
-				diff -= blue;
-				diff /= mod;
-				blue += static_cast<uint8_t>( diff );
+				register int blue = *src++;
+				blue -= db;
+				blue /= mod;
+				blue += db;
 
-				diff = *(src++);
-				diff -= green;
-				diff /= mod;
-				green += static_cast<uint8_t>( diff );
+				register int green = *src++;
+				green -= dg;
+				green /= mod;
+				green += dg;
 
-				diff = *(src++);
-				diff -= red;
-				diff /= mod;
-				red += static_cast<uint8_t>( diff );
+				register int red = *src++;
+				red -= dr;
+				red /= mod;
+				red += dr;
 
 				*(reinterpret_cast<uint16_t *>( dest )) =
-					static_cast<uint16_t>( (blue&0xf8)>>3 ) |
-					static_cast<uint16_t>( (green&0xf8)<<3 ) |
-					static_cast<uint16_t>( (red&0xf8)<<8 );
+					static_cast<uint16_t>(
+						((blue&0xf8)>>3) |
+						((green&0xf8)<<3) |
+						((red&0xf8)<<8) );
 
 				dest += 2;
 				++src;
