@@ -149,8 +149,7 @@ bool Menu::update( std::string menuName, Window forWindow )
 			if( !XGetClassHint( app->getDisplay(), (*i), &xch ) )
 				continue;
 
-			if( (!menuItems->oneIconPerWindow() &&
-					app->getSettings()->ignoreWindow( xch.res_name )) ||
+			if( app->getSettings()->ignoreWindow( xch.res_name ) ||
 				((forWindow || menuItems->onlyFromActive()) &&
 					classFilter.compare( xch.res_class )) )
 			{
