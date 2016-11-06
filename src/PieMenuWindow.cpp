@@ -15,6 +15,8 @@
 #include "WindowManager.h"
 #include "Hotspot.h"
 
+#include <X11/Xutil.h>
+
 #include <stdexcept>
 
 using namespace PieDock;
@@ -68,14 +70,31 @@ PieMenuWindow::~PieMenuWindow()
  * @param n - menu name (optional)
  * @param p - where the menu should appear (optional)
  */
-bool PieMenuWindow::appear( std::string n,
-	PieMenuWindow::Placement p )
+bool PieMenuWindow::appear( std::string n, PieMenuWindow::Placement p )
 {
 	if( !menu.update( n ) )
 		return false;
 
 	if( p == PieMenuWindow::IconBelowCursor )
+	{
+		Display *d = getApp()->getDisplay();
+		int screen = DefaultScreen( d );
+		int desktopWidth = DisplayWidth( d, screen );
+		int desktopHeight = DisplayHeight( d, screen );
+
+		XWarpPointer(
+			d,
+			None,
+			DefaultRootWindow( d ),
+			0,
+			0,
+			0,
+			0,
+			desktopWidth >> 1,
+			desktopHeight >> 1 );
+
 		menu.setTwistForSelection();
+	}
 
 	show( p );
 
