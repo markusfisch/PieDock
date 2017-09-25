@@ -251,6 +251,13 @@ ArgbSurface *WindowManager::getIcon(Display *d, Window w) {
 				l > 2;) {
 			unsigned long s = b[0] * b[1];
 
+			// some WMs seem to terminate the list of possible icons
+			// with 0 values instead of returning the correct number
+			// of entries in nitems_return of XGetWindowProperty();
+			if (s == 0) {
+				break;
+			}
+
 			if (s > iconSize) {
 				icon = b;
 				iconSize = s;
