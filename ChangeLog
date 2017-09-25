@@ -1,3 +1,9 @@
+1.6.9
+* fixed iterating WM icons
+
+1.6.8
+* exclude ignored windows from open windows menu too
+
 1.6.7
 * fixed showing ignored windows in open windows menu
 
