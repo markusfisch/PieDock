@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "WindowManager.h"
 #include "ArgbSurface.h"
 #include "WorkspaceLayout.h"
@@ -34,18 +21,19 @@ WindowManager::StringToAtom WindowManager::stringToAtom;
  *
  * @param d - display
  */
-void WindowManager::WindowList::addClientsOf( Display *d )
-{
-	Property<Window> p( d, DefaultRootWindow( d ) );
+void WindowManager::WindowList::addClientsOf(Display *d) {
+	Property<Window> p(d, DefaultRootWindow(d));
 
-	if( !p.fetch( XA_WINDOW, "_NET_CLIENT_LIST" ) &&
-		!p.fetch( XA_CARDINAL, "_WIN_CLIENT_LIST" ) )
+	if (!p.fetch(XA_WINDOW, "_NET_CLIENT_LIST") &&
+			!p.fetch(XA_CARDINAL, "_WIN_CLIENT_LIST")) {
 		return;
+	}
 
 	Window *w = p.getData();
 
-	for( int i = p.getItems(); i--; )
-		push_back( *w++ );
+	for (int i = p.getItems(); i--;) {
+		push_back(*w++);
+	}
 }
 
 /**
@@ -54,15 +42,14 @@ void WindowManager::WindowList::addClientsOf( Display *d )
  * @param d - display
  * @param w - window id
  */
-void WindowManager::activate( Display *d, Window w )
-{
+void WindowManager::activate(Display *d, Window w) {
 	// switch to workspace
-	Window root = DefaultRootWindow( d );
-	WorkspaceLayout *wsl = WorkspaceLayout::getWorkspaceLayout( d );
+	Window root = DefaultRootWindow(d);
+	WorkspaceLayout *wsl = WorkspaceLayout::getWorkspaceLayout(d);
 	WorkspaceLayout::WorkspacePosition p;
 
-	if( wsl->isOnAnotherWorkspace( w, p ) )
-		if( wsl->isVirtual() )
+	if (wsl->isOnAnotherWorkspace(w, p)) {
+		if (wsl->isVirtual()) {
 			sendClientMessage(
 				d,
 				root,
@@ -72,38 +59,40 @@ void WindowManager::activate( Display *d, Window w )
 				// workspace geometry
 				p.x/wsl->getScreenWidth()*wsl->getScreenWidth(),
 				p.y/wsl->getScreenHeight()*wsl->getScreenHeight(),
-				CurrentTime );
-		else
+				CurrentTime);
+		} else {
 			sendClientMessage(
 				d,
 				root,
 				"_NET_CURRENT_DESKTOP",
-				p.number );
+				p.number);
+		}
+	}
 
 	sendClientMessage(
 		d,
 		w,
 		"_NET_ACTIVE_WINDOW",
 		2L,
-		CurrentTime );
+		CurrentTime);
 
-	XMapRaised( d, w );
+	XMapRaised(d, w);
 
 	// wait until the window becomes viewable before setting input focus;
 	// abort if the window doesn't become viewable within roughly 2 seconds
-	for( time_t start = time( 0 )+2;
-		start > time( 0 );
-		usleep( 1000 ) )
-	{
+	for (time_t start = time(0) + 2;
+			start > time(0);
+			usleep(1000)) {
 		XWindowAttributes wa;
 
-		XGetWindowAttributes( d, w, &wa );
+		XGetWindowAttributes(d, w, &wa);
 
-		if( wa.map_state != IsViewable )
+		if (wa.map_state != IsViewable) {
 			continue;
+		}
 
-		XSetInputFocus( d, w, RevertToPointerRoot, CurrentTime );
-		XRaiseWindow( d, w );
+		XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
+		XRaiseWindow(d, w);
 		break;
 	}
 }
@@ -114,9 +103,8 @@ void WindowManager::activate( Display *d, Window w )
  * @param d - display
  * @param w - window id
  */
-void WindowManager::iconify( Display *d, Window w )
-{
-	XIconifyWindow( d, w, DefaultScreen( d ) );
+void WindowManager::iconify(Display *d, Window w) {
+	XIconifyWindow(d, w, DefaultScreen(d));
 }
 
 /**
@@ -125,9 +113,8 @@ void WindowManager::iconify( Display *d, Window w )
  * @param d - display
  * @param w - window id
  */
-void WindowManager::close( Display *d, Window w )
-{
-	sendClientMessage( d, w, "_NET_CLOSE_WINDOW" );
+void WindowManager::close(Display *d, Window w) {
+	sendClientMessage(d, w, "_NET_CLOSE_WINDOW");
 }
 
 /**
@@ -135,12 +122,12 @@ void WindowManager::close( Display *d, Window w )
  *
  * @param d - display
  */
-Window WindowManager::getActive( Display *d )
-{
-	Property<Window> p( d, DefaultRootWindow( d ) );
+Window WindowManager::getActive(Display *d) {
+	Property<Window> p(d, DefaultRootWindow(d));
 
-	if( !p.fetch( XA_WINDOW, "_NET_ACTIVE_WINDOW" ) )
+	if (!p.fetch(XA_WINDOW, "_NET_ACTIVE_WINDOW")) {
 		return 0;
+	}
 
 	return *p.getData();
 }
@@ -151,77 +138,72 @@ Window WindowManager::getActive( Display *d )
  * @param d - display
  * @param w - window
  */
-Window WindowManager::getClientWindow( Display *d, Window w )
-{
+Window WindowManager::getClientWindow(Display *d, Window w) {
 	Window root;
 	int i;
 	unsigned int u;
 
-	if( w &&
-		w != DefaultRootWindow( d ) &&
-		XGetGeometry( d, w, &root, &i, &i, &u, &u, &u, &u ) )
-	{
+	if (w && w != DefaultRootWindow(d) &&
+			XGetGeometry(d, w, &root, &i, &i, &u, &u, &u, &u)) {
 #ifdef HAVE_XMU
-		w = XmuClientWindow( d, w );
+		w = XmuClientWindow(d, w);
 #else
 		/**
 		 * Private class to stand in if XmuClientWindow is missing;
 		 * didn't like the thought of having a depedency for this
 		 */
-		class WindowDiver
-		{
-			public:
-				WindowDiver( Display *d ) : display( d ) {}
-				virtual ~WindowDiver() {}
-				Window find( Window window )
-				{
-					if( hasWmState( window ) )
-						return window;
-
-					Window w = checkChildren( window );
-					return w ? w : window;
+		class WindowDiver {
+		public:
+			WindowDiver(Display *d) : display(d) {}
+			virtual ~WindowDiver() {}
+			Window find(Window window) {
+				if (hasWmState(window)) {
+					return window;
 				}
 
-			private:
-				Window checkChildren( Window window ) const
-				{
-					Window root;
-					Window parent;
-					Window *children;
-					unsigned int n;
+				Window w = checkChildren(window);
+				return w ? w : window;
+			}
 
-					if( !XQueryTree( display, window, &root, &parent,
-							&children, &n ) )
-						return 0;
+		private:
+			Window checkChildren(Window window) const {
+				Window root;
+				Window parent;
+				Window *children;
+				unsigned int n;
 
-					for( int i = 0; i < n; ++i )
-						if( hasWmState( children[i] ) )
-							return children[i];
-
-					for( int i = 0; i < n; ++i )
-					{
-						Window w;
-
-						if( (w = checkChildren( children[i] )) )
-							return w;
-					}
-
+				if (!XQueryTree(display, window, &root, &parent,
+						&children, &n)) {
 					return 0;
-				};
-				const bool hasWmState( const Window window ) const
-				{
-					Property<unsigned char*> p( display, window );
+				}
 
-					return p.fetch(
-						getAtom( display, "WM_STATE" ),
-						"WM_STATE" );
-				};
+				for (int i = 0; i < n; ++i) {
+					if (hasWmState(children[i])) {
+						return children[i];
+					}
+				}
 
-				Display *display;
+				for (int i = 0; i < n; ++i) {
+					Window w;
+
+					if ((w = checkChildren(children[i]))) {
+						return w;
+					}
+				}
+
+				return 0;
+			};
+			const bool hasWmState(const Window window) const {
+				Property<unsigned char*> p(display, window);
+
+				return p.fetch(getAtom(display, "WM_STATE"), "WM_STATE");
+			};
+
+			Display *display;
 		};
 
-		WindowDiver wd( d );
-		return wd.find( w );
+		WindowDiver wd(d);
+		return wd.find(w);
 #endif
 	}
 
@@ -234,13 +216,13 @@ Window WindowManager::getClientWindow( Display *d, Window w )
  * @param d - display
  * @param w - window id
  */
-std::string WindowManager::getTitle( Display *d, Window w )
-{
-	Property<char> p( d, w );
+std::string WindowManager::getTitle(Display *d, Window w) {
+	Property<char> p(d, w);
 
-	if( !p.fetch( getAtom( d, "UTF8_STRING" ), "_NET_WM_NAME" ) &&
-		!p.fetch( XA_STRING, "WM_NAME" ) )
+	if (!p.fetch(getAtom(d, "UTF8_STRING"), "_NET_WM_NAME") &&
+			!p.fetch(XA_STRING, "WM_NAME")) {
 		return "";
+	}
 
 	return p.getData();
 }
@@ -251,12 +233,12 @@ std::string WindowManager::getTitle( Display *d, Window w )
  * @param d - display
  * @param w - window id
  */
-ArgbSurface *WindowManager::getIcon( Display *d, Window w )
-{
-	Property<unsigned long> p( d, w );
+ArgbSurface *WindowManager::getIcon(Display *d, Window w) {
+	Property<unsigned long> p(d, w);
 
-	if( !p.fetch( XA_CARDINAL, "_NET_WM_ICON", 0xffffffff ) )
+	if (!p.fetch(XA_CARDINAL, "_NET_WM_ICON", 0xffffffff)) {
 		return 0;
+	}
 
 	unsigned long *icon = 0;
 	unsigned long iconSize = 0;
@@ -265,13 +247,11 @@ ArgbSurface *WindowManager::getIcon( Display *d, Window w )
 	{
 		unsigned long *b = p.getData();
 
-		for( unsigned long l = p.getItems();
-			l > 2; )
-		{
-			unsigned long s = b[0]*b[1];
+		for (unsigned long l = p.getItems();
+				l > 2;) {
+			unsigned long s = b[0] * b[1];
 
-			if( s > iconSize )
-			{
+			if (s > iconSize) {
 				icon = b;
 				iconSize = s;
 			}
@@ -284,19 +264,20 @@ ArgbSurface *WindowManager::getIcon( Display *d, Window w )
 
 	ArgbSurface *s;
 
-	if( !icon ||
-		!(s = new ArgbSurface( icon[0], icon[1] )) )
+	if (!icon || !(s = new ArgbSurface(icon[0], icon[1]))) {
 		return 0;
+	}
 
 	// copy image data, don't use memcpy here since the bytes per pixel
 	// may be different from ArgbSurface's 32 bits
 	{
-		uint32_t *dest = reinterpret_cast<uint32_t *>( s->getData() );
+		uint32_t *dest = reinterpret_cast<uint32_t *>(s->getData());
 		unsigned long *src = &icon[2];
 
-		for( int y = s->getHeight(); y--; )
-			for( int x = s->getWidth(); x--; )
+		for (int y = s->getHeight(); y--;)
+			for (int x = s->getWidth(); x--;) {
 				*dest++ = *src++ & 0xffffffff;
+			}
 	}
 
 	return s;
@@ -308,13 +289,13 @@ ArgbSurface *WindowManager::getIcon( Display *d, Window w )
  * @param d - display
  * @param w - window id
  */
-unsigned long WindowManager::getWorkspace( Display *d, Window w )
-{
-	Property<unsigned long> p( d, w );
+unsigned long WindowManager::getWorkspace(Display *d, Window w) {
+	Property<unsigned long> p(d, w);
 
-	if( p.fetch( XA_CARDINAL, "_NET_WM_DESKTOP" ) ||
-		p.fetch( XA_CARDINAL, "_WIN_WORKSPACE" ) )
+	if (p.fetch(XA_CARDINAL, "_NET_WM_DESKTOP") ||
+			p.fetch(XA_CARDINAL, "_WIN_WORKSPACE")) {
 		return *p.getData();
+	}
 
 	return 0;
 }
@@ -324,13 +305,13 @@ unsigned long WindowManager::getWorkspace( Display *d, Window w )
  *
  * @param d - display
  */
-unsigned long WindowManager::getNumberOfWorkspaces( Display *d )
-{
-	Property<unsigned long> p( d, DefaultRootWindow( d ) );
+unsigned long WindowManager::getNumberOfWorkspaces(Display *d) {
+	Property<unsigned long> p(d, DefaultRootWindow(d));
 
-	if( p.fetch( XA_CARDINAL, "_NET_NUMBER_OF_DESKTOPS" ) ||
-		p.fetch( XA_CARDINAL, "_WIN_WORKSPACE_COUNT" ) )
+	if (p.fetch(XA_CARDINAL, "_NET_NUMBER_OF_DESKTOPS") ||
+			p.fetch(XA_CARDINAL, "_WIN_WORKSPACE_COUNT")) {
 		return *p.getData();
+	}
 
 	return 0;
 }
@@ -340,13 +321,13 @@ unsigned long WindowManager::getNumberOfWorkspaces( Display *d )
  *
  * @param d - display
  */
-unsigned long WindowManager::getCurrentWorkspace( Display *d )
-{
-	Property <unsigned long> p( d, DefaultRootWindow( d ) );
+unsigned long WindowManager::getCurrentWorkspace(Display *d) {
+	Property <unsigned long> p(d, DefaultRootWindow(d));
 
-	if( p.fetch( XA_CARDINAL, "_NET_CURRENT_DESKTOP" ) ||
-		p.fetch( XA_CARDINAL, "_WIN_WORKSPACE" ) )
+	if (p.fetch(XA_CARDINAL, "_NET_CURRENT_DESKTOP") ||
+			p.fetch(XA_CARDINAL, "_WIN_WORKSPACE")) {
 		return *p.getData();
+	}
 
 	return 0;
 }
@@ -359,14 +340,14 @@ unsigned long WindowManager::getCurrentWorkspace( Display *d )
  * @param y - vertical position
  */
 bool WindowManager::getWorkspacePosition(
-	Display *d,
-	unsigned long &x,
-	unsigned long &y )
-{
-	Property <unsigned long> p( d, DefaultRootWindow( d ) );
+		Display *d,
+		unsigned long &x,
+		unsigned long &y) {
+	Property <unsigned long> p(d, DefaultRootWindow(d));
 
-	if( !p.fetch( XA_CARDINAL, "_NET_DESKTOP_VIEWPORT" ) )
+	if (!p.fetch(XA_CARDINAL, "_NET_DESKTOP_VIEWPORT")) {
 		return false;
+	}
 
 	x = p.getData()[0];
 	y = p.getData()[1];
@@ -382,14 +363,14 @@ bool WindowManager::getWorkspacePosition(
  * @param h - sum of the height of all workspaces
  */
 bool WindowManager::getDesktopGeometry(
-	Display *d,
-	unsigned long &w,
-	unsigned long &h )
-{
-	Property <unsigned long> p( d, DefaultRootWindow( d ) );
+		Display *d,
+		unsigned long &w,
+		unsigned long &h) {
+	Property <unsigned long> p(d, DefaultRootWindow(d));
 
-	if( !p.fetch( XA_CARDINAL, "_NET_DESKTOP_GEOMETRY" ) )
+	if (!p.fetch(XA_CARDINAL, "_NET_DESKTOP_GEOMETRY")) {
 		return false;
+	}
 
 	w = p.getData()[0];
 	h = p.getData()[1];
@@ -403,19 +384,19 @@ bool WindowManager::getDesktopGeometry(
  * @param d - display
  * @param w - window id
  */
-bool WindowManager::isNormalWindow( Display *d, Window w )
-{
-	Property<Atom> p( d, w );
+bool WindowManager::isNormalWindow(Display *d, Window w) {
+	Property<Atom> p(d, w);
 
-	if( p.fetch( XA_ATOM, "_NET_WM_WINDOW_TYPE" ) )
-		for( int n = p.getItems(); n > 0; --n )
-			if( *p.getData() == getAtom( d, "_NET_WM_WINDOW_TYPE_NORMAL" ) )
+	if (p.fetch(XA_ATOM, "_NET_WM_WINDOW_TYPE"))
+		for (int n = p.getItems(); n > 0; --n)
+			if (*p.getData() == getAtom(d, "_NET_WM_WINDOW_TYPE_NORMAL")) {
 				break;
-			else if( *p.getData() == getAtom( d, "_NET_WM_WINDOW_TYPE_SPLASH" ) ||
-				*p.getData() == getAtom( d, "_NET_WM_WINDOW_TYPE_DOCK" ) ||
-				*p.getData() == getAtom( d, "_NET_WM_WINDOW_TYPE_TOOLBAR" ) ||
-				*p.getData() == getAtom( d, "_NET_WM_WINDOW_TYPE_DESKTOP" ) )
+			} else if (*p.getData() == getAtom(d, "_NET_WM_WINDOW_TYPE_SPLASH") ||
+					*p.getData() == getAtom(d, "_NET_WM_WINDOW_TYPE_DOCK") ||
+					*p.getData() == getAtom(d, "_NET_WM_WINDOW_TYPE_TOOLBAR") ||
+					*p.getData() == getAtom(d, "_NET_WM_WINDOW_TYPE_DESKTOP")) {
 				return false;
+			}
 
 	return true;
 }
@@ -427,22 +408,21 @@ bool WindowManager::isNormalWindow( Display *d, Window w )
  * @param w - target window
  * @param t - type
  */
-void WindowManager::setWindowType( Display *d, Window w, const char *type )
-{
+void WindowManager::setWindowType(Display *d, Window w, const char *type) {
 	Atom a[2];
 	int n = 0;
 
-	a[n++] = getAtom( d, type );
+	a[n++] = getAtom(d, type);
 
 	XChangeProperty(
 		d,
 		w,
-		getAtom( d, "_NET_WM_WINDOW_TYPE" ),
+		getAtom(d, "_NET_WM_WINDOW_TYPE"),
 		XA_ATOM,
 		32,
 		PropModeReplace,
-		reinterpret_cast<unsigned char *>( &a ),
-		n );
+		reinterpret_cast<unsigned char *>(&a),
+		n);
 }
 
 /**
@@ -458,21 +438,20 @@ void WindowManager::setWindowType( Display *d, Window w, const char *type )
  * @param data4 - data (optional)
  */
 void WindowManager::sendClientMessage(
-	Display *d,
-	Window w,
-	const char *message,
-	unsigned long data0,
-	unsigned long data1,
-	unsigned long data2,
-	unsigned long data3,
-	unsigned long data4 )
-{
+		Display *d,
+		Window w,
+		const char *message,
+		unsigned long data0,
+		unsigned long data1,
+		unsigned long data2,
+		unsigned long data3,
+		unsigned long data4) {
 	XEvent event;
 
 	event.xclient.type = ClientMessage;
 	event.xclient.serial = 0;
 	event.xclient.send_event = True;
-	event.xclient.message_type = getAtom( d, message );
+	event.xclient.message_type = getAtom(d, message);
 	event.xclient.window = w;
 	event.xclient.format = 32;
 	event.xclient.data.l[0] = data0;
@@ -483,10 +462,10 @@ void WindowManager::sendClientMessage(
 
 	XSendEvent(
 		d,
-		DefaultRootWindow( d ),
+		DefaultRootWindow(d),
 		False,
 		SubstructureRedirectMask | SubstructureNotifyMask,
-		&event );
+		&event);
 }
 
 /**
@@ -495,12 +474,12 @@ void WindowManager::sendClientMessage(
  * @param d - display
  * @param n - name of atom
  */
-Atom WindowManager::getAtom( Display *d, const char *n )
-{
+Atom WindowManager::getAtom(Display *d, const char *n) {
 	StringToAtom::iterator i;
 
-	if( (i = stringToAtom.find( n )) != stringToAtom.end() )
+	if ((i = stringToAtom.find(n)) != stringToAtom.end()) {
 		return (*i).second;
+	}
 
-	return (stringToAtom[n] = XInternAtom( d, n, False ));
+	return (stringToAtom[n] = XInternAtom(d, n, False));
 }

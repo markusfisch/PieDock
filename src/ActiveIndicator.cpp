@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "ActiveIndicator.h"
 #include "Png.h"
 
@@ -21,11 +8,10 @@ using namespace PieDock;
  *
  * @param f - PNG file to load
  */
-void ActiveIndicator::load( std::string f )
-{
+void ActiveIndicator::load(std::string f) {
 	clear();
-	ArgbSurface *s = Png::load( f );
-	sizeMap = new ArgbSurfaceSizeMap( s );
+	ArgbSurface *s = Png::load(f);
+	sizeMap = new ArgbSurfaceSizeMap(s);
 	delete s;
 }
 
@@ -34,14 +20,14 @@ void ActiveIndicator::load( std::string f )
  *
  * @param s - string describing position
  */
-void ActiveIndicator::parseX( std::string s )
-{
-	if( !s.compare( "left" ) )
+void ActiveIndicator::parseX(std::string s) {
+	if (!s.compare("left")) {
 		xAlign = Left;
-	else if( !s.compare( "center" ) )
+	} else if (!s.compare("center")) {
 		xAlign = Center;
-	else if( !s.compare( "right" ) )
+	} else if (!s.compare("right")) {
 		xAlign = Right;
+	}
 }
 
 /**
@@ -49,21 +35,20 @@ void ActiveIndicator::parseX( std::string s )
  *
  * @param s - string describing position
  */
-void ActiveIndicator::parseY( std::string s )
-{
-	if( !s.compare( "top" ) )
+void ActiveIndicator::parseY(std::string s) {
+	if (!s.compare("top")) {
 		yAlign = Top;
-	else if( !s.compare( "center" ) )
+	} else if (!s.compare("center")) {
 		yAlign = Center;
-	else if( !s.compare( "bottom" ) )
+	} else if (!s.compare("bottom")) {
 		yAlign = Bottom;
+	}
 }
 
 /**
  * Reset
  */
-void ActiveIndicator::reset()
-{
+void ActiveIndicator::reset() {
 	clear();
 	xAlign = Right;
 	yAlign = Bottom;
@@ -72,8 +57,7 @@ void ActiveIndicator::reset()
 /**
  * Clean up
  */
-void ActiveIndicator::clear()
-{
+void ActiveIndicator::clear() {
 	delete sizeMap;
 	sizeMap = 0;
 }

@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "IconMap.h"
 #include "WildcardCompare.h"
 #include "Png.h"
@@ -622,21 +609,20 @@ const char IconMap::fallbackPng[] = {
 	(char) 0xd8, (char) 0x67, (char) 0x57, (char) 0x61, (char) 0x1e, (char) 0xf3, (char) 0x98, (char) 0xc7, (char) 0x3c, (char) 0xe6, (char) 0x31, (char) 0x8f,
 	(char) 0x79, (char) 0xcc, (char) 0x63, (char) 0x1e, (char) 0xf3, (char) 0x98, (char) 0xc7, (char) 0x3c, (char) 0x9f, (char) 0xc4, (char) 0xf9, (char) 0x3f,
 	(char) 0x26, (char) 0xb5, (char) 0xd1, (char) 0xf8, (char) 0x17, (char) 0x18, (char) 0xd5, (char) 0x2a, (char) 0x0, (char) 0x0, (char) 0x0, (char) 0x0,
-	(char) 0x49, (char) 0x45, (char) 0x4e, (char) 0x44, (char) 0xae, (char) 0x42, (char) 0x60, (char) 0x82 };
+	(char) 0x49, (char) 0x45, (char) 0x4e, (char) 0x44, (char) 0xae, (char) 0x42, (char) 0x60, (char) 0x82
+};
 
 /**
  * Free resources
  */
-IconMap::~IconMap()
-{
+IconMap::~IconMap() {
 	freeIcons();
 }
 
 /**
  * Reset icon map
  */
-void IconMap::reset()
-{
+void IconMap::reset() {
 	paths.clear();
 	nameToFile.clear();
 	classToFile.clear();
@@ -650,8 +636,7 @@ void IconMap::reset()
  * @param a - alias name
  * @param n - icon name
  */
-void IconMap::addNameAlias( std::string a, std::string n )
-{
+void IconMap::addNameAlias(std::string a, std::string n) {
 	nameToFile[a] = n;
 }
 
@@ -661,8 +646,7 @@ void IconMap::addNameAlias( std::string a, std::string n )
  * @param a - class alias
  * @param n - icon name
  */
-void IconMap::addClassAlias( std::string a, std::string n )
-{
+void IconMap::addClassAlias(std::string a, std::string n) {
 	classToFile[a] = n;
 }
 
@@ -672,8 +656,7 @@ void IconMap::addClassAlias( std::string a, std::string n )
  * @param a - title alias
  * @param n - icon name
  */
-void IconMap::addTitleAlias( std::string a, std::string n )
-{
+void IconMap::addTitleAlias(std::string a, std::string n) {
 	titleToFile[a] = n;
 }
 
@@ -684,14 +667,14 @@ void IconMap::addTitleAlias( std::string a, std::string n )
  * @param c - resource class
  * @param n - resource name
  */
-Icon *IconMap::getIcon( std::string t, std::string c, std::string n )
-{
+Icon *IconMap::getIcon(std::string t, std::string c, std::string n) {
 	Icon *icon;
 
-	if( !(icon = getIconByTitle( t )) &&
-		!(icon = getIconByClass( c )) &&
-		!(icon = getIconByName( n )) )
+	if (!(icon = getIconByTitle(t)) &&
+			!(icon = getIconByClass(c)) &&
+			!(icon = getIconByName(n))) {
 		return 0;
+	}
 
 	return icon;
 }
@@ -701,22 +684,23 @@ Icon *IconMap::getIcon( std::string t, std::string c, std::string n )
  *
  * @param n - resource name of window
  */
-Icon *IconMap::getIconByName( std::string n )
-{
+Icon *IconMap::getIconByName(std::string n) {
 	// try to resolve alias
 	{
 		AliasToFile::iterator i;
 
-		if( (i = nameToFile.find( n )) != nameToFile.end() )
+		if ((i = nameToFile.find(n)) != nameToFile.end()) {
 			n = (*i).second;
+		}
 	}
 
 	// cache look up
 	{
 		FileToIcon::iterator i;
 
-		if( (i = cache.find( n )) != cache.end() )
+		if ((i = cache.find(n)) != cache.end()) {
 			return (*i).second;
+		}
 	}
 
 	// load PNG file from disk
@@ -726,19 +710,17 @@ Icon *IconMap::getIconByName( std::string n )
 			file.begin(),
 			file.end(),
 			file.begin(),
-			::tolower );
+			::tolower);
 
-		for( Paths::const_iterator i = paths.begin();
-			i != paths.end();
-			++i )
-		{
+		for (Paths::const_iterator i = paths.begin();
+				i != paths.end();
+				++i) {
 			std::string path = *i+file;
 			struct stat buf;
 
-			if( stat( path.c_str(), &buf ) > -1 )
-			{
-				ArgbSurface *s = Png::load( path );
-				Icon *icon = createIcon( s, n, Icon::File );
+			if (stat(path.c_str(), &buf) > -1) {
+				ArgbSurface *s = Png::load(path);
+				Icon *icon = createIcon(s, n, Icon::File);
 				delete s;
 				return icon;
 			}
@@ -749,7 +731,7 @@ Icon *IconMap::getIconByName( std::string n )
 	// ask GNOME for icon
 	{
 		GtkIconTheme *theme = gtk_icon_theme_get_for_screen(
-			gdk_screen_get_default() );
+			gdk_screen_get_default());
 		GdkPixbuf *pixbuf = 0;
 
 		// theme look up
@@ -758,53 +740,50 @@ Icon *IconMap::getIconByName( std::string n )
 				theme,
 				n.c_str(),
 				128,
-				GTK_ICON_LOOKUP_USE_BUILTIN );
+				GTK_ICON_LOOKUP_USE_BUILTIN);
 
-			if( iconInfo )
-			{
+			if (iconInfo) {
 				pixbuf = gdk_pixbuf_new_from_file_at_size(
-					gtk_icon_info_get_filename( iconInfo ),
+					gtk_icon_info_get_filename(iconInfo),
 					128,
 					-1,
-					0 );
+					0);
 
-				gtk_icon_info_free( iconInfo );
+				gtk_icon_info_free(iconInfo);
 			}
 		}
 
 		// otherwise try to load the icon blindly
-		if( !pixbuf )
+		if (!pixbuf)
 			pixbuf = gtk_icon_theme_load_icon(
 				theme,
 				n.c_str(),
 				128,
 				GTK_ICON_LOOKUP_FORCE_SVG,
-				0 );
+				0);
 
-		if( pixbuf &&
-			gdk_pixbuf_get_colorspace( pixbuf ) == GDK_COLORSPACE_RGB &&
-			gdk_pixbuf_get_bits_per_sample( pixbuf ) == 8 &&
-			gdk_pixbuf_get_n_channels( pixbuf ) == 4 &&
-			gdk_pixbuf_get_has_alpha( pixbuf ) )
-		{
+		if (pixbuf &&
+				gdk_pixbuf_get_colorspace(pixbuf) == GDK_COLORSPACE_RGB &&
+				gdk_pixbuf_get_bits_per_sample(pixbuf) == 8 &&
+				gdk_pixbuf_get_n_channels(pixbuf) == 4 &&
+				gdk_pixbuf_get_has_alpha(pixbuf)) {
 			unsigned char *src = reinterpret_cast<unsigned char *>(
-				gdk_pixbuf_get_pixels( pixbuf ) );
-			int w = gdk_pixbuf_get_width( pixbuf );
-			int h = gdk_pixbuf_get_height( pixbuf );
-			int p = gdk_pixbuf_get_rowstride( pixbuf )-(w<<2);
-			ArgbSurface s( w, h );
+				gdk_pixbuf_get_pixels(pixbuf));
+			int w = gdk_pixbuf_get_width(pixbuf);
+			int h = gdk_pixbuf_get_height(pixbuf);
+			int p = gdk_pixbuf_get_rowstride(pixbuf) - (w << 2);
+			ArgbSurface s(w, h);
 			unsigned char *dest = reinterpret_cast<unsigned char *>(
-				s.getData() );
+				s.getData());
 			int dp = s.getPadding();
 
 			// only 4-byte alignments are sane for 32 bits per pixel
-			if( p%4 ||
-				dp%4 )
+			if (p % 4 || dp % 4) {
 				return 0;
+			}
 
-			for( int y = s.getHeight(); y--; src += p, dest += dp )
-				for( int x = s.getWidth(); x--; src += 4, dest += 4 )
-				{
+			for (int y = s.getHeight(); y--; src += p, dest += dp)
+				for (int x = s.getWidth(); x--; src += 4, dest += 4) {
 					// swap Red with Blue; GdkPixbuf has BGR order
 					dest[0] = src[2];
 					dest[1] = src[1];
@@ -812,7 +791,7 @@ Icon *IconMap::getIconByName( std::string n )
 					dest[3] = src[3];
 				}
 
-			return createIcon( &s, n, Icon::File );
+			return createIcon(&s, n, Icon::File);
 		}
 	}
 #endif
@@ -822,8 +801,7 @@ Icon *IconMap::getIconByName( std::string n )
 	{
 		KIconLoader *loader;
 
-		if( loader = KIconLoader::global() )
-		{
+		if (loader = KIconLoader::global()) {
 			QPixmap pixmap = loader->loadIcon(
 				n.c_str(),
 				KIconLoader::Desktop,
@@ -831,42 +809,40 @@ Icon *IconMap::getIconByName( std::string n )
 				KIconLoader::DefaultState,
 				QStringList(),
 				0L,
-				true );
+				true);
 
-			if( !pixmap.isNull() )
-			{
+			if (!pixmap.isNull()) {
 				QImage image = pixmap.toImage();
 
-				if( image.format() == QImage::Format_ARGB32_Premultiplied )
-				{
-					ArgbSurface s( image.width(), image.height() );
+				if (image.format() == QImage::Format_ARGB32_Premultiplied) {
+					ArgbSurface s(image.width(), image.height());
 					unsigned char *dest = reinterpret_cast<unsigned char *>(
-						s.getData() );
+						s.getData());
 					unsigned char *src = reinterpret_cast<unsigned char *>(
-						image.bits() );
-					int p = image.bytesPerLine()-(image.width()<<2);
+						image.bits());
+					int p = image.bytesPerLine()-(image.width() << 2);
 					int dp = s.getPadding();
 
-					if( s.getBytesPerLine() == image.bytesPerLine() )
-						memcpy( dest, src, s.getSize() );
-					else
-					{
-						// only 4-byte alignments are sane for 32 bits per pixel
-						if( p%4 ||
-							dp%4 )
+					if (s.getBytesPerLine() == image.bytesPerLine()) {
+						memcpy(dest, src, s.getSize());
+					} else {
+						// only 4-byte alignments are sane
+						// for 32 bits per pixel
+						if (p%4 || dp%4) {
 							return 0;
+						}
 
-						for( int y = s.getHeight();
-							y--;
-							src += p, dest += dp )
-							for( int x = s.getWidth();
-								x--;
-								src += 4, dest += 4 )
-								*reinterpret_cast<uint32_t *>( dest ) =
-									*reinterpret_cast<uint32_t *>( src );
+						for (int y = s.getHeight();
+								y--;
+								src += p, dest += dp)
+							for (int x = s.getWidth();
+									x--;
+									src += 4, dest += 4)
+								*reinterpret_cast<uint32_t *>(dest) =
+									*reinterpret_cast<uint32_t *>(src);
 					}
 
-					return createIcon( &s, n, Icon::File );
+					return createIcon(&s, n, Icon::File);
 				}
 			}
 		}
@@ -881,13 +857,13 @@ Icon *IconMap::getIconByName( std::string n )
  *
  * @param c - resource class of window
  */
-Icon *IconMap::getIconByClass( const std::string c )
-{
+Icon *IconMap::getIconByClass(const std::string c) {
 	// resolve alias to filename
 	AliasToFile::iterator i;
 
-	if( (i = classToFile.find( c )) != classToFile.end() )
-		return getIconByName( (*i).second );
+	if ((i = classToFile.find(c)) != classToFile.end()) {
+		return getIconByName((*i).second);
+	}
 
 	return 0;
 }
@@ -901,14 +877,14 @@ Icon *IconMap::getIconByClass( const std::string c )
  *
  * @param t - window title (may contain wildcards)
  */
-Icon *IconMap::getIconByTitle( const std::string t )
-{
+Icon *IconMap::getIconByTitle(const std::string t) {
 	// resolve alias to filename
-	for( AliasToFile::iterator i = titleToFile.begin();
-		i != titleToFile.end();
-		++i )
-		if( WildcardCompare::match( t.c_str(), (*i).first.c_str() ) )
-			return getIconByName( (*i).second );
+	for (AliasToFile::iterator i = titleToFile.begin();
+			i != titleToFile.end();
+			++i)
+		if (WildcardCompare::match(t.c_str(), (*i).first.c_str())) {
+			return getIconByName((*i).second);
+		}
 
 	return 0;
 }
@@ -918,60 +894,54 @@ Icon *IconMap::getIconByTitle( const std::string t )
  *
  * @param n - resource name of window for which there is no icon
  */
-Icon *IconMap::getMissingIcon( const std::string n )
-{
-	if( !missingSurface )
-	{
+Icon *IconMap::getMissingIcon(const std::string n) {
+	if (!missingSurface) {
 		struct stat buf;
 
-		if( !fileForMissing.empty() &&
-			stat( fileForMissing.c_str(), &buf ) > -1 )
-		{
-			if( !(missingSurface = Png::load( fileForMissing )) )
+		if (!fileForMissing.empty() &&
+				stat(fileForMissing.c_str(), &buf) > -1) {
+			if (!(missingSurface = Png::load(fileForMissing))) {
 				return 0;
-		}
-		else
-		{
-			std::string d( fallbackPng, sizeof( fallbackPng ) );
-			std::istringstream iss( d, std::ios::binary );
+			}
+		} else {
+			std::string d(fallbackPng, sizeof(fallbackPng));
+			std::istringstream iss(d, std::ios::binary);
 
-			if( !(missingSurface = Png::load( iss )) )
+			if (!(missingSurface = Png::load(iss))) {
 				return 0;
+			}
 		}
 	}
 
-	return createIcon( missingSurface, n, Icon::Missing );
+	return createIcon(missingSurface, n, Icon::Missing);
 }
 
 /**
  * Create and return a new filler icon
  */
-Icon *IconMap::getFillerIcon()
-{
-	if( !fillerSurface )
-	{
+Icon *IconMap::getFillerIcon() {
+	if (!fillerSurface) {
 		struct stat buf;
 
-		if( !fileForFiller.empty() &&
-			stat( fileForFiller.c_str(), &buf ) > -1 )
-		{
-			if( !(fillerSurface = Png::load( fileForFiller )) )
+		if (!fileForFiller.empty() &&
+				stat(fileForFiller.c_str(), &buf) > -1) {
+			if (!(fillerSurface = Png::load(fileForFiller))) {
 				return 0;
-		}
-		else
-		{
-			if( !(fillerSurface = new ArgbSurface( 1, 1 )) )
+			}
+		} else {
+			if (!(fillerSurface = new ArgbSurface(1, 1))) {
 				return 0;
+			}
 
 			// clear surface
 			memset(
 				fillerSurface->getData(),
 				0,
-				fillerSurface->getSize() );
+				fillerSurface->getSize());
 		}
 	}
 
-	return createIcon( fillerSurface, "", Icon::Filler );
+	return createIcon(fillerSurface, "", Icon::Filler);
 }
 
 /**
@@ -984,9 +954,8 @@ Icon *IconMap::getFillerIcon()
 Icon *IconMap::createIcon(
 	const ArgbSurface *s,
 	const std::string n,
-	const Icon::Type t )
-{
-	Icon *icon = new Icon( s, t );
+	const Icon::Type t) {
+	Icon *icon = new Icon(s, t);
 	cache[n] = icon;
 
 	return icon;
@@ -998,28 +967,26 @@ Icon *IconMap::createIcon(
  * @param s - ARGB surface for icon
  * @param n - resource name of window
  */
-void IconMap::saveIcon( const ArgbSurface *s, const std::string n ) const
-{
+void IconMap::saveIcon(const ArgbSurface *s, const std::string n) const {
 	std::string file = n+".png";
 	std::transform(
 		file.begin(),
 		file.end(),
 		file.begin(),
-		::tolower );
+		::tolower);
 
-	for( Paths::const_iterator i = paths.begin();
-		i != paths.end();
-		++i )
-	{
+	for (Paths::const_iterator i = paths.begin();
+			i != paths.end();
+			++i) {
 		std::string path = *i+file;
 		struct stat buf;
 
-		if( stat( path.c_str(), &buf ) == -1 )
-		{
-			std::ofstream out( path.c_str(), std::ios::out );
+		if (stat(path.c_str(), &buf) == -1) {
+			std::ofstream out(path.c_str(), std::ios::out);
 
-			if( out.good() )
-				Png::save( out, s );
+			if (out.good()) {
+				Png::save(out, s);
+			}
 		}
 
 		// try first directory only
@@ -1030,23 +997,21 @@ void IconMap::saveIcon( const ArgbSurface *s, const std::string n ) const
 /**
  * Free icons
  */
-void IconMap::freeIcons()
-{
-	for( FileToIcon::iterator i = cache.begin();
-		i != cache.end();
-		++i )
-		delete (*i).second;
+void IconMap::freeIcons() {
+	for (FileToIcon::iterator i = cache.begin();
+			i != cache.end();
+			++i) {
+		delete(*i).second;
+	}
 
 	cache.clear();
 
-	if( missingSurface )
-	{
+	if (missingSurface) {
 		delete missingSurface;
 		missingSurface = 0;
 	}
 
-	if( fillerSurface )
-	{
+	if (fillerSurface) {
 		delete fillerSurface;
 		fillerSurface = 0;
 	}

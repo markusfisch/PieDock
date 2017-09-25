@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #ifndef _PieDock_PieMenu_
 #define _PieDock_PieMenu_
 
@@ -23,86 +10,87 @@
 #include <vector>
 #include <math.h>
 
-namespace PieDock
-{
+namespace PieDock {
+class PieMenu : public Menu {
+public:
+	PieMenu(Application *, Surface &);
+	virtual ~PieMenu() {}
+	inline const bool cursorInCenter() const {
+		return (getSelected() == 0);
+	}
+	inline const int &getRadius() const {
+		return maxRadius;
+	}
+	inline Blender *getBlender() {
+		return &blender;
+	}
+	inline void invalidate() {
+		lastX = lastY = -1;
+	}
+	virtual bool update(std::string = "", Window = 0);
+	virtual bool isObsolete(int, int);
+	virtual void draw(int, int);
+	virtual void turn(double);
+	virtual void turn(int);
+	virtual void setTwistForSelection();
+
+protected:
 	/**
-	 * Realize a pie menu
+	 * Return the difference of two angles in radians; implemented
+	 * here to ensure the method will be compiled inline
 	 *
-	 * @author Markus Fisch <mf@markusfisch.de>
+	 * @param a - angle in radians
+	 * @param b - angle in radians
 	 */
-	class PieMenu : public Menu
-	{
-		public:
-			PieMenu( Application *, Surface & );
-			virtual ~PieMenu() {}
-			inline const bool cursorInCenter() const {
-				return (getSelected() == 0); }
-			inline const int &getRadius() const { return maxRadius; }
-			inline Blender *getBlender() { return &blender; }
-			inline void invalidate() { lastX = lastY = -1; }
-			virtual bool update( std::string = "", Window = 0 );
-			virtual bool isObsolete( int, int );
-			virtual void draw( int, int );
-			virtual void turn( double );
-			virtual void turn( int );
-			virtual void setTwistForSelection();
+	inline virtual double getAngleDifference(double a, double b) {
+		double c = a - b;
+		double d;
 
-		protected:
-			/**
-			 * Return the difference of two angles in radians; implemented
-			 * here to ensure the method will be compiled inline
-			 *
-			 * @param a - angle in radians
-			 * @param b - angle in radians
-			 */
-			inline virtual double getAngleDifference( double a, double b )
-			{
-				double c = a-b;
-				double d;
+		if (a > b) {
+			d = a - (b + tau);
+		} else {
+			d = a - (b - tau);
+		}
 
-				if( a > b )
-					d = a-(b+radiansPerCircle);
-				else
-					d = a-(b-radiansPerCircle);
+		if (fabs(c) < fabs(d)) {
+			return c;
+		}
 
-				if( fabs( c ) < fabs( d ) )
-					return c;
+		return d;
+	}
 
-				return d;
-			}
+	/**
+	 * Recalculate angle to be within a valid range; implemented
+	 * here to ensure the method will be compiled inline
+	 *
+	 * @param a - angle in radians
+	 */
+	inline virtual double getValidAngle(double a) {
+		if (a < -M_PI) {
+			a += tau;
+		} else if (a > M_PI) {
+			a -= tau;
+		}
 
-			/**
-			 * Recalculate angle to be within a valid range; implemented
-			 * here to ensure the method will be compiled inline
-			 *
-			 * @param a - angle in radians
-			 */
-			inline virtual double getValidAngle( double a )
-			{
-				if( a < -M_PI )
-					a += radiansPerCircle;
-				else if( a > M_PI )
-					a -= radiansPerCircle;
+		return a;
+	}
 
-				return a;
-			}
+private:
+	static const double tau;
+	static const double turnSteps[];
 
-		private:
-			static const double radiansPerCircle;
-			static const double turnSteps[];
-
-			Blender blender;
-			int size;
-			int maxRadius;
-			int radius;
-			double twist;
-			int centerX;
-			int centerY;
-			int lastX;
-			int lastY;
-			double *turnStack;
-			double *turnBy;
-	};
+	Blender blender;
+	int size;
+	int maxRadius;
+	int radius;
+	double twist;
+	int centerX;
+	int centerY;
+	int lastX;
+	int lastY;
+	double *turnStack;
+	double *turnBy;
+};
 }
 
 #endif

@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2010 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #ifndef _PieDock_Menu_
 #define _PieDock_Menu_
 
@@ -21,48 +8,49 @@
 
 #include <string>
 
-namespace PieDock
-{
-	/**
-	 * Abstract menu
-	 *
-	 * @author Markus Fisch <mf@markusfisch.de>
-	 */
-	class Menu
-	{
-		public:
-			Menu( Application * );
-			virtual ~Menu() {}
-			inline void setWindowBelowCursor( Window w ) {
-				windowBelowCursor = w; }
-			inline const Window &getWindowBelowCursor() const {
-				return windowBelowCursor; }
-			inline MenuItem *getSelected() const {
-				return selected; }
-			inline const std::string &getName() const {
-				return name; }
-			virtual bool update( std::string, Window = 0 );
-			virtual void draw( int, int ) {}
-			virtual bool change( Settings::Action = Settings::Launch );
-			virtual void execute( Settings::Action = Settings::Launch );
-			virtual std::string getItemTitle() const;
+namespace PieDock {
+class Menu {
+public:
+	Menu(Application *);
+	virtual ~Menu() {}
+	inline void setWindowBelowCursor(Window w) {
+		windowBelowCursor = w;
+	}
+	inline const Window &getWindowBelowCursor() const {
+		return windowBelowCursor;
+	}
+	inline MenuItem *getSelected() const {
+		return selected;
+	}
+	inline const std::string &getName() const {
+		return name;
+	}
+	virtual bool update(std::string, Window = 0);
+	virtual void draw(int, int) {}
+	virtual bool change(Settings::Action = Settings::Launch);
+	virtual void execute(Settings::Action = Settings::Launch);
+	virtual std::string getItemTitle() const;
 
-		protected:
-			inline Application *getApp() const { return app; }
-			inline void setSelected( MenuItem *s ) {
-				selected = s; }
-			inline MenuItems *getMenuItems() const {
-				return menuItems; }
-			virtual int run( std::string ) const;
+protected:
+	inline Application *getApp() const {
+		return app;
+	}
+	inline void setSelected(MenuItem *s) {
+		selected = s;
+	}
+	inline MenuItems *getMenuItems() const {
+		return menuItems;
+	}
+	virtual int run(std::string) const;
 
-		private:
-			Application *app;
-			MenuItem *selected;
-			MenuItems *menuItems;
-			MenuItems openWindows;
-			Window windowBelowCursor;
-			std::string name;
-	};
+private:
+	Application *app;
+	MenuItem *selected;
+	MenuItems *menuItems;
+	MenuItems openWindows;
+	Window windowBelowCursor;
+	std::string name;
+};
 }
 
 #endif

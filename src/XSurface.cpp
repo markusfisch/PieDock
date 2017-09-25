@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "XSurface.h"
 
 #include <string.h>
@@ -30,21 +17,19 @@ using namespace PieDock;
  * @param v - visual structure for XImage (optional)
  * @param depth - desired depth of XImage (optional)
  */
-XSurface::XSurface( int w, int h, Display *d, Visual *v, int depth ) :
-	display( d ),
-	visual( v ),
-	orginalDepth( depth ),
-	resource( 0 )
-{
-	calculateSize( w, h, determineBitsPerPixel( depth ) );
+XSurface::XSurface(int w, int h, Display *d, Visual *v, int depth) :
+		display(d),
+		visual(v),
+		orginalDepth(depth),
+		resource(0) {
+	calculateSize(w, h, determineBitsPerPixel(depth));
 	allocateData();
 }
 
 /**
  * Clean up
  */
-XSurface::~XSurface()
-{
+XSurface::~XSurface() {
 	freeData();
 }
 
@@ -55,26 +40,24 @@ XSurface::~XSurface()
  *
  * @param depth - color depth
  */
-int XSurface::determineBitsPerPixel( int depth )
-{
+int XSurface::determineBitsPerPixel(int depth) {
 	XPixmapFormatValues *pf;
 	int formats;
 	int bitsPerPixel = depth;
 
-	pf = XListPixmapFormats( display, &formats );
+	pf = XListPixmapFormats(display, &formats);
 
-	if( formats )
-	{
+	if (formats) {
 		int format;
 
-		for( format = formats; format--; )
-			if( pf[format].depth == bitsPerPixel )
-			{
+		for (format = formats; format--;) {
+			if (pf[format].depth == bitsPerPixel) {
 				bitsPerPixel = pf[format].bits_per_pixel;
 				break;
 			}
+		}
 
-		XFree( reinterpret_cast<char *>( pf ) );
+		XFree(reinterpret_cast<char *>(pf));
 	}
 
 	return bitsPerPixel;
@@ -83,36 +66,36 @@ int XSurface::determineBitsPerPixel( int depth )
 /**
  * Allocate data
  */
-void XSurface::allocateData()
-{
-	setData( reinterpret_cast<unsigned char *>( calloc(
-		getSize(),
-		sizeof( char ) ) ) );
+void XSurface::allocateData() {
+	setData(reinterpret_cast<unsigned char *>(calloc(
+				getSize(),
+				sizeof(char))));
 
-	if( !getData() )
-		throw std::runtime_error( "cannot allocate memory" );
+	if (!getData()) {
+		throw std::runtime_error("cannot allocate memory");
+	}
 
-	if( !(resource = XCreateImage(
+	if (!(resource = XCreateImage(
 			display,
 			visual,
 			orginalDepth,
 			ZPixmap,
 			0,
-			reinterpret_cast<char *>( getData() ),
+			reinterpret_cast<char *>(getData()),
 			getWidth(),
 			getHeight(),
 			32,
-			0 )) )
-		throw std::runtime_error( "cannot create XImage" );
+			0))) {
+		throw std::runtime_error("cannot create XImage");
+	}
 }
 
 /**
  * Free data
  */
-void XSurface::freeData()
-{
-	XDestroyImage( resource );
+void XSurface::freeData() {
+	XDestroyImage(resource);
 	resource = 0;
 	// data is freed by XDestroyImage
-	setData( 0 );
+	setData(0);
 }

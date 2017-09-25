@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "TransparentWindow.h"
 
 #include <stdlib.h>
@@ -26,17 +13,17 @@ using namespace PieDock;
  *
  * @param a - Application object
  */
-TransparentWindow::TransparentWindow( Application &a ) :
-	app( &a ),
-	width( app->getSettings()->getWidth() ),
-	height( app->getSettings()->getHeight() ),
-	canvas( 0 ),
-	buffer( 0 )
+TransparentWindow::TransparentWindow(Application &a) :
+		app(&a),
+		width(app->getSettings()->getWidth()),
+		height(app->getSettings()->getHeight()),
+		canvas(0),
+		buffer(0)
 #ifdef HAVE_XRENDER
-	,
-	alphaPixmap( None ),
-	windowPicture( None ),
-	alphaPicture( None )
+		,
+		alphaPixmap(None),
+		windowPicture(None),
+		alphaPicture(None)
 #endif
 {
 	Visual *visual = CopyFromParent;
@@ -44,7 +31,7 @@ TransparentWindow::TransparentWindow( Application &a ) :
 	unsigned long vmask = 0;
 	XSetWindowAttributes xswat;
 
-	memset( &xswat, 0, sizeof( xswat ) );
+	memset(&xswat, 0, sizeof(xswat));
 
 	xswat.override_redirect = True;
 	xswat.do_not_propagate_mask =
@@ -53,28 +40,27 @@ TransparentWindow::TransparentWindow( Application &a ) :
 	vmask = CWOverrideRedirect | CWDontPropagate;
 
 #ifdef HAVE_XRENDER
-	if( app->getSettings()->useCompositing() )
-	{
+	if (app->getSettings()->useCompositing()) {
 		// check if extensions for compositing are available
 		{
 			int majorOpcode;
 			int firstEvent;
 			int firstError;
 
-			if( !XQueryExtension(
-					app->getDisplay(),
-					"RENDER",
-					&majorOpcode,
-					&firstEvent,
-					&firstError) ||
-				!XQueryExtension(
-					app->getDisplay(),
-					"Composite",
-					&majorOpcode,
-					&firstEvent,
-					&firstError ) )
+			if (!XQueryExtension(
+						app->getDisplay(),
+						"RENDER",
+						&majorOpcode,
+						&firstEvent,
+						&firstError) ||
+					!XQueryExtension(
+						app->getDisplay(),
+						"Composite",
+						&majorOpcode,
+						&firstEvent,
+						&firstError))
 				throw std::runtime_error(
-					"RENDER and/or Composite extension unavailable" );
+					"RENDER and/or Composite extension unavailable");
 		}
 
 		// find visual
@@ -84,14 +70,15 @@ TransparentWindow::TransparentWindow( Application &a ) :
 			// color depth must be ARGB for compositing
 			depth = 32;
 
-			if( !XMatchVisualInfo(
+			if (!XMatchVisualInfo(
 					app->getDisplay(),
-					DefaultScreen( app->getDisplay() ),
+					DefaultScreen(app->getDisplay()),
 					depth,
 					TrueColor,
-					&vi ) )
+					&vi)) {
 				throw std::runtime_error(
-					"cannot find a visual supporting alpha transparency" );
+					"cannot find a visual supporting alpha transparency");
+			}
 
 			visual = vi.visual;
 
@@ -99,18 +86,17 @@ TransparentWindow::TransparentWindow( Application &a ) :
 			xswat.border_pixel = 0x00000000;
 			xswat.colormap = XCreateColormap(
 				app->getDisplay(),
-				DefaultRootWindow( app->getDisplay() ),
+				DefaultRootWindow(app->getDisplay()),
 				visual,
-				AllocNone );
+				AllocNone);
 
 			vmask |= CWBackPixel | CWBorderPixel | CWColormap;
 		}
 	}
 #endif
 
-	if( !(window = XCreateWindow(
-			app->getDisplay(),
-			DefaultRootWindow( app->getDisplay() ),
+	if (!(window = XCreateWindow(app->getDisplay(),
+			DefaultRootWindow(app->getDisplay()),
 			0,
 			0,
 			width,
@@ -120,61 +106,62 @@ TransparentWindow::TransparentWindow( Application &a ) :
 			CopyFromParent,
 			visual,
 			vmask,
-			&xswat )) )
-		throw std::runtime_error( "cannot create window" );
+			&xswat))) {
+		throw std::runtime_error("cannot create window");
+	}
 
 #ifdef HAVE_XRENDER
-	if( app->getSettings()->useCompositing() )
-	{
-		if( !(alphaPixmap = XCreatePixmap(
-				app->getDisplay(),
-				window,
-				width,
-				height,
-				32 )) ||
-			!(windowPicture = XRenderCreatePicture(
-				app->getDisplay(),
-				window,
-				XRenderFindStandardFormat(
+	if (app->getSettings()->useCompositing()) {
+		if (!(alphaPixmap = XCreatePixmap(
 					app->getDisplay(),
-					PictStandardARGB32 ),
-				0,
-				0 )) ||
-			!(alphaPicture = XRenderCreatePicture(
-				app->getDisplay(),
-				alphaPixmap,
-				XRenderFindStandardFormat(
-					app->getDisplay(),
-					PictStandardARGB32 ),
-				0,
-				0 )) )
-			throw std::runtime_error( "cannot create transparency pixmap" );
-	}
-	else
+					window,
+					width,
+					height,
+					32)) ||
+				!(windowPicture = XRenderCreatePicture(
+						app->getDisplay(),
+						window,
+						XRenderFindStandardFormat(
+								app->getDisplay(),
+								PictStandardARGB32),
+						0,
+						0)) ||
+				!(alphaPicture = XRenderCreatePicture(
+						app->getDisplay(),
+						alphaPixmap,
+						XRenderFindStandardFormat(
+								app->getDisplay(),
+								PictStandardARGB32),
+						0,
+						0))) {
+			throw std::runtime_error("cannot create transparency pixmap");
+		}
+	} else
 #endif
-	// fall back to default values
+		// fall back to default values
 	{
-		int screen = DefaultScreen( app->getDisplay() );
+		int screen = DefaultScreen(app->getDisplay());
 
-		visual = DefaultVisual( app->getDisplay(), screen );
-		depth = DefaultDepth( app->getDisplay(), screen );
+		visual = DefaultVisual(app->getDisplay(), screen);
+		depth = DefaultDepth(app->getDisplay(), screen);
 	}
 
-	if( !(canvas = new XSurface(
+	if (!(canvas = new XSurface(
 			width,
 			height,
 			app->getDisplay(),
 			visual,
-			depth )) ||
-		!(buffer = new unsigned char[canvas->getSize()]) )
-		throw std::runtime_error( "cannot create offscreen surface" );
+			depth)) || !(buffer = new unsigned char[canvas->getSize()])) {
+		throw std::runtime_error("cannot create offscreen surface");
+	}
 
-	if( !(gc = XCreateGC(
+	if (!(gc = XCreateGC(
 			app->getDisplay(),
 			window,
 			0,
-			0 )) )
-		throw std::runtime_error( "cannot create graphics context" );
+			0))) {
+		throw std::runtime_error("cannot create graphics context");
+	}
 
 	// you still need to select input
 }
@@ -182,37 +169,37 @@ TransparentWindow::TransparentWindow( Application &a ) :
 /**
  * Clean up
  */
-TransparentWindow::~TransparentWindow()
-{
+TransparentWindow::~TransparentWindow() {
 	// it's valid to delete 0
 	delete canvas;
 	delete buffer;
 
 #ifdef HAVE_XRENDER
-	if( alphaPixmap )
-		XFreePixmap( app->getDisplay(), alphaPixmap );
+	if (alphaPixmap) {
+		XFreePixmap(app->getDisplay(), alphaPixmap);
+	}
 
-	if( windowPicture )
-		XRenderFreePicture( app->getDisplay(), windowPicture );
+	if (windowPicture) {
+		XRenderFreePicture(app->getDisplay(), windowPicture);
+	}
 
-	if( alphaPicture )
-		XRenderFreePicture( app->getDisplay(), alphaPicture );
+	if (alphaPicture) {
+		XRenderFreePicture(app->getDisplay(), alphaPicture);
+	}
 #endif
 
-	XDestroyWindow( app->getDisplay(), window );
+	XDestroyWindow(app->getDisplay(), window);
 }
 
 /**
  * Show window; the caller must ensure that the window is completely
  * visible on the screen or XGetSubImage will fail !
  */
-void TransparentWindow::show()
-{
-	XMapRaised( app->getDisplay(), window );
+void TransparentWindow::show() {
+	XMapRaised(app->getDisplay(), window);
 
 #ifdef HAVE_XRENDER
-	if( app->getSettings()->useCompositing() )
-	{
+	if (app->getSettings()->useCompositing()) {
 		clear();
 		return;
 	}
@@ -229,34 +216,31 @@ void TransparentWindow::show()
 		ZPixmap,
 		canvas->getResource(),
 		0,
-		0 );
+		0);
 
 	memcpy(
 		buffer,
 		canvas->getData(),
-		canvas->getSize() );
+		canvas->getSize());
 }
 
 /**
  * Hide window
  */
-void TransparentWindow::hide() const
-{
-	XUnmapWindow( app->getDisplay(), window );
+void TransparentWindow::hide() const {
+	XUnmapWindow(app->getDisplay(), window);
 }
 
 /**
  * Clear window for drawing
  */
-void TransparentWindow::clear()
-{
+void TransparentWindow::clear() {
 #ifdef HAVE_XRENDER
-	if( app->getSettings()->useCompositing() )
-	{
+	if (app->getSettings()->useCompositing()) {
 		memset(
 			canvas->getData(),
 			0,
-			canvas->getSize() );
+			canvas->getSize());
 
 		return;
 	}
@@ -265,17 +249,15 @@ void TransparentWindow::clear()
 	memcpy(
 		canvas->getData(),
 		buffer,
-		canvas->getSize() );
+		canvas->getSize());
 }
 
 /**
  * Update window
  */
-void TransparentWindow::update() const
-{
+void TransparentWindow::update() const {
 #ifdef HAVE_XRENDER
-	if( app->getSettings()->useCompositing() )
-	{
+	if (app->getSettings()->useCompositing()) {
 		XPutImage(
 			app->getDisplay(),
 			window,
@@ -286,7 +268,7 @@ void TransparentWindow::update() const
 			0,
 			0,
 			width,
-			height );
+			height);
 
 		XPutImage(
 			app->getDisplay(),
@@ -298,7 +280,7 @@ void TransparentWindow::update() const
 			0,
 			0,
 			width,
-			height );
+			height);
 
 		composite();
 
@@ -316,5 +298,5 @@ void TransparentWindow::update() const
 		0,
 		0,
 		width,
-		height );
+		height);
 }

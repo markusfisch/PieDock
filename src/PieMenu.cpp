@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2007-2012 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "PieMenu.h"
 
 #include <math.h>
@@ -19,7 +6,7 @@
 
 using namespace PieDock;
 
-const double PieMenu::radiansPerCircle = M_PI+M_PI;
+const double PieMenu::tau = M_PI+M_PI;
 const double PieMenu::turnSteps[] = {
 	.1,
 	.3,
@@ -31,7 +18,8 @@ const double PieMenu::turnSteps[] = {
 	.5,
 	.3,
 	.1,
-	.0 };
+	.0
+};
 
 /**
  * Initialize menu
@@ -39,24 +27,25 @@ const double PieMenu::turnSteps[] = {
  * @param a - application
  * @param s - surface to draw menu into
  */
-PieMenu::PieMenu( Application *a, Surface &s ) :
-	Menu( a ),
-	blender( s ),
-	size( (s.getWidth() < s.getHeight() ? s.getWidth() : s.getHeight()) ),
-	maxRadius( (size-static_cast<int>( .3*size ))>>1 ),
-	radius( size>>2 ),
-	twist( .0 ),
-	centerX( s.getWidth()>>1 ),
-	centerY( s.getHeight()>>1 ),
-	turnStack( 0 )
-{
+PieMenu::PieMenu(Application *a, Surface &s) :
+	Menu(a),
+	blender(s),
+	size((s.getWidth() < s.getHeight() ? s.getWidth() : s.getHeight())),
+	maxRadius((size-static_cast<int>(.3 * size)) >> 1),
+	radius(size >> 2),
+	twist(.0),
+	centerX(s.getWidth() >> 1),
+	centerY(s.getHeight() >> 1),
+	turnStack(0) {
 #ifdef HAVE_XRENDER
-	if( a->getSettings()->useCompositing() )
-		blender.setCompositing( true );
+	if (a->getSettings()->useCompositing()) {
+		blender.setCompositing(true);
+	}
 #endif
 
-	if( maxRadius < radius )
-		throw std::invalid_argument( "window too small" );
+	if (maxRadius < radius) {
+		throw std::invalid_argument("window too small");
+	}
 }
 
 /**
@@ -65,21 +54,19 @@ PieMenu::PieMenu( Application *a, Surface &s ) :
  * @param n - menu name (optional)
  * @param w - window id (optional)
  */
-bool PieMenu::update( std::string n, Window w )
-{
+bool PieMenu::update(std::string n, Window w) {
 	radius = static_cast<int>(
-		getApp()->getSettings()->getStartRadius()*maxRadius );
-	twist = -.05*static_cast<double>( (maxRadius-radius)>>1 );
+		getApp()->getSettings()->getStartRadius() * maxRadius);
+	twist = -.05 * static_cast<double>((maxRadius-radius) >> 1);
 
 	invalidate();
 
-	if( turnStack )
-	{
+	if (turnStack) {
 		delete turnStack;
 		turnStack = 0;
 	}
 
-	return Menu::update( n, w );
+	return Menu::update(n, w);
 }
 
 /**
@@ -88,17 +75,14 @@ bool PieMenu::update( std::string n, Window w )
  * @param x - x coordinate of cursor position within target surface
  * @param y - y coordinate of cursor position within target surface
  */
-bool PieMenu::isObsolete( int x, int y )
-{
+bool PieMenu::isObsolete(int x, int y) {
 	// menu is always obsolete while animating
-	if( radius < maxRadius ||
-		turnStack )
+	if (radius < maxRadius || turnStack) {
 		return true;
+	}
 
 	// redraw only if position changed
-	if( x != lastX ||
-		y != lastY )
-	{
+	if (x != lastX || y != lastY) {
 		lastX = x;
 		lastY = y;
 
@@ -114,13 +98,11 @@ bool PieMenu::isObsolete( int x, int y )
  * @param x - x coordinate of cursor position within target surface
  * @param y - y coordinate of cursor position within target surface
  */
-void PieMenu::draw( int x, int y )
-{
+void PieMenu::draw(int x, int y) {
 	int numberOfIcons = getMenuItems()->size();
 	int closestIcon = 0;
 	bool cursorNearCenter = false;
-	struct
-	{
+	struct {
 		int x;
 		int y;
 		double weight;
@@ -129,74 +111,78 @@ void PieMenu::draw( int x, int y )
 	} iconGeometries[numberOfIcons];
 
 	// reset selected icon
-	setSelected( 0 );
+	setSelected(0);
 
 	// don't do anything if there are no icons
-	if( !numberOfIcons )
+	if (!numberOfIcons) {
 		return;
+	}
 
 	// calculate positions and sizes
 	{
-		double circumference = M_PI*(radius<<1);
-		double pixelsPerRadian = radiansPerCircle/circumference;
+		double circumference = M_PI * (radius << 1);
+		double pixelsPerRadian = tau / circumference;
 		int centeredY = y-centerY;
 		int centeredX = x-centerX;
-		double cursorAngle = atan2( centeredY, centeredX );
-		double cellSize = radiansPerCircle/numberOfIcons;
+		double cursorAngle = atan2(centeredY, centeredX);
+		double cellSize = tau / numberOfIcons;
 		double closestAngle = 0;
 		double weight = 0;
-		double maxIconSize = .8*radius;
+		double maxIconSize = .8 * radius;
 		double maxWeight;
 
 		// calculate weight of each icon
 		{
 			double cursorRadius = sqrt(
-				(centeredY*centeredY)+(centeredX*centeredX) );
+				centeredY * centeredY +
+				centeredX * centeredX);
 			double infieldRadius = radius>>1;
 			double z = getApp()->getSettings()->getZoomModifier();
-			double f = cursorRadius/infieldRadius*z;
+			double f = cursorRadius/infieldRadius * z;
 
-			if( f > z )
+			if (f > z) {
 				f = z;
-
-			if( f < 1.0 )
-			{
-				double b = (circumference/numberOfIcons)*.75;
-
-				if( b < maxIconSize )
-					maxIconSize = b+(maxIconSize-b)*f;
 			}
 
-			if( cursorRadius < infieldRadius )
+			if (f < 1.0) {
+				double b = (circumference / numberOfIcons) * .75;
+
+				if (b < maxIconSize) {
+					maxIconSize = b + (maxIconSize - b) * f;
+				}
+			}
+
+			if (cursorRadius < infieldRadius) {
 				cursorNearCenter = true;
+			}
 
 			// determine how close every icon is to the cursor
 			{
-				double closestDistance = radiansPerCircle;
+				double closestDistance = tau;
 				double a = twist;
-				double m = (maxIconSize*pixelsPerRadian)/cellSize;
+				double m = (maxIconSize * pixelsPerRadian) / cellSize;
 
-				maxWeight = M_PI_2+pow( M_PI, m );
+				maxWeight = M_PI_2 + pow(M_PI, m);
 
-				for( int n = 0; n < numberOfIcons; ++n )
-				{
-					double d = fabs( getAngleDifference( a, cursorAngle ) );
+				for (int n = 0; n < numberOfIcons; ++n) {
+					double d = fabs(getAngleDifference(a, cursorAngle));
 
-					if( d < closestDistance )
-					{
+					if (d < closestDistance) {
 						closestDistance = d;
 						closestIcon = n;
 						closestAngle = a;
 					}
 
-					if( f < 1.0 )
+					if (f < 1.0) {
 						d *= f;
+					}
 
-					iconGeometries[n].weight = M_PI_2+pow( M_PI-d, m );
+					iconGeometries[n].weight = M_PI_2 + pow(M_PI - d, m);
 					weight += iconGeometries[n].weight;
 
-					if( (a += cellSize) > M_PI )
-						a -= radiansPerCircle;
+					if ((a += cellSize) > M_PI) {
+						a -= tau;
+					}
 				}
 			}
 		}
@@ -205,21 +191,21 @@ void PieMenu::draw( int x, int y )
 		{
 			double sizeUnit = circumference/weight;
 
-			for( int n = numberOfIcons; n--; )
+			for (int n = numberOfIcons; n--;)
 				iconGeometries[n].size =
 					iconGeometries[n].cellSize =
-						sizeUnit*iconGeometries[n].weight;
+						sizeUnit * iconGeometries[n].weight;
 
 			// scale icons within cell
 			{
-				double maxSize = sizeUnit*maxWeight;
+				double maxSize = sizeUnit * maxWeight;
 
-				if( maxSize > maxIconSize )
-				{
-					double f = maxIconSize/maxSize;
+				if (maxSize > maxIconSize) {
+					double f = maxIconSize / maxSize;
 
-					for( int n = numberOfIcons; n--; )
+					for (int n = numberOfIcons; n--;) {
 						iconGeometries[n].size *= f;
+					}
 				}
 			}
 		}
@@ -227,18 +213,17 @@ void PieMenu::draw( int x, int y )
 		// calculate icon positions
 		{
 			double difference = getAngleDifference(
-				cursorAngle, closestAngle );
+				cursorAngle, closestAngle);
 			double angle = getValidAngle(
-				cursorAngle-
-					(pixelsPerRadian*
-						iconGeometries[closestIcon].cellSize)/cellSize*
-					difference );
+				cursorAngle-(pixelsPerRadian *
+					iconGeometries[closestIcon].cellSize) / cellSize*
+					difference);
 
 			// active icon
 			iconGeometries[closestIcon].x =
-				centerX+static_cast<int>( radius*cos( angle ) );
+				centerX + static_cast<int>(radius * cos(angle));
 			iconGeometries[closestIcon].y =
-				centerY+static_cast<int>( radius*sin( angle ) );
+				centerY + static_cast<int>(radius * sin(angle));
 
 			// calculate positions of all other icons
 			{
@@ -249,45 +234,46 @@ void PieMenu::draw( int x, int y )
 				int previousRight = closestIcon;
 				int previousLeft = closestIcon;
 
-				for( int n = 0; ; ++n )
-				{
-					if( (--left) < 0 )
-						left = numberOfIcons-1;
+				for (int n = 0; ; ++n) {
+					if ((--left) < 0) {
+						left = numberOfIcons - 1;
+					}
 
 					// break here when number of icons is odd
-					if( right == left )
+					if (right == left) {
 						break;
+					}
 
-					if( (++right) >= numberOfIcons )
+					if ((++right) >= numberOfIcons) {
 						right = 0;
+					}
 
 					leftAngle = getValidAngle(
-						leftAngle-
-							(
-								(.5*iconGeometries[previousLeft].cellSize)+
-								(.5*iconGeometries[left].cellSize)
-							)*pixelsPerRadian );
+						leftAngle - (
+							(.5 * iconGeometries[previousLeft].cellSize) +
+							(.5 * iconGeometries[left].cellSize)
+						) * pixelsPerRadian);
 
 					iconGeometries[left].x =
-						centerX+static_cast<int>( radius*cos( leftAngle ) );
+						centerX + static_cast<int>(radius * cos(leftAngle));
 					iconGeometries[left].y =
-						centerY+static_cast<int>( radius*sin( leftAngle ) );
+						centerY + static_cast<int>(radius * sin(leftAngle));
 
 					// break here when number of icons is even
-					if( left == right )
+					if (left == right) {
 						break;
+					}
 
 					rightAngle = getValidAngle(
-						rightAngle+
-							(
-								(.5*iconGeometries[previousRight].cellSize)+
-								(.5*iconGeometries[right].cellSize)
-							)*pixelsPerRadian );
+						rightAngle + (
+							(.5 * iconGeometries[previousRight].cellSize) +
+							(.5 * iconGeometries[right].cellSize)
+						) * pixelsPerRadian);
 
 					iconGeometries[right].x =
-						centerX+static_cast<int>( radius*cos( rightAngle ) );
+						centerX + static_cast<int>(radius * cos(rightAngle));
 					iconGeometries[right].y =
-						centerY+static_cast<int>( radius*sin( rightAngle ) );
+						centerY + static_cast<int>(radius * sin(rightAngle));
 
 					previousRight = right;
 					previousLeft = left;
@@ -303,91 +289,84 @@ void PieMenu::draw( int x, int y )
 		ArgbSurfaceSizeMap *activeIndicatorSizeMap =
 			activeIndicator->getSizeMap();
 		const bool selectInCenter =
-			(getApp()->getSettings()->getCenterAction() ==
-				Settings::CenterNearestIcon ?
-				true :
-				false);
+			getApp()->getSettings()->getCenterAction() ==
+				Settings::CenterNearestIcon ? true : false;
 		int n = 0;
 
-		for( MenuItems::iterator i = getMenuItems()->begin();
-			i != getMenuItems()->end();
-			++i, ++n )
-		{
-			const int size = static_cast<int>( iconGeometries[n].size )>>1<<1;
+		for (MenuItems::iterator i = getMenuItems()->begin();
+				i != getMenuItems()->end();
+				++i, ++n) {
+			const int size =
+				static_cast<int>(iconGeometries[n].size) >> 1 << 1;
 			const ArgbSurface *surface =
-				(*i)->getIcon()->getSurface( size, size );
+				(*i)->getIcon()->getSurface(size, size);
 
-			if( !surface )
+			if (!surface) {
 				continue;
+			}
 
-			const int x = iconGeometries[n].x-(surface->getWidth()>>1);
-			const int y = iconGeometries[n].y-(surface->getHeight()>>1);
+			const int x = iconGeometries[n].x - (surface->getWidth() >> 1);
+			const int y = iconGeometries[n].y - (surface->getHeight() >> 1);
 			int opacity;
 
-			if( n == closestIcon &&
-				(!cursorNearCenter ||
-					selectInCenter) )
-			{
-				setSelected( *i );
+			if (n == closestIcon &&
+					(!cursorNearCenter || selectInCenter)) {
+				setSelected(*i);
 				opacity = getApp()->getSettings()->getFocusedAlpha();
-			}
-			else
+			} else {
 				opacity = getApp()->getSettings()->getUnfocusedAlpha();
+			}
 
 			blender.blend(
 				*surface,
 				x,
 				y,
-				opacity );
+				opacity);
 
-			if( (*i)->hasWindows() )
-			{
+			if ((*i)->hasWindows()) {
 				const int activeIndicatorSize = size/3;
-				const ArgbSurface *s =
-					(activeIndicatorSizeMap ?
-						activeIndicatorSizeMap :
-						(*i)->getIcon())->getSurface(
-							activeIndicatorSize,
-							activeIndicatorSize );
+				const ArgbSurface *s = (activeIndicatorSizeMap ?
+					activeIndicatorSizeMap :
+					(*i)->getIcon())->getSurface(
+						activeIndicatorSize,
+						activeIndicatorSize);
 
-				if( s )
+				if (s) {
 					blender.blend(
 						*s,
-						x+activeIndicator->getX(
+						x + activeIndicator->getX(
 							activeIndicatorSize,
-							surface->getWidth() ),
-						y+activeIndicator->getY(
+							surface->getWidth()),
+						y + activeIndicator->getY(
 							activeIndicatorSize,
-							surface->getHeight() ),
-						opacity );
+							surface->getHeight()),
+						opacity);
+				}
 			}
 		}
 	}
 
 	// zoom and rotate into appearance
-	if( radius < maxRadius )
-	{
-		if( (radius += 2) > maxRadius )
+	if (radius < maxRadius) {
+		if ((radius += 2) > maxRadius) {
 			radius = maxRadius;
+		}
 
-		if( (twist += .05) > radiansPerCircle )
-			twist -= radiansPerCircle;
-	}
-	else if( turnStack )
-	{
-		if( *turnBy == .0 )
-		{
+		if ((twist += .05) > tau) {
+			twist -= tau;
+		}
+	} else if (turnStack) {
+		if (*turnBy == .0) {
 			delete turnStack;
 			turnStack = 0;
-		}
-		else
-		{
+		} else {
 			twist += *(turnBy++);
 
-			if( twist > radiansPerCircle )
-				twist -= radiansPerCircle;
-			else if( twist < 0 )
-				twist += radiansPerCircle;
+			if (twist > tau) {
+				twist -= tau;
+			} else if (twist < 0) {
+				twist += tau;
+			}
 		}
 	}
 }
@@ -397,14 +376,14 @@ void PieMenu::draw( int x, int y )
  *
  * @param r - radians to turn
  */
-void PieMenu::turn( double r )
-{
+void PieMenu::turn(double r) {
 	twist += r;
 
-	if( twist > radiansPerCircle )
-		twist -= radiansPerCircle;
-	else if( twist < 0 )
-		twist += radiansPerCircle;
+	if (twist > tau) {
+		twist -= tau;
+	} else if (twist < 0) {
+		twist += tau;
+	}
 
 	invalidate();
 }
@@ -414,58 +393,58 @@ void PieMenu::turn( double r )
  *
  * @param c - cells to turn
  */
-void PieMenu::turn( int c )
-{
-	double f = radiansPerCircle/
-		static_cast<double>( getMenuItems()->size() )*
-		static_cast<double>( c );
+void PieMenu::turn(int c) {
+	double f = tau /
+		static_cast<double>(getMenuItems()->size()) *
+		static_cast<double>(c);
 
-	if( turnStack )
-	{
-		for( ; *turnBy != 0.0; ++turnBy )
+	if (turnStack) {
+		for (; *turnBy != 0.0; ++turnBy) {
 			f += *turnBy;
+		}
 
 		delete turnStack;
 	}
 
 	f /= 4.5; // turn steps
 
-	turnBy = turnStack = new double[sizeof( turnSteps )/sizeof( double )];
+	turnBy = turnStack = new double[sizeof(turnSteps) / sizeof(double)];
 
 	double *t = turnStack;
 	const double *s = turnSteps;
 
-	for( ; ; ++t, ++s )
-	{
+	for (; ; ++t, ++s) {
 		*t = f*(*s);
-		if( *s == 0.0 )
+		if (*s == 0.0) {
 			break;
+		}
 	}
 }
 
 /**
  * Set twist to have the last selected item selected again
  */
-void PieMenu::setTwistForSelection()
-{
-	if( !getSelected() )
+void PieMenu::setTwistForSelection() {
+	if (!getSelected()) {
 		return;
+	}
 
 	int n = 0;
-	double f = radiansPerCircle/
-		static_cast<double>( getMenuItems()->size() );
+	double f = tau /
+		static_cast<double>(getMenuItems()->size());
 
-	for( MenuItems::iterator i = getMenuItems()->begin();
-		i != getMenuItems()->end();
-		++i, ++n )
-		if( *i == getSelected() )
-		{
-			if( getMenuItems()->oneIconPerWindow() &&
-				++n >= getMenuItems()->size() )
+	for (MenuItems::iterator i = getMenuItems()->begin();
+			i != getMenuItems()->end();
+			++i, ++n)
+		if (*i == getSelected()) {
+			if (getMenuItems()->oneIconPerWindow() &&
+					++n >= getMenuItems()->size()) {
 				break;
+			}
 
-			if( n )
-				twist -= f*static_cast<double>( n );
+			if (n) {
+				twist -= f * static_cast<double>(n);
+			}
 
 			break;
 		}

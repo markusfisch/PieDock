@@ -1,16 +1,3 @@
-/*
- *   O         ,-
- *  ° o    . -´  '     ,-
- *   °  .´        ` . ´,´
- *     ( °   ))     . (
- *      `-;_    . -´ `.`.
- *          `._'       ´
- *
- * Copyright (c) 2012 Markus Fisch <mf@markusfisch.de>
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- */
 #include "WorkspaceLayout.h"
 #include "WindowManager.h"
 
@@ -29,13 +16,13 @@ WorkspaceLayout *WorkspaceLayout::singleton = 0;
  * @param l - preferred layout of workspaces (optional)
  */
 WorkspaceLayout *WorkspaceLayout::getWorkspaceLayout(
-	Display *d,
-	PreferredVirtualLayout l )
-{
-	if( singleton )
+		Display *d,
+		PreferredVirtualLayout l) {
+	if (singleton) {
 		return singleton;
+	}
 
-	return (singleton = new WorkspaceLayout( d, l ));
+	return (singleton = new WorkspaceLayout(d, l));
 }
 
 /**
@@ -45,13 +32,13 @@ WorkspaceLayout *WorkspaceLayout::getWorkspaceLayout(
  * @param p - workspace position
  */
 bool WorkspaceLayout::isOnAnotherWorkspace(
-	Window w,
-	WorkspacePosition &p )
-{
+		Window w,
+		WorkspacePosition &p) {
 	XWindowAttributes wa;
 
-	if( XGetWindowAttributes( display, w, &wa ) )
-		return isOnAnotherWorkspace( w, wa, p );
+	if (XGetWindowAttributes(display, w, &wa)) {
+		return isOnAnotherWorkspace(w, wa, p);
+	}
 
 	return false;
 }
@@ -64,10 +51,9 @@ bool WorkspaceLayout::isOnAnotherWorkspace(
  * @param p - workspace position
  */
 bool WorkspaceLayout::isOnAnotherWorkspace(
-	Window w,
-	XWindowAttributes &wa,
-	WorkspacePosition &p )
-{
+		Window w,
+		XWindowAttributes &wa,
+		WorkspacePosition &p) {
 	// get position of window relative to the current viewport
 	{
 		Window dummy;
@@ -80,57 +66,51 @@ bool WorkspaceLayout::isOnAnotherWorkspace(
 			-wa.border_width,
 			&p.x,
 			&p.y,
-			&dummy );
+			&dummy);
 	}
 
-	if( virtualDesktop )
-	{
+	if (virtualDesktop) {
 		unsigned long vx;
 		unsigned long vy;
 
-		if( (p.x < 0 ||
+		if ((p.x < 0 ||
 				p.y < 0 ||
 				p.x > screen.width ||
 				p.y > screen.height) &&
-			WindowManager::getWorkspacePosition(
-				display,
-				vx,
-				vy ) )
-		{
-			if( p.x < 0 &&
-				!vx )
+				WindowManager::getWorkspacePosition(
+					display,
+					vx,
+					vy)) {
+			if (p.x < 0 && !vx) {
 				p.x += total.width;
-			else
+			} else {
 				p.x += vx;
+			}
 
-			if( p.y < 0 &&
-				!vy )
+			if (p.y < 0 && !vy) {
 				p.y += total.height;
-			else
+			} else {
 				p.y += vy;
+			}
 
 			return true;
 		}
-	}
-	else
-	{
-		p.number = WindowManager::getWorkspace( display, w );
+	} else {
+		p.number = WindowManager::getWorkspace(display, w);
 
-		if( p.number != WindowManager::getCurrentWorkspace( display ) )
-		{
-			switch( preferredLayout )
-			{
-				case Horizontal:
-					p.x += p.number*screen.width;
-					break;
-				case Vertical:
-					p.y += p.number*screen.height;
-					break;
-				default:
-				case Square:
-					p.x += p.number%columns*screen.width;
-					p.y += p.number/columns*screen.height;
-					break;
+		if (p.number != WindowManager::getCurrentWorkspace(display)) {
+			switch (preferredLayout) {
+			case Horizontal:
+				p.x += p.number*screen.width;
+				break;
+			case Vertical:
+				p.y += p.number*screen.height;
+				break;
+			default:
+			case Square:
+				p.x += p.number%columns*screen.width;
+				p.y += p.number/columns*screen.height;
+				break;
 			}
 
 			return true;
@@ -147,12 +127,11 @@ bool WorkspaceLayout::isOnAnotherWorkspace(
  * @param l - preferred layout of workspaces
  */
 WorkspaceLayout::WorkspaceLayout(
-	Display *d,
-	PreferredVirtualLayout l ) :
-	display( d ),
-	preferredLayout( l )
-{
-	Window root = DefaultRootWindow( d );
+		Display *d,
+		PreferredVirtualLayout l) :
+	display(d),
+	preferredLayout(l) {
+	Window root = DefaultRootWindow(d);
 
 	// get desktop geometry, can't use _NET_WORKAREA here because
 	// it returns the geometry minus dock windows; nor does
@@ -161,8 +140,9 @@ WorkspaceLayout::WorkspaceLayout(
 	{
 		XWindowAttributes xwa;
 
-		if( !XGetWindowAttributes( d, root, &xwa ) )
-			throw std::runtime_error( "cannot get attributes of root window" );
+		if (!XGetWindowAttributes(d, root, &xwa)) {
+			throw std::runtime_error("cannot get attributes of root window");
+		}
 
 		screen.width = xwa.width;
 		screen.height = xwa.height;
@@ -172,35 +152,30 @@ WorkspaceLayout::WorkspaceLayout(
 	{
 		unsigned long n;
 
-		if( (n = WindowManager::getNumberOfWorkspaces( d )) > 1 )
-		{
-			switch( l )
-			{
-				case Horizontal:
-					total.width = n*screen.width;
-					total.height = screen.height;
-					break;
-				case Vertical:
-					total.width = screen.width;
-					total.height = n*screen.height;
-					break;
-				default:
-				case Square:
-					int s = static_cast<int>( ceil( sqrt( n ) ) );
-					total.width = s*screen.width;
-					total.height = s*screen.height;
-					break;
+		if ((n = WindowManager::getNumberOfWorkspaces(d)) > 1) {
+			switch (l) {
+			case Horizontal:
+				total.width = n * screen.width;
+				total.height = screen.height;
+				break;
+			case Vertical:
+				total.width = screen.width;
+				total.height = n * screen.height;
+				break;
+			default:
+			case Square:
+				int s = static_cast<int>(ceil(sqrt(n)));
+				total.width = s * screen.width;
+				total.height = s * screen.height;
+				break;
 			}
 
 			virtualDesktop = false;
-		}
-		else
-		{
-			if( !WindowManager::getDesktopGeometry(
-				d,
-				total.width,
-				total.height ) )
-			{
+		} else {
+			if (!WindowManager::getDesktopGeometry(
+					d,
+					total.width,
+					total.height)) {
 				total.width = screen.width;
 				total.height = screen.height;
 			}
@@ -209,6 +184,6 @@ WorkspaceLayout::WorkspaceLayout(
 		}
 	}
 
-	columns = total.width/screen.width;
-	rows = total.height/screen.height;
+	columns = total.width / screen.width;
+	rows = total.height / screen.height;
 }

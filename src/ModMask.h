@@ -9,40 +9,31 @@
 
 #include <X11/Xlib.h>
 
-namespace PieDock
-{
-	/**
-	 * Mod mask
-	 *
-	 * @author Tatiana Azundris <hacks@azundris.com>
-	 */
-	class ModMask
-	{
-		public:
-			ModMask( Display * );
-			virtual ~ModMask();
-			unsigned int getModMaskFor( const char * );
+namespace PieDock {
+class ModMask {
+public:
+	ModMask(Display *);
+	virtual ~ModMask();
+	unsigned int getModMaskFor(const char *);
 
-		private:
-			struct XlatEntry
-			{
-				const char *name;
-				int index;
-				int mask;
-			};
-
-			struct ModKeyEntry
-			{
-				KeyCode code;
-				const char *name;
-				const XlatEntry *xlat;
-				char *type;
-			};
-
-			Display *display;
-			int modKeyCount;
-			ModKeyEntry *modKey;
+private:
+	struct XlatEntry {
+		const char *name;
+		int index;
+		int mask;
 	};
+
+	struct ModKeyEntry {
+		KeyCode code;
+		const char *name;
+		const XlatEntry *xlat;
+		char *type;
+	};
+
+	Display *display;
+	int modKeyCount;
+	ModKeyEntry *modKey;
+};
 }
 
 #endif
