@@ -1,110 +1,110 @@
 1.6.7
-	fixed showing ignored windows in open windows menu
+* fixed showing ignored windows in open windows menu
 
 1.6.6
-	fixed 16bit image blending
+* fixed 16bit image blending
 
 1.6.5
-	initialize GTK/Qt after forking
+* initialize GTK/Qt after forking
 
 1.6.4
-	fixed missing memcpy/memset includes in Png.cpp and IconMap.cpp
+* fixed missing memcpy/memset includes in Png.cpp and IconMap.cpp
 
 1.6.3
-	use a blind XErrorHandler to avoid crashes because of invalid windows
+* use a blind XErrorHandler to avoid crashes because of invalid windows
 
 1.6.2
-	explicitly include string.h for libpng16
+* explicitly include string.h for libpng16
 
 1.6.1
-	improved detection of compositing in setup.sh
-	fixed compilation with GCC 4 (thanks to jonas.gehring@boolsoft.org)
+* improved detection of compositing in setup.sh
+* fixed compilation with GCC 4 (thanks to jonas.gehring@boolsoft.org)
 
 1.6.0
-	option to ask KDE for icons (--enable-kde)
-	throw std::exception's only
+* option to ask KDE for icons (--enable-kde)
+* throw std::exception's only
 
 1.5.0
-	show windows on workspaces for one-icon-per-window icons
-	new action (ShowWindows) that shows a menu of windows for the selected icon
-	binaries are now all lower case to comply with Debian packaging rules
-	option to ask Gtk for icons (--enable-gtk)
-	icons gathered from windows are now saved by default
-	use Fitts' Law by default
-	default size is now 320px
-	default Xft font size in titles is now 9.0
-	socket file doesn't include DISPLAY anymore
+* show windows on workspaces for one-icon-per-window icons
+* new action (ShowWindows) that shows a menu of windows for the selected icon
+* binaries are now all lower case to comply with Debian packaging rules
+* option to ask Gtk for icons (--enable-gtk)
+* icons gathered from windows are now saved by default
+* use Fitts' Law by default
+* default size is now 320px
+* default Xft font size in titles is now 9.0
+* socket file doesn't include DISPLAY anymore
 
 1.4.3
-	fixed assignment of icons from window manager for menu items with aliases
+* fixed assignment of icons from window manager for menu items with aliases
 
 1.4.2
-	fixed sticky menu items not using the icon from the window manager
+* fixed sticky menu items not using the icon from the window manager
 
 1.4.1
-	fixed tokenization of settings statements (by jonas.gehring@boolsoft.org)
-	fixed some post-increments to (better performing) pre-increments
+* fixed tokenization of settings statements (by jonas.gehring@boolsoft.org)
+* fixed some post-increments to (better performing) pre-increments
 
 1.4.0
-	custom button actions for menus and icons (by jonas.gehring@boolsoft.org)
+* custom button actions for menus and icons (by jonas.gehring@boolsoft.org)
 
 1.3.3
-	fixed crash when trying to determine a client window from a invalid window
-	stock icons for window controlling actions added
+* fixed crash when trying to determine a client window from a invalid window
+* stock icons for window controlling actions added
 
 1.3.2
-	fixed replacement for XmuClientWindow
+* fixed replacement for XmuClientWindow
 
 1.3.1
-	fixed memory leak by freeing XClassHint members
-	improved sending client messages to WM
-	translate decor/frame windows when replacing the window ID in commands
-	minor configure.ac fixes
+* fixed memory leak by freeing XClassHint members
+* improved sending client messages to WM
+* translate decor/frame windows when replacing the window ID in commands
+* minor configure.ac fixes
 
 1.3.0
-	switch workspaces on large desktops (Compiz) when activating a window
-	support for _NET_WM_ICON to get icons from windows
+* switch workspaces on large desktops (Compiz) when activating a window
+* support for _NET_WM_ICON to get icons from windows
 
 1.2.2
-	improved gathering of window titles
+* improved gathering of window titles
 
 1.2.1
-	improved icon determination in one-icon-per-window menus
+* improved icon determination in one-icon-per-window menus
 
 1.2.0
-	switch through windows of active application only
-	fixed loading of PNG files with a bit depth of 16
-	removed optional support for gtk_icon_theme_* and KGlocal::iconLoader()
+* switch through windows of active application only
+* fixed loading of PNG files with a bit depth of 16
+* removed optional support for gtk_icon_theme_* and KGlocal::iconLoader()
 
 1.1.0
-	windows on the same workspace get raised now too
-	option to have an icon for each window
-	menu now responds to key releases too (key-up directive)
-	ask gtk libs for icons when configured with --with-gnome
+* windows on the same workspace get raised now too
+* option to have an icon for each window
+* menu now responds to key releases too (key-up directive)
+* ask gtk libs for icons when configured with --with-gnome
 
 1.0.0
-	use of a compositing manager for real transparency
-	ships now with Autotools
-	Xft is now optional
-	cascading menus
-	minimum number of menu items
-	specify a filler icon for filling up
-	the missing icon (question mark) is now configurable
-	_NET_WM_WINDOW_TYPE is used to automatically ignore toolbar windows
-	specify multiple icon paths
-	give name of menu for wake-up through socket on the command line
+* use of a compositing manager for real transparency
+* ships now with Autotools
+* Xft is now optional
+* cascading menus
+* minimum number of menu items
+* specify a filler icon for filling up
+* the missing icon (question mark) is now configurable
+* _NET_WM_WINDOW_TYPE is used to automatically ignore toolbar windows
+* specify multiple icon paths
+* give name of menu for wake-up through socket on the command line
 
 0.2.3
-	mask for key masks to ignore (Num_Lock)
-	ignore certain windows explicitly
-	choose if trigger button reacts on press or release
+* mask for key masks to ignore (Num_Lock)
+* ignore certain windows explicitly
+* choose if trigger button reacts on press or release
 
 0.2.2
-	show a label in the middle of the pie
-	pie-slices extend now to the edge of the screen to observe Fitts' Law
-	have launcher, window list or mixed menus
-	improved handling of mod masks
-	improved keyboard control when the menu is open
+* show a label in the middle of the pie
+* pie-slices extend now to the edge of the screen to observe Fitts' Law
+* have launcher, window list or mixed menus
+* improved handling of mod masks
+* improved keyboard control when the menu is open
 
 0.1.7
-	first useable release
+* first useable release

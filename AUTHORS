@@ -9,3 +9,6 @@ Tatiana Azundris <hacks@azundris.com>
 
 Jonas Gehring <jonas.gehring@boolsoft.org>
 * Custom button actions for menus and icons
+
+Pavel Sanda <sanda@lyx.org>
+* Patch for iterating through icons from WMs
