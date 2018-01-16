@@ -36,43 +36,28 @@ public:
 
 protected:
 	/**
-	 * Return the difference of two angles in radians; implemented
+	 * Return the smallest difference of two angles in radians; implemented
 	 * here to ensure the method will be compiled inline
 	 *
 	 * @param a - angle in radians
 	 * @param b - angle in radians
 	 */
 	inline virtual double getAngleDifference(double a, double b) {
-		double c = a - b;
-		double d;
-
-		if (a > b) {
-			d = a - (b + tau);
-		} else {
-			d = a - (b - tau);
+		double d = fmod(((a - b) + tau), tau);
+		if (d > M_PI) {
+			d -= tau;
 		}
-
-		if (fabs(c) < fabs(d)) {
-			return c;
-		}
-
 		return d;
 	}
 
 	/**
-	 * Recalculate angle to be within a valid range; implemented
-	 * here to ensure the method will be compiled inline
+	 * Make sure angle is between 0 and TAU; implemented here to ensure
+	 * the method will be compiled inline
 	 *
 	 * @param a - angle in radians
 	 */
 	inline virtual double getValidAngle(double a) {
-		if (a < -M_PI) {
-			a += tau;
-		} else if (a > M_PI) {
-			a -= tau;
-		}
-
-		return a;
+		return fmod(a + tau, tau);
 	}
 
 private:
