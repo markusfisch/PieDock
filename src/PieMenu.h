@@ -43,7 +43,7 @@ protected:
 	 * @param b - angle in radians
 	 */
 	inline virtual double getAngleDifference(double a, double b) {
-		double d = fmod(((a - b) + tau), tau);
+		double d = fmod((a - b) + tau, tau);
 		if (d > M_PI) {
 			d -= tau;
 		}
