@@ -12,6 +12,7 @@ AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
+PKG_PROG_PKG_CONFIG
 
 # Checks for mandatory libraries
 AC_CHECK_LIB([X11], [XOpenDisplay], , AC_MSG_ERROR([libX11 not found]))
@@ -47,15 +48,9 @@ AC_ARG_ENABLE(
 
 # Checks for Freetype
 if test "x$XFT" = "xtrue"; then
-	AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
-
-	if test x$FREETYPE_CONFIG = xno; then
-		AC_MSG_ERROR([*** freetype-config not found])
-	fi
-
-	FREETYPE_CFLAGS="`$FREETYPE_CONFIG --cflags`"
-	FREETYPE_LIBS="`$FREETYPE_CONFIG --libs`"
-	CXXFLAGS="$CXXFLAGS $FREETYPE_CFLAGS"
+	PKG_CHECK_MODULES(FREETYPE, freetype2, [
+		CXXFLAGS="$CXXFLAGS $FREETYPE_CFLAGS"
+	], AC_MSG_ERROR([Cannot find freetype]))
 fi
 
 # Checks for Xrender
